@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>10X Club KARE Student Chapter</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+    :root {
+      --primary-blue: #1657FF;
+      --primary-orange: #F2551D;
+      --text-light: #FFFFFF;
+      --text-dark: #22252B;
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: #000;
+      color: var(--text-light);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 15px;
+      border: 1px solid var(--glass-border);
+    }
+
+    /* ===== Animations ===== */
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(50px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .navbar, .main-banner, .vision-section, .events-section, .team-section,
+    .contact-section, footer {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+
+    body.loaded .navbar,
+    body.loaded .main-banner,
+    body.loaded .vision-section,
+    body.loaded .events-section,
+    body.loaded .team-section,
+    body.loaded .contact-section,
+    body.loaded footer {
+      animation: slideUp 0.9s ease forwards;
+    }
+
+    body.loaded .main-banner      { animation-delay: 0.15s; }
+    body.loaded .vision-section   { animation-delay: 0.3s; }
+    body.loaded .events-section   { animation-delay: 0.45s; }
+    body.loaded .team-section     { animation-delay: 0.6s; }
+    body.loaded .contact-section  { animation-delay: 0.75s; }
+    body.loaded footer            { animation-delay: 0.9s; }
+
+    /* Scroll reveal for cards */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    .reveal.in-view {
+      animation: slideUp 0.8s ease forwards;
+    }
+
+    /* ===== Navbar ===== */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      margin-top: 1.5rem;
+    }
+
+    .logo { height: 40px; }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      margin: 0;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+
+    .navbar a:hover { color: var(--primary-orange); }
+
+    .glass-btn {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      border-radius: 30px;
+      padding: 10px 30px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .glass-btn:hover {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    /* ===== Main Banner ===== */
+    .main-banner { margin-top: 1.5rem; padding: 2.5rem 3rem; }
+    .banner-content { display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
+    .banner-text h1 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin: 0 0 1rem 0; }
+
+    /* ===== Vision ===== */
+    .vision-section { text-align: center; padding: 4rem 20px; }
+    .vision-text {
+      max-width: 800px;
+      margin: 0 auto 1rem auto;
+      line-height: 1.7;
+      font-size: 1rem;
+      color: #E0E0E0;
+    }
+
+    /* ===== Events ===== */
+    .events-section { padding: 2.5rem; margin-bottom: 4rem; }
+    .events-section h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; }
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+    .event-card { padding: 1.2rem; }
+    .event-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .event-buttons { display: flex; justify-content: center; gap: 1rem; }
+    .not-open-btn { opacity: 0.5; pointer-events: none; }
+
+    /* ===== Team Sections ===== */
+    .team-section { padding: 0 20px 4rem 20px; text-align: center; }
+    .team-section h2 {
+      color: var(--primary-blue);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: 1px;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .profile-card {
+      padding: 1.5rem 1rem;
+    }
+    .profile-card img {
+      width: 100px;
+      height: max-content;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+    }
+    .profile-card span {
+      display: block;
+      font-size: 0.85rem;
+      color: #bbb;
+      margin-top: 4px;
+    }
+
+    /* ===== Contact ===== */
+    .contact-section { padding: 4rem 20px 2rem; text-align: center; }
+    .contact-section h2 {
+      color: var(--primary-blue);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .contact-form textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      background: rgba(255,255,255,0.05);
+      margin-top: 2rem;
+      color: #ccc;
+    }
+
+    /* ===== Popup ===== */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .popup {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      padding: 2rem 2.5rem;
+      text-align: center;
+      animation: slideUp 0.5s ease forwards;
+    }
+    .popup h3 { margin-bottom: 1.2rem; }
+    .popup-icons {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .popup-icons a img {
+      width: 40px;
+      height: 40px;
+      transition: transform 0.3s;
+    }
+    .popup-icons a img:hover { transform: scale(1.15); }
+    .close-btn {
+      margin-top: 1rem;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 20px;
+      background: var(--primary-orange);
+      color: white;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .navbar { flex-direction: column; gap: 1rem; }
+      .navbar ul { flex-direction: column; gap: 1rem; }
+      .events-grid { grid-template-columns: 1fr; }
+      .profile-grid { grid-template-columns: 1fr; }
+      .banner-text h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Navigation Bar -->
+    <nav class="navbar glass">
+      <img src="img/image 26.png" alt="10X Club Logo" class="logo">
+      <ul>
+        <li><a href="#home">HOME</a></li>
+        <li><a href="#events">EVENTS</a></li>
+        
+        <li><a href="#team">OUR TEAM</a></li>
+        <li><a href="#contact" class="glass-btn">CONTACT US</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Banner -->
+    <header class="main-banner glass" id="home">
+      <div class="banner-content">
+        <img src="img/image 27.png" alt="Coding Ninjas Logo">
+        <div class="banner-text">
+          <h1>10X CLUB KARE<br>STUDENT CHAPTER</h1>
+          <button class="glass-btn" id="connectBtn">Connect</button>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <!-- Vision Section -->
+  <section class="vision-section" id="vision">
+    <button class="glass-btn">OUR VISION</button>
+    <p class="vision-text">At 10X Club – KARE Chapter, our vision is to ignite a culture of exponential learning, innovation, and technical excellence among students...</p>
+    <p class="vision-text">We envision a campus where every aspiring coder, designer, and engineer feels empowered to dream bigger, build faster, and grow smarter — ten times over.</p>
+  </section>
+
+  <!-- Events Section -->
+  <div class="container">
+    <section class="events-section glass" id="events">
+      <h2>UPCOMING EVENTS</h2>
+      <div class="events-grid">
+        <div class="event-card glass reveal">
+          <img src="img/image 40.png" alt="API Maze Event">
+          <h3>API MAZE</h3>
+          <div class="event-buttons">
+            <a href="img/API MAZE.pdf"><button class="glass-btn">Learn More</button></a>
+            <a href="test2.html"><button class="glass-btn">Register</button></a>
+          </div>
+        </div>
+        <div class="event-card glass reveal">
+          <img src="img/image 41.png" alt="Gen AI Hackathon">
+          <h3>GEN AI HACKATHON</h3>
+          <div class="event-buttons">
+            <button class="glass-btn">Learn More</button>
+            <button class="glass-btn not-open-btn" disabled>Not open</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Faculty Coordinators Section -->
+  <section class="team-section" id="faculty">
+    <h2>FACULTY COORDINATORS</h2>
+    <div class="profile-grid">
+      <div class="profile-card glass reveal">
+        <img src="img/image 31.png" alt="Faculty Coordinator 1">
+        <p>Dr. R. SUNDARRAJAN</p>
+      </div>
+      <div class="profile-card glass reveal">
+        <img src="img/image 31.png" alt="Faculty Coordinator 2">
+        <p>Dr. V. SIVAKUMAR</p>
+      </div>
+      <div class="profile-card glass reveal">
+        <img src="img/image 31.png" alt="Faculty Coordinator 3">
+        <p>MR. BARANIDHARAN</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Team Section -->
+  <section class="team-section" id="team">
+    <h2>CORE TEAM</h2>
+    <div class="profile-grid">
+      <div class="profile-card glass reveal"><img src="img/image 31.png" alt=""><p>JEFRIN<span>CEO</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/image 32.png" alt=""><p>SHANMUGESHWAR<span>CEO</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/am.png" alt=""><p>AMBARREESH<span>CTO</span></p></div>
+
+      <div class="profile-card glass reveal"><img src="img/sr.png" alt=""><p>SREE<span>CMO</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/ar.png" alt=""><p>ARCHANA<span>COO</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/vi.png" alt=""><p>VIKAS<span>CCO</span></p></div>
+
+      <div class="profile-card glass reveal"><img src="img/ra.png" alt=""><p>RAGAVI<span>CAO</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/chi.png" alt=""><p>CHITAMBRESH<span>CONTENT CREATION TEAM LEAD</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/chi.png" alt=""><p>VAMSI<span>CONTENT CREATION TEAM</span></p></div>
+
+      <div class="profile-card glass reveal"><img src="img/aja.png" alt=""><p>AJAY VAIRAM<span>FULL STACK TEAM LEAD</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/jef.png" alt=""><p>JEGATHEESAN<span>FULL STACK TEAM</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/fed.png" alt=""><p>FREDRICK<span>FULL STACK TEAM</span></p></div>
+
+      <div class="profile-card glass reveal"><img src="img/go.png" alt=""><p>GOPI<span>EVENT MANAGEMENT TEAM LEAD</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/praa.png" alt=""><p>PRASSANA RAJ<span>EVENT MANAGEMENT TEAM</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/go.png" alt=""><p>ALDO JEFRIN<span>EVENT MANAGEMENT TEAM</span></p></div>
+
+      <div class="profile-card glass reveal"><img src="img/dhiya.png" alt=""><p>DHIYANESHWAR<span>EVENT MANAGEMENT TEAM</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/ud.png" alt=""><p>UDHAYA RAAJ<span>MEDIA TEAM LEAD</span></p></div>
+      <div class="profile-card glass reveal"><img src="img/gau.png" alt=""><p>GAUSHIK<span>MEDIA TEAM</span></p></div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section glass" id="contact">
+    <h2>CONTACT US</h2>
+    <form class="contact-form" onsubmit="event.preventDefault(); alert('Thanks! We will get back to you.');">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <input type="text" placeholder="Subject" required>
+      <textarea placeholder="Message..." required></textarea>
+      <button type="submit" class="glass-btn">Send</button>
+    </form>
+  </section>
+
+  <!-- Popup -->
+  <!-- Add this to your <head> section if not already present -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<!-- Popup -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup glass">
+    <h3>Connect With Us</h3>
+    <div class="popup-icons">
+      <a href="https://wa.me/your_whatsapp" target="_blank" rel="noopener" title="WhatsApp">
+        <i class="fab fa-whatsapp fa-2x" style="color: #25D366;"></i>
+      </a>
+      <a href="https://instagram.com/your_instagram" target="_blank" rel="noopener" title="Instagram">
+        <i class="fab fa-instagram fa-2x" style="color: #E1306C;"></i>
+      </a>
+      <a href="https://linkedin.com/in/your_linkedin" target="_blank" rel="noopener" title="LinkedIn">
+        <i class="fab fa-linkedin fa-2x" style="color: #0A66C2;"></i>
+      </a>
+    </div>
+    <button class="close-btn" id="closePopup">Close</button>
+  </div>
+</div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 10X Club KARE Student Chapter. All Rights Reserved.
+  </footer>
+
+  <script>
+    // Load animation trigger
+    window.onload = () => document.body.classList.add('loaded');
+
+    // Popup logic
+    const connectBtn   = document.getElementById('connectBtn');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const closePopup   = document.getElementById('closePopup');
+
+    connectBtn.addEventListener('click', () => {
+      popupOverlay.style.display = 'flex';
+    });
+    closePopup.addEventListener('click', () => {
+      popupOverlay.style.display = 'none';
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target === popupOverlay) popupOverlay.style.display = 'none';
+    });
+
+    // Scroll reveal logic (for .reveal elements)
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    revealEls.forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
