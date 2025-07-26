@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- jsPDF & QRCode (for building the Event Pass PDF) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>10X Club KARE Student Chapter</title>
@@ -291,7 +294,6 @@
     &copy; 2025 10X Club KARE Student Chapter. All Rights Reserved.
   </footer>
 
-  <!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <!-- Firebase -->
@@ -303,7 +305,9 @@
     GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
     signOut, createUserWithEmailAndPassword, updateProfile
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import {
+    getFirestore, collection, query, where, getDocs
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // ---------- CONFIG ----------
   const firebaseConfig = {
@@ -447,10 +451,8 @@
   function gateRegisterButtons() {
     const btns = document.querySelectorAll(REGISTER_SELECTOR);
     btns.forEach(btn => {
-      // Avoid double binding
       if (btn.dataset.authBound === '1') return;
       btn.dataset.authBound = '1';
-
       btn.addEventListener('click', (e) => {
         if (!auth.currentUser) {
           e.preventDefault();
@@ -475,7 +477,7 @@
         btn.title = "";
       } else {
         btn.style.opacity = "0.6";
-        btn.style.pointerEvents = "auto"; // we keep it clickable to show the modal
+        btn.style.pointerEvents = "auto";
         btn.title = "Sign in with your @klu.ac.in email to register";
       }
     });
@@ -626,7 +628,6 @@
     if(profileMenu) profileMenu.style.display = 'none';
     const user = auth.currentUser;
     if(!user) return;
-
     if (profileInfo) {
       profileInfo.innerHTML = `
         <div><b>Name</b>: ${user.displayName || '(not set)'}</div>
@@ -640,11 +641,128 @@
   profileCloseBtn?.addEventListener('click', ()=> profileOverlay?.classList.remove('active'));
   profileOverlay?.addEventListener('click', (e)=> { if(e.target === profileOverlay) profileOverlay.classList.remove('active') });
 
-  // Event pass (placeholder)
-  downloadPassBtn?.addEventListener('click', ()=>{
+  /* -----------------------
+     EVENT PASS FEATURE
+  ----------------------- */
+  const EVENT_ID   = "api-maze-2025";
+  const EVENT_NAME = "API MAZE";
+  const EVENT_DATE = "2025-08-02";
+  const ORG_NAME   = "10X Club – KARE Student Chapter";
+  const LOGO_KARE  = "img/klu.png";
+  const LOGO_CLUB  = "img/image 26.png";
+
+  downloadPassBtn?.addEventListener('click', async ()=>{
     if(profileMenu) profileMenu.style.display = 'none';
-    alert("Coming soon: This will let you download your verified event pass.");
+    const user = auth.currentUser;
+    if (!user) return alert("Sign in first.");
+    try {
+      const reg = await findLatestVerifiedRegistration(user.email);
+      if (!reg) return alert("Your event registration is not verified yet.");
+      const base64 = await generateEntryPassPDF(reg);
+      downloadBase64Pdf(base64, `${EVENT_NAME}_Pass_${reg.token || 'pass'}.pdf`);
+    } catch(err) {
+      console.error(err);
+      alert("Failed to generate pass. Try later.");
+    }
   });
+
+  async function findLatestVerifiedRegistration(email) {
+    const colRef = collection(db, "events", EVENT_ID, "registrations");
+    const q = query(colRef, where("email", "==", email));
+    const snap = await getDocs(q);
+    const all = [];
+    snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+    const verified = all.filter(r => r.verified === true);
+    if (!verified.length) return null;
+    verified.sort((a,b)=> (b.verifiedAt?.seconds||0)-(a.verifiedAt?.seconds||0));
+    return verified[0];
+  }
+
+  async function generateEntryPassPDF(r) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    const pageWidth  = doc.internal.pageSize.getWidth();
+    const marginX    = 50;
+    let y = 60;
+    const row=(label,value)=>{
+      doc.setFont('helvetica','bold'); doc.text(label, marginX, y);
+      doc.setFont('helvetica','normal'); doc.text(value||'-', pageWidth-marginX, y, {align:'right'});
+      y+=22;
+    };
+    const kareLogo = await toDataURL(LOGO_KARE);
+    const clubLogo = await toDataURL(LOGO_CLUB);
+    const qrPayload = JSON.stringify({
+      participant_no:r.participant_no, token:r.token, name:r.name,
+      regno:r.regno, event:EVENT_NAME, date:EVENT_DATE
+    });
+    doc.addImage(kareLogo,'PNG', marginX, 30, 70,70);
+    doc.addImage(clubLogo,'PNG', pageWidth-marginX-70, 30, 70,70);
+    doc.setFont('helvetica','bold'); doc.setFontSize(20);
+    doc.text(`${EVENT_NAME} – ENTRY PASS`, pageWidth/2,55,{align:'center'});
+    doc.setFontSize(12); doc.setTextColor(120);
+    doc.text(ORG_NAME, pageWidth/2,75,{align:'center'}); doc.setTextColor(0);
+    y=130; doc.setDrawColor(220); doc.line(marginX, y, pageWidth-marginX,y); y+=30;
+    row('Participant No.', String(r.participant_no||'-'));
+    row('Name', r.name); row('Reg No.', r.regno);
+    row('Year', r.year); row('Department', r.dept);
+    row('Phone', r.phone); row('Email', r.email);
+    row('Transaction ID', r.transaction_id||'-');
+    row('Amount', `₹${r.amount||100}`);
+    row('Event Date', EVENT_DATE);
+    row('Token', r.token);
+    y+=10; doc.setDrawColor(220); doc.line(marginX,y,pageWidth-marginX,y); y+=20;
+    const qrCanvas = await makeQrCanvas(qrPayload,160);
+    const qrData   = qrCanvas ? qrCanvas.toDataURL('image/png') : null;
+    if (qrData) {
+      const qrSize=150; const qrX=(pageWidth-qrSize)/2;
+      doc.addImage(qrData,'PNG',qrX,y,qrSize,qrSize); y+=qrSize+20;
+    }
+    doc.setFontSize(10); doc.setTextColor(120);
+    doc.text('Please bring this token to event check-in.', pageWidth/2, y,{align:'center'});
+    const arrayBuf=doc.output('arraybuffer');
+    return arrayBufferToBase64(arrayBuf);
+  }
+
+  function downloadBase64Pdf(base64, filename) {
+    const link=document.createElement('a');
+    link.href=`data:application/pdf;base64,${base64}`;
+    link.download=filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async function toDataURL(url) {
+    try{
+      const res=await fetch(url);
+      const blob=await res.blob();
+      return await new Promise((resolve)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    }catch(err){return null;}
+  }
+  function arrayBufferToBase64(buffer) {
+    let binary=''; const bytes=new Uint8Array(buffer);
+    for (let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
+    return window.btoa(binary);
+  }
+  function makeQrCanvas(text,size=128) {
+    return new Promise((resolve)=>{
+      const temp=document.createElement('div');
+      const qr=new QRCode(temp,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});
+      setTimeout(()=>{
+        const img=temp.querySelector('img')||temp.querySelector('canvas');
+        if(img && img.tagName==='IMG'){ const c=document.createElement('canvas');
+          c.width=size; c.height=size; const ctx=c.getContext('2d');
+          const i=new Image(); i.crossOrigin='Anonymous';
+          i.onload=()=>{ctx.drawImage(i,0,0,size,size); resolve(c);};
+          i.src=img.src; } else if(img && img.tagName==='CANVAS') resolve(img);
+        else resolve(null);
+      },300);
+    });
+  }
 
   // Auth state listener
   onAuthStateChanged(auth, async (user)=>{
@@ -652,8 +770,6 @@
       await signOut(auth);
       return;
     }
-
-    // Update UI
     if(user){
       document.getElementById('openSignin')?.style && (document.getElementById('openSignin').style.display = 'none');
       if(profileBox) profileBox.style.display = 'block';
@@ -664,13 +780,10 @@
       document.getElementById('openSignin')?.style && (document.getElementById('openSignin').style.display = 'inline-flex');
       if(profileBox) profileBox.style.display = 'none';
     }
-
-    // Gate register buttons each time auth state changes
     gateRegisterButtons();
     updateRegisterButtons();
   });
 
-  // First attach once DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
     gateRegisterButtons();
     updateRegisterButtons();
