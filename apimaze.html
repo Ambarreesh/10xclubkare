@@ -201,6 +201,17 @@
     form#regForm{ padding:24px 18px; }
     .event-card{ padding:20px 18px; }
   }
+
+  /* Spinner for Complete Payment button */
+  .btn-spinner{
+    display:none;
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .6s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -330,7 +341,10 @@
         <input id="paidAmount" name="paidAmount" type="number" value="100" />
       </div>
 
-      <button type="submit" class="btn btn-primary" id="completePaymentBtn">Complete Payment</button>
+      <button type="submit" class="btn btn-primary" id="completePaymentBtn">
+        <span class="btn-text">Complete Payment</span>
+        <span class="btn-spinner"></span>
+      </button>
     </form>
   </div>
 </div>
@@ -342,7 +356,7 @@
     <h3>Payment Submitted</h3>
     <div class="divider"></div>
     <p style="text-align:center; line-height:1.6;">
-      Thank you! You will get your entry pass through email soon.
+      Thank you! You will get your entry pass in your profile at 10xclubkare.vercel.app.
     </p>
     <div style="display:flex; justify-content:center; margin-top:12px;">
       <button class="btn btn-primary" id="okSuccess">OK</button>
@@ -394,9 +408,25 @@ const closeSuccess     = document.getElementById('closeSuccess');
 const okSuccess        = document.getElementById('okSuccess');
 const payQRContainer   = document.getElementById('payQR');
 const upiTextEl        = document.getElementById('upiText');
+const completePaymentBtn = document.getElementById('completePaymentBtn');
+const completeBtnText    = completePaymentBtn?.querySelector('.btn-text');
+const completeBtnSpin    = completePaymentBtn?.querySelector('.btn-spinner');
 
 let formDataCache = null;
 let submitting = false;
+
+function setCompleteBtnLoading(state){
+  if(!completePaymentBtn) return;
+  if(state){
+    completePaymentBtn.disabled = true;
+    if(completeBtnSpin) completeBtnSpin.style.display = 'inline-block';
+    if(completeBtnText) completeBtnText.textContent = 'Processing...';
+  }else{
+    completePaymentBtn.disabled = false;
+    if(completeBtnSpin) completeBtnSpin.style.display = 'none';
+    if(completeBtnText) completeBtnText.textContent = 'Complete Payment';
+  }
+}
 
 payBtn.addEventListener('click', () => {
   const form = document.getElementById('regForm');
@@ -431,10 +461,32 @@ successOverlay.addEventListener('click', (e)=> {
   if(e.target === successOverlay) successOverlay.style.display = 'none';
 });
 
+/* ---------- Helpers ---------- */
+function collectFormData(){
+  return {
+    name:  document.getElementById('name').value.trim(),
+    regno: document.getElementById('regno').value.trim(),
+    year:  document.getElementById('year').value,
+    dept:  document.getElementById('dept').value,
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    amount: AMOUNT_RUPEES
+  };
+}
+function buildUpiUrl(upiId, name, amount){
+  return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+}
+function generateToken(regno){
+  const suffix = Math.floor(Math.random()*900+100);
+  return `AMZ-${regno}-${suffix}`;
+}
+
+/* Payment Form Submit */
 paymentForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (submitting) return;
   submitting = true;
+  setCompleteBtnLoading(true);
 
   const txnId      = document.getElementById('txnId').value.trim();
   const payerName  = document.getElementById('payerName').value.trim();
@@ -443,6 +495,7 @@ paymentForm.addEventListener('submit', async (e) => {
   if(!txnId){
     alert("Please enter your Transaction / UTR ID.");
     submitting = false;
+    setCompleteBtnLoading(false);
     return;
   }
 
@@ -465,8 +518,6 @@ paymentForm.addEventListener('submit', async (e) => {
 
     paymentOverlay.style.display = 'none';
     successOverlay.style.display = 'flex';
-
-    // reset form to avoid duplicate submissions
     document.getElementById('regForm').reset();
     paymentForm.reset();
   }catch(err){
@@ -474,62 +525,31 @@ paymentForm.addEventListener('submit', async (e) => {
     alert("Something went wrong while saving your payment. Please try again or contact the organizers.");
   }finally{
     submitting = false;
+    setCompleteBtnLoading(false);
   }
 });
 
-function collectFormData(){
-  return {
-    name:  document.getElementById('name').value.trim(),
-    regno: document.getElementById('regno').value.trim(),
-    year:  document.getElementById('year').value,
-    dept:  document.getElementById('dept').value,
-    email: document.getElementById('email').value.trim(),
-    phone: document.getElementById('phone').value.trim(),
-  };
-}
-
-/** Build a UPI deep link string for the QR. */
-function buildUpiUrl(upiId, upiName, amount){
-  const params = new URLSearchParams({
-    pa: upiId,
-    pn: upiName,
-    am: amount.toFixed(2),
-    cu: "INR"
+/* ---------- Firestore ---------- */
+async function savePaymentToFirestore(data){
+  const colRef = collection(db, "event_registrations", EVENT_ID, "payments");
+  const docRef = doc(colRef, data.regno);
+  await setDoc(docRef, {
+    ...data,
+    timestamp: serverTimestamp()
   });
-  return `upi://pay?${params.toString()}`;
 }
-
-/** Atomically increments and returns the next participant number. */
 async function allocateParticipantNumber(){
-  const countersRef = doc(db, "events", EVENT_ID, "meta", "counters");
-  const next = await runTransaction(db, async (tx) => {
-    const snap = await tx.get(countersRef);
-    if (!snap.exists()) {
-      tx.set(countersRef, { lastParticipantNo: 1 });
-      return 1;
-    } else {
-      const current = snap.data().lastParticipantNo || 0;
-      const updated = current + 1;
-      tx.update(countersRef, { lastParticipantNo: updated });
-      return updated;
+  const counterRef = doc(db, "event_registrations", EVENT_ID);
+  return await runTransaction(db, async (transaction)=>{
+    const docSnap = await transaction.get(counterRef);
+    let current = 0;
+    if(docSnap.exists()){
+      current = docSnap.data().counter || 0;
     }
+    const next = current + 1;
+    transaction.set(counterRef, { counter: next }, { merge: true });
+    return next;
   });
-  return next;
-}
-
-/** Save one document per payment. */
-async function savePaymentToFirestore(payload){
-  const ref = doc(collection(db, "events", EVENT_ID, "registrations"));
-  await setDoc(ref, {
-    ...payload,
-    createdAt: serverTimestamp(),
-    id: ref.id
-  }, { merge: true });
-}
-
-function generateToken(regno){
-  const short = regno.replace(/\s+/g,'').slice(-4).toUpperCase();
-  return `API25-${short}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
 }
 </script>
 </body>
