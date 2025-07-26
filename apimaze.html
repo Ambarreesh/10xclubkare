@@ -8,14 +8,8 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
 
-<!-- Razorpay -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <!-- QR Code -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<!-- html2pdf (for downloadable receipt) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
   :root{
@@ -46,8 +40,6 @@
     margin:0 auto;
     padding:24px 16px 120px;
   }
-
-  /* Liquid Glass card */
   .glass{
     background: var(--glass);
     border:1px solid var(--border);
@@ -56,7 +48,6 @@
     border-radius: var(--radius);
     box-shadow: 0 24px 40px rgba(0,0,0,.3);
   }
-
   header.hero{
     display:flex;
     gap:24px;
@@ -65,6 +56,7 @@
     margin:24px 0 40px;
     position:relative;
     overflow:hidden;
+    flex-wrap:wrap;
   }
   header.hero::after{
     content:"";
@@ -97,14 +89,12 @@
     font-size:0.9rem;
     letter-spacing:1px;
   }
-
   .grid{
     display:grid;
     grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
     gap:28px;
     align-items:start;
   }
-
   .event-card{
     padding:24px 22px;
   }
@@ -116,7 +106,6 @@
     color:#ddd;
     margin:4px 0 12px;
   }
-
   form#regForm{
     padding:32px 26px;
     display:flex;
@@ -142,7 +131,6 @@
   input:focus, select:focus, textarea:focus{
     border-color: var(--accent);
   }
-
   .btn{
     appearance:none;
     border:none;
@@ -164,18 +152,13 @@
   .btn-primary:hover{ transform:translateY(-1px) scale(1.01); }
   .btn-ghost{
     background: transparent;
-    border:1px solid rgba(255,255,255,0.12);
-    color:#fff;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
   }
-
   .price{
     font-size:1.5rem;
     font-weight:700;
   }
-
-  .hidden{ display:none !important; }
-
-  /* Receipt modal */
   .modal-overlay{
     position:fixed; inset:0;
     background:rgba(0,0,0,.7);
@@ -184,7 +167,7 @@
     padding:20px;
   }
   .modal{
-    max-width:480px; width:100%;
+    max-width:520px; width:100%;
     padding:24px 22px 28px;
     position:relative;
   }
@@ -192,34 +175,16 @@
     margin:0 0 14px;
     text-align:center;
   }
-  .receipt-header{
-    display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:18px;
-  }
-  .receipt-header img{
-    height:42px; object-fit:contain;
-    background:rgba(255,255,255,0.06); border-radius:8px; padding:6px;
-  }
-  .receipt-row{
-    display:flex; justify-content:space-between; margin-bottom:8px;
-    font-size:.92rem;
-  }
-  .qrbox{
-    display:flex; justify-content:center; margin:18px 0 8px;
-  }
-  .token{
-    text-align:center; font-weight:700; letter-spacing:1px; margin-top:8px;
-  }
-
-  .divider{
-    height:1px; background:rgba(255,255,255,0.07); margin:12px 0 16px;
-  }
-
   .close-x{
     position:absolute; right:14px; top:12px;
     font-size:22px; cursor:pointer; opacity:.7;
   }
-
-  /* subtle float animation for blobs */
+  .divider{
+    height:1px; background:rgba(255,255,255,0.07); margin:12px 0 16px;
+  }
+  .qrpay-box{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; margin:14px 0 18px;
+  }
   .blob{
     position:absolute; border-radius:50%;
     filter: blur(80px); opacity:.06; z-index:-1;
@@ -231,10 +196,10 @@
     50%{ transform:translateY(-20px) translateX(10px) scale(1.05);}
     100%{ transform:translateY(0) translateX(0) scale(1);}
   }
-
-  /* responsive */
   @media(max-width:520px){
     .hero h1{ font-size:1.8rem; }
+    form#regForm{ padding:24px 18px; }
+    .event-card{ padding:20px 18px; }
   }
 </style>
 </head>
@@ -248,7 +213,7 @@
 
     <div class="logos">
       <img src="img/klu.png" alt="KARE">
-      <img src="img/img" alt="10X Club KARE">
+      <img src="img/image 26.png" alt="10X Club KARE">
     </div>
 
     <div>
@@ -270,7 +235,7 @@
       </ul>
 
       <div class="price">₹ 100</div>
-      <small style="opacity:.8;">(includes 1(EE)Credit & certificate)</small>
+      <small style="opacity:.8;">(includes 1 (EE) Credit & certificate)</small>
     </section>
 
     <!-- Registration Form -->
@@ -288,8 +253,8 @@
           <input id="regno" name="regno" required />
         </div>
 
-        <div style="display:flex; gap:12px;">
-          <div style="flex:1;">
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1 1 140px;">
             <label for="year">Year</label>
             <select id="year" name="year" required>
               <option value="">Select</option>
@@ -299,20 +264,20 @@
               <option>4th Year</option>
             </select>
           </div>
-          <div style="flex:1;">
+          <div style="flex:1 1 140px;">
           <label for="dept">Department</label>
-          <select id="dept" name="dept" required>
-            <option value="">Select</option>
-            <option>IT</option>
-            <option>CSE</option>
-            <option>ECE</option>
-            <option>EEE</option>
-            <option>MECH</option>
-            <option>CIVIL</option>
-            <option>AIDS</option>
-            <option>AIML</option>
-            <option>Other</option>
-          </select>
+            <select id="dept" name="dept" required>
+              <option value="">Select</option>
+              <option>IT</option>
+              <option>CSE</option>
+              <option>ECE</option>
+              <option>EEE</option>
+              <option>MECH</option>
+              <option>CIVIL</option>
+              <option>AIDS</option>
+              <option>AIML</option>
+              <option>Other</option>
+            </select>
           </div>
         </div>
 
@@ -328,197 +293,244 @@
 
         <div>
           <label>Amount</label>
-          <input value="₹ 100" disabled />
+          <input value="₹ 100.00" disabled />
         </div>
 
-        <button type="button" class="btn btn-primary" id="payBtn">Pay Now</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" id="payBtn">Pay Now</button>
+        </div>
       </form>
     </section>
   </div>
 </div>
 
-<!-- Receipt Modal -->
-<div class="modal-overlay" id="receiptOverlay">
-  <div class="modal glass" id="receiptCard">
-    <span class="close-x" id="closeReceipt">&times;</span>
-
-    <div class="receipt-header">
-      <img src="img/klu.png" alt="KARE">
-      <img src="img/image 26.png" alt="10X Club">
-    </div>
-
-    <h3>API MAZE • Entry Token</h3>
-
+<!-- PAYMENT MODAL (QR + Txn ID entry) -->
+<div class="modal-overlay" id="paymentOverlay">
+  <div class="modal glass" id="paymentCard">
+    <span class="close-x" id="closePayment">&times;</span>
+    <h3>Pay ₹100 via UPI</h3>
     <div class="divider"></div>
 
-    <div class="receipt-row"><span>Name</span><span id="r_name"></span></div>
-    <div class="receipt-row"><span>Reg No.</span><span id="r_regno"></span></div>
-    <div class="receipt-row"><span>Year</span><span id="r_year"></span></div>
-    <div class="receipt-row"><span>Department</span><span id="r_dept"></span></div>
-    <div class="receipt-row"><span>Phone</span><span id="r_phone"></span></div>
-    <div class="receipt-row"><span>Email</span><span id="r_email"></span></div>
-    <div class="receipt-row"><span>Amount</span><span>₹ 100</span></div>
-    <div class="receipt-row"><span>Paid On</span><span id="r_time"></span></div>
-    <div class="receipt-row"><span>Payment ID</span><span id="r_payid"></span></div>
-
-    <div class="divider"></div>
-
-    <div class="qrbox">
-      <div id="qr"></div>
+    <div class="qrpay-box">
+      <div id="payQR"></div>
+      <div style="opacity:.8; font-size:.9rem;" id="upiText"></div>
     </div>
-    <div class="token" id="r_token"></div>
 
-    <div style="margin-top:16px; display:flex; gap:10px; justify-content:center;">
-      <button class="btn btn-primary" id="downloadPdf">Download PDF</button>
-      <button class="btn btn-ghost" id="closeReceipt2">Close</button>
+    <form id="paymentForm" style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <label for="txnId">Transaction / UTR ID (required)</label>
+        <input id="txnId" name="txnId" required placeholder="e.g., 3245XXXXXXXX" />
+      </div>
+      <div>
+        <label for="payerName">Payer Name (as shown in app)</label>
+        <input id="payerName" name="payerName" placeholder="Optional" />
+      </div>
+      <div>
+        <label for="paidAmount">Amount Paid</label>
+        <input id="paidAmount" name="paidAmount" type="number" value="100" />
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="completePaymentBtn">Complete Payment</button>
+    </form>
+  </div>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div class="modal-overlay" id="successOverlay">
+  <div class="modal glass">
+    <span class="close-x" id="closeSuccess">&times;</span>
+    <h3>Payment Submitted</h3>
+    <div class="divider"></div>
+    <p style="text-align:center; line-height:1.6;">
+      Thank you! You will get your entry pass through email soon.
+    </p>
+    <div style="display:flex; justify-content:center; margin-top:12px;">
+      <button class="btn btn-primary" id="okSuccess">OK</button>
     </div>
   </div>
 </div>
 
-<script>
-  const AMOUNT_PAISE = 100 * 100; // ₹100 in paise
+<script type="module">
+/* ---------- Firebase ---------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {
+  getFirestore, collection, doc, setDoc, serverTimestamp, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const payBtn = document.getElementById('payBtn');
-  const receiptOverlay = document.getElementById('receiptOverlay');
-  const closeReceipt = document.getElementById('closeReceipt');
-  const closeReceipt2 = document.getElementById('closeReceipt2');
-  const downloadPdf = document.getElementById('downloadPdf');
+/* your config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCzCBr-sZ_XiA1qiHjy2Ks0RDUJqELXjkY",
+  authDomain: "xclub-ac88a.firebaseapp.com",
+  projectId: "xclub-ac88a",
+  storageBucket: "xclub-ac88a.firebasestorage.app",
+  messagingSenderId: "929300450378",
+  appId: "1:929300450378:web:7d3ed01c4f270c3a136ab3",
+  measurementId: "G-66T0PCEXT0"
+};
 
-  // placeholders for receipt fields
-  const rFields = {
-    name: document.getElementById('r_name'),
-    regno: document.getElementById('r_regno'),
-    year: document.getElementById('r_year'),
-    dept: document.getElementById('r_dept'),
-    phone: document.getElementById('r_phone'),
-    email: document.getElementById('r_email'),
-    time: document.getElementById('r_time'),
-    payid: document.getElementById('r_payid'),
-    token: document.getElementById('r_token')
-  };
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getFirestore(app);
 
-  let formDataCache = null;
+/* ---------- Constants ---------- */
+const EVENT_ID = "api-maze-2025";
+const AMOUNT_RUPEES = 100;
 
-  payBtn.addEventListener('click', async () => {
-    const form = document.getElementById('regForm');
-    if (!form.reportValidity()) return;
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+   >>>  REPLACE WITH YOUR DETAILS  <<<
+   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+*/
+const UPI_ID   = "your-upi-id@bank";     // <<-- CHANGE THIS
+const UPI_NAME = "10X Club - KARE";      // <<-- CHANGE THIS
 
-    // gather form data
-    const data = {
-      name:  document.getElementById('name').value.trim(),
-      regno: document.getElementById('regno').value.trim(),
-      year:  document.getElementById('year').value,
-      dept:  document.getElementById('dept').value,
-      email: document.getElementById('email').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-    };
-    formDataCache = data;
+/* ---------- Elements ---------- */
+const payBtn           = document.getElementById('payBtn');
+const paymentOverlay   = document.getElementById('paymentOverlay');
+const closePayment     = document.getElementById('closePayment');
+const paymentForm      = document.getElementById('paymentForm');
+const successOverlay   = document.getElementById('successOverlay');
+const closeSuccess     = document.getElementById('closeSuccess');
+const okSuccess        = document.getElementById('okSuccess');
+const payQRContainer   = document.getElementById('payQR');
+const upiTextEl        = document.getElementById('upiText');
 
-    // ---- BACKEND: create an order and get order_id ----
-    // const order = await fetch('/create-order', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: AMOUNT_PAISE, currency: 'INR', receipt: 'rcpt_'+Date.now() }) }).then(r=>r.json());
-    // const { order_id } = order;
+let formDataCache = null;
+let submitting = false;
 
-    // MOCK (remove when backend ready)
-    const order_id = 'order_' + Math.random().toString(36).slice(2);
+payBtn.addEventListener('click', () => {
+  const form = document.getElementById('regForm');
+  if (!form.reportValidity()) return;
 
-    const options = {
-      key: "RAZORPAY_KEY_ID_HERE", // <-- replace with your key_id
-      amount: AMOUNT_PAISE,
-      currency: "INR",
-      name: "10X Club - KARE",
-      description: "API MAZE Registration",
-      image: "img/10x-logo.png",
-      order_id: order_id, // from server
-      prefill: {
-        name: data.name,
-        email: data.email,
-        contact: data.phone
-      },
-      notes: {
-        regno: data.regno,
-        year: data.year,
-        dept: data.dept,
-        event: "API MAZE"
-      },
-      theme: {
-        color: "#1657FF"
-      },
-      handler: async function (response){
-        // response.razorpay_payment_id, order_id, signature
-        // ---- BACKEND: verify signature here ----
-        showReceipt(response.razorpay_payment_id);
-      },
-      modal: {
-        ondismiss: function(){
-          console.log("Payment popup closed");
-        }
-      }
-    };
+  formDataCache = collectFormData();
 
-    const rzp = new Razorpay(options);
-    rzp.open();
+  // build UPI deep link & QR
+  const upiUrl = buildUpiUrl(UPI_ID, UPI_NAME, AMOUNT_RUPEES);
+  upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
+  payQRContainer.innerHTML = "";
+  new QRCode(payQRContainer, {
+    text: upiUrl,
+    width: 200,
+    height: 200,
+    colorDark : "#ffffff",
+    colorLight : "transparent",
+    correctLevel : QRCode.CorrectLevel.H
   });
 
-  function showReceipt(paymentId){
+  paymentOverlay.style.display = 'flex';
+});
+
+closePayment.addEventListener('click', ()=> paymentOverlay.style.display = 'none');
+paymentOverlay.addEventListener('click', (e)=> {
+  if(e.target === paymentOverlay) paymentOverlay.style.display = 'none';
+});
+
+closeSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
+okSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
+successOverlay.addEventListener('click', (e)=> {
+  if(e.target === successOverlay) successOverlay.style.display = 'none';
+});
+
+paymentForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (submitting) return;
+  submitting = true;
+
+  const txnId      = document.getElementById('txnId').value.trim();
+  const payerName  = document.getElementById('payerName').value.trim();
+  const paidAmount = Number(document.getElementById('paidAmount').value || AMOUNT_RUPEES);
+
+  if(!txnId){
+    alert("Please enter your Transaction / UTR ID.");
+    submitting = false;
+    return;
+  }
+
+  try{
     const tokenId = generateToken(formDataCache.regno);
-    const time    = new Date().toLocaleString();
+    const paidAt  = new Date().toISOString();
+    const participantNo = await allocateParticipantNumber();
 
-    // fill receipt
-    rFields.name.textContent  = formDataCache.name;
-    rFields.regno.textContent = formDataCache.regno;
-    rFields.year.textContent  = formDataCache.year;
-    rFields.dept.textContent  = formDataCache.dept;
-    rFields.phone.textContent = formDataCache.phone;
-    rFields.email.textContent = formDataCache.email;
-    rFields.time.textContent  = time;
-    rFields.payid.textContent = paymentId;
-    rFields.token.textContent = tokenId;
-
-    // QR payload (simple)
-    const qrPayload = JSON.stringify({
+    await savePaymentToFirestore({
+      status: "submitted",
+      amount: paidAmount,
+      paid_at: paidAt,
       token: tokenId,
-      name: formDataCache.name,
-      regno: formDataCache.regno,
-      event: "API MAZE",
-      date: "2025-08-02"
+      participant_no: participantNo,
+      transaction_id: txnId,
+      payer_name: payerName || null,
+      upi_id: UPI_ID,
+      ...formDataCache
     });
 
-    // clear old qr
-    document.getElementById('qr').innerHTML = "";
-    new QRCode(document.getElementById("qr"), {
-      text: qrPayload,
-      width: 160,
-      height: 160,
-      colorDark : "#ffffff",
-      colorLight : "transparent",
-      correctLevel : QRCode.CorrectLevel.H
-    });
+    paymentOverlay.style.display = 'none';
+    successOverlay.style.display = 'flex';
 
-    receiptOverlay.style.display = 'flex';
+    // reset form to avoid duplicate submissions
+    document.getElementById('regForm').reset();
+    paymentForm.reset();
+  }catch(err){
+    console.error(err);
+    alert("Something went wrong while saving your payment. Please try again or contact the organizers.");
+  }finally{
+    submitting = false;
   }
+});
 
-  function generateToken(regno){
-    const short = regno.replace(/\s+/g,'').slice(-4).toUpperCase();
-    return `API25-${short}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
-  }
+function collectFormData(){
+  return {
+    name:  document.getElementById('name').value.trim(),
+    regno: document.getElementById('regno').value.trim(),
+    year:  document.getElementById('year').value,
+    dept:  document.getElementById('dept').value,
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+  };
+}
 
-  closeReceipt.addEventListener('click', ()=> receiptOverlay.style.display = 'none');
-  closeReceipt2.addEventListener('click', ()=> receiptOverlay.style.display = 'none');
-  receiptOverlay.addEventListener('click', (e)=> {
-    if(e.target === receiptOverlay) receiptOverlay.style.display = 'none';
+/** Build a UPI deep link string for the QR. */
+function buildUpiUrl(upiId, upiName, amount){
+  const params = new URLSearchParams({
+    pa: upiId,
+    pn: upiName,
+    am: amount.toFixed(2),
+    cu: "INR"
   });
+  return `upi://pay?${params.toString()}`;
+}
 
-  downloadPdf.addEventListener('click', ()=>{
-    const element = document.getElementById('receiptCard');
-    const opt = {
-      margin:       0.4,
-      filename:     'API_MAZE_Token.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, backgroundColor: '#000' },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+/** Atomically increments and returns the next participant number. */
+async function allocateParticipantNumber(){
+  const countersRef = doc(db, "events", EVENT_ID, "meta", "counters");
+  const next = await runTransaction(db, async (tx) => {
+    const snap = await tx.get(countersRef);
+    if (!snap.exists()) {
+      tx.set(countersRef, { lastParticipantNo: 1 });
+      return 1;
+    } else {
+      const current = snap.data().lastParticipantNo || 0;
+      const updated = current + 1;
+      tx.update(countersRef, { lastParticipantNo: updated });
+      return updated;
+    }
   });
+  return next;
+}
+
+/** Save one document per payment. */
+async function savePaymentToFirestore(payload){
+  const ref = doc(collection(db, "events", EVENT_ID, "registrations"));
+  await setDoc(ref, {
+    ...payload,
+    createdAt: serverTimestamp(),
+    id: ref.id
+  }, { merge: true });
+}
+
+function generateToken(regno){
+  const short = regno.replace(/\s+/g,'').slice(-4).toUpperCase();
+  return `API25-${short}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+}
 </script>
 </body>
 </html>
