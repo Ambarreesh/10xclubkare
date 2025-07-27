@@ -185,22 +185,6 @@
   .qrpay-box{
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; margin:14px 0 18px;
   }
-  .blob{
-    position:absolute; border-radius:50%;
-    filter: blur(80px); opacity:.06; z-index:-1;
-  }
-  .blob.b1{ width:380px; height:380px; top:-60px; left:-80px; background:#1657ff; animation:float 12s ease-in-out infinite; }
-  .blob.b2{ width:300px; height:300px; bottom:-40px; right:-80px; background:#F2551D; animation:float 14s ease-in-out infinite reverse; }
-  @keyframes float{
-    0%{ transform:translateY(0) translateX(0) scale(1);}
-    50%{ transform:translateY(-20px) translateX(10px) scale(1.05);}
-    100%{ transform:translateY(0) translateX(0) scale(1);}
-  }
-  @media(max-width:520px){
-    .hero h1{ font-size:1.8rem; }
-    form#regForm{ padding:24px 18px; }
-    .event-card{ padding:20px 18px; }
-  }
 
   /* Spinner for Complete Payment button */
   .btn-spinner{
@@ -219,9 +203,6 @@
 
   <!-- HERO -->
   <header class="hero glass">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-
     <div class="logos">
       <img src="img/klu.png" alt="KARE">
       <img src="img/image 26.png" alt="10X Club KARE">
@@ -392,23 +373,20 @@ const db = getFirestore(app);
 const EVENT_ID = "api-maze-2025";
 const AMOUNT_RUPEES = 100;
 
-/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-   >>>  REPLACE WITH YOUR DETAILS  <<<
-   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-*/
-const UPI_ID   = "your-upi-id@bank";     // <<-- CHANGE THIS
-const UPI_NAME = "10X Club - KARE";      // <<-- CHANGE THIS
+/* >>> CHANGE THESE <<< */
+const UPI_ID   = "your-upi-id@bank";
+const UPI_NAME = "10X Club - KARE";
 
 /* ---------- Elements ---------- */
-const payBtn           = document.getElementById('payBtn');
-const paymentOverlay   = document.getElementById('paymentOverlay');
-const closePayment     = document.getElementById('closePayment');
-const paymentForm      = document.getElementById('paymentForm');
-const successOverlay   = document.getElementById('successOverlay');
-const closeSuccess     = document.getElementById('closeSuccess');
-const okSuccess        = document.getElementById('okSuccess');
-const payQRContainer   = document.getElementById('payQR');
-const upiTextEl        = document.getElementById('upiText');
+const payBtn             = document.getElementById('payBtn');
+const paymentOverlay     = document.getElementById('paymentOverlay');
+const closePayment       = document.getElementById('closePayment');
+const paymentForm        = document.getElementById('paymentForm');
+const successOverlay     = document.getElementById('successOverlay');
+const closeSuccess       = document.getElementById('closeSuccess');
+const okSuccess          = document.getElementById('okSuccess');
+const payQRContainer     = document.getElementById('payQR');
+const upiTextEl          = document.getElementById('upiText');
 const completePaymentBtn = document.getElementById('completePaymentBtn');
 const completeBtnText    = completePaymentBtn?.querySelector('.btn-text');
 const completeBtnSpin    = completePaymentBtn?.querySelector('.btn-spinner');
@@ -435,7 +413,6 @@ payBtn.addEventListener('click', () => {
 
   formDataCache = collectFormData();
 
-  // build UPI deep link & QR
   const upiUrl = buildUpiUrl(UPI_ID, UPI_NAME, AMOUNT_RUPEES);
   upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
   payQRContainer.innerHTML = "";
@@ -455,7 +432,6 @@ closePayment.addEventListener('click', ()=> paymentOverlay.style.display = 'none
 paymentOverlay.addEventListener('click', (e)=> {
   if(e.target === paymentOverlay) paymentOverlay.style.display = 'none';
 });
-
 closeSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
 okSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
 successOverlay.addEventListener('click', (e)=> {
@@ -482,7 +458,7 @@ function generateToken(regno){
   return `AMZ-${regno}-${suffix}`;
 }
 
-/* Payment Form Submit */
+/* ---------- Submit payment ---------- */
 paymentForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (submitting) return;
@@ -503,7 +479,7 @@ paymentForm.addEventListener('submit', async (e) => {
   try{
     const tokenId = generateToken(formDataCache.regno);
     const paidAt  = new Date().toISOString();
-    const participantNo = await allocateParticipantNumber();
+    const participantNo = await allocateParticipantNumber();  // <- FIXED PATH
 
     await savePaymentToFirestore({
       status: "submitted",
@@ -514,15 +490,18 @@ paymentForm.addEventListener('submit', async (e) => {
       transaction_id: txnId,
       payer_name: payerName || null,
       upi_id: UPI_ID,
+      verified: false,
       ...formDataCache
     });
+
+    console.log("[OK] Saved to Firestore -> events/%s/registrations", EVENT_ID);
 
     paymentOverlay.style.display = 'none';
     successOverlay.style.display = 'flex';
     document.getElementById('regForm').reset();
     paymentForm.reset();
   }catch(err){
-    console.error(err);
+    console.error("[ERROR] Firestore write failed:", err);
     alert("Something went wrong while saving your payment. Please try again or contact the organizers.");
   }finally{
     submitting = false;
@@ -530,27 +509,33 @@ paymentForm.addEventListener('submit', async (e) => {
   }
 });
 
-/* ---------- Firestore ---------- */
+/* ---------- Firestore (FIXED PATHS) ---------- */
 async function savePaymentToFirestore(data){
-  const colRef = collection(db, "event_registrations", EVENT_ID, "payments");
-  const docRef = doc(colRef, data.regno);
-  await setDoc(docRef, {
+  const colRef = collection(db, "events", EVENT_ID, "registrations");
+  const ref    = doc(colRef);  // auto id
+  await setDoc(ref, {
     ...data,
-    timestamp: serverTimestamp()
-  });
+    id: ref.id,
+    createdAt: serverTimestamp()
+  }, { merge: true });
 }
+
 async function allocateParticipantNumber(){
-  const counterRef = doc(db, "event_registrations", EVENT_ID);
-  return await runTransaction(db, async (transaction)=>{
-    const docSnap = await transaction.get(counterRef);
-    let current = 0;
-    if(docSnap.exists()){
-      current = docSnap.data().counter || 0;
+  const counterRef = doc(db, "events", EVENT_ID, "meta", "counters");
+  const next = await runTransaction(db, async (tx)=>{
+    const snap = await tx.get(counterRef);
+    if(!snap.exists()){
+      tx.set(counterRef, { lastParticipantNo: 1 });
+      return 1;
+    } else {
+      const current = snap.data().lastParticipantNo || 0;
+      const updated = current + 1;
+      tx.update(counterRef, { lastParticipantNo: updated });
+      return updated;
     }
-    const next = current + 1;
-    transaction.set(counterRef, { counter: next }, { merge: true });
-    return next;
   });
+  console.log("[counter] new participant_no =", next);
+  return next;
 }
 </script>
 </body>
