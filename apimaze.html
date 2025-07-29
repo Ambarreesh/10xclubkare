@@ -304,9 +304,9 @@
     <div class="divider"></div>
 
     <div class="qrpay-box">
-      <div id="payQR"></div>
-      <div style="opacity:.8; font-size:.9rem;" id="upiText"></div>
-    </div>
+  <img id="payQRImage" src="img/qr.jpeg" alt="Scan to Pay" width="200" height="200" style="border-radius:12px;" />
+  <div style="opacity:.8; font-size:.9rem;" id="upiText"></div>
+</div>
 
     <form id="paymentForm" style="display:flex; flex-direction:column; gap:14px;">
       <div>
@@ -319,7 +319,7 @@
       </div>
       <div>
         <label for="paidAmount">Amount Paid</label>
-        <input id="paidAmount" name="paidAmount" type="number" value="100" />
+        <input id="paidAmount" name="paidAmount" type="number" value="100" disabled/>
       </div>
 
       <button type="submit" class="btn btn-primary" id="completePaymentBtn">
@@ -415,15 +415,7 @@ payBtn.addEventListener('click', () => {
 
   const upiUrl = buildUpiUrl(UPI_ID, UPI_NAME, AMOUNT_RUPEES);
   upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
-  payQRContainer.innerHTML = "";
-  new QRCode(payQRContainer, {
-    text: upiUrl,
-    width: 200,
-    height: 200,
-    colorDark : "#ffffff",
-    colorLight : "transparent",
-    correctLevel : QRCode.CorrectLevel.H
-  });
+  
 
   paymentOverlay.style.display = 'flex';
 });
