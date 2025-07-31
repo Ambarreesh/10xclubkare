@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API MAZE – Attendance Panel | 10X Club KARE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(255, 255, 255, 0.15);
+      --border: rgba(255, 255, 255, 0.18);
+      --white: #fff;
+      --accent: #1657ff;
+      --accent-2: #f2551d;
+      --bg: #000;
+      --radius: 24px;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .glass {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 24px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
+    th {
+      background-color: rgba(255,255,255,0.05);
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.25s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .terminate-btn {
+      background: #ff3b30;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .terminate-btn:hover {
+      background: #e00e00;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Login Overlay */
+    #login-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .login-box {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius);
+      padding: 30px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0 24px 40px rgba(0,0,0,0.3);
+    }
+
+    .login-box img {
+      width: 80px;
+      margin-bottom: 16px;
+    }
+
+    .login-box input {
+      width: 96%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .login-box .btn {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .error-msg {
+      color: #ff4d4f;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div id="login-overlay">
+  <div class="login-box glass">
+    <img src="img/image 26.png" alt="10X Club Logo" />
+    <h2>Admin Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button class="btn" onclick="validateLogin()">Login</button>
+    <div class="error-msg" id="login-error"></div>
+  </div>
+</div>
+
+<!-- Attendance Panel -->
+<div class="glass" id="attendance-panel" style="display: none;">
+  <div class="top-bar">
+    <h1>Attendance – API MAZE</h1>
+    <div id="save-status" style="color: white; font-weight: bold;"></div>
+    <button class="btn" onclick="saveAttendance()">Save Attendance</button>
+    <button class="btn" onclick="downloadAttendance()">Download Excel</button>
+  </div>
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>S.No</th>
+        <th>Participant No</th>
+        <th>Register No</th>
+        <th>Name</th>
+        <th>F.N</th>
+        <th>A.N</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data rows inserted by JS -->
+    </tbody>
+  </table>
+</div>
+
+<script type="module">
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, updateDoc, doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAg9CZRgpK2PbEDfbL9LkuzcyqDNmJpJAI",
+  authDomain: "cnclubkare.firebaseapp.com",
+  projectId: "cnclubkare",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const EVENT_ID = "api-maze-2025";
+
+const tableBody = document.querySelector('#attendanceTable tbody');
+
+async function loadParticipants() {
+  const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
+  const map = new Map();
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    const key = `${d.regno}_${d.transaction_id}`;
+    if (!map.has(key)) {
+      map.set(key, {
+        id: doc.id,
+        participant_no: d.participant_no,
+        regno: d.regno,
+        name: d.name,
+        txn: d.transaction_id,
+        fn: d.fn || false,
+        an: d.an || false,
+        timestamp: d.timestamp || ""
+      });
+    }
+  });
+
+  const list = Array.from(map.values());
+  list.sort((a, b) => a.participant_no - b.participant_no);
+
+  tableBody.innerHTML = "";
+  list.forEach((p, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${p.participant_no}</td>
+      <td>${p.regno}</td>
+      <td>${p.name}</td>
+      <td><input type="checkbox" ${p.fn ? 'checked' : ''} data-id="${p.id}" data-slot="fn" /></td>
+      <td><input type="checkbox" ${p.an ? 'checked' : ''} data-id="${p.id}" data-slot="an" /></td>
+    `;
+    tableBody.appendChild(tr);
+  });
+}
+
+window.saveAttendance = async () => {
+  const inputs = document.querySelectorAll('input[type="checkbox"]');
+  const saveStatus = document.getElementById("save-status");
+
+  saveStatus.textContent = "Saving...";
+  saveStatus.style.color = "orange";
+
+  try {
+    const updates = Array.from(inputs).map(input => {
+      const id = input.dataset.id;
+      const slot = input.dataset.slot;
+      const checked = input.checked;
+      return updateDoc(doc(db, "events", EVENT_ID, "registrations", id), {
+        [slot]: checked
+      });
+    });
+
+    await Promise.all(updates);
+
+    saveStatus.textContent = "Saved ✅";
+    saveStatus.style.color = "lightgreen";
+  } catch (error) {
+    console.error(error);
+    saveStatus.textContent = "Failed ❌";
+    saveStatus.style.color = "red";
+  }
+
+  setTimeout(() => {
+    saveStatus.textContent = "";
+  }, 3000);
+};
+
+window.downloadAttendance = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
+    const map = new Map();
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const key = `${d.regno}_${d.transaction_id}`;
+      if (!map.has(key)) {
+        map.set(key, {
+          RegisterNo: d.regno || "",
+          Name: d.name || "",
+          FN: d.fn ? "Present" : "Absent",
+          AN: d.an ? "Present" : "Absent",
+          Timestamp: d.timestamp || ""
+        });
+      }
+    });
+
+    const list = Array.from(map.values());
+    if (list.length === 0) {
+      alert("No data to export.");
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(list);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+
+    const now = new Date();
+    const filename = `attendance_report_${now.toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+  } catch (err) {
+    console.error("Error exporting to Excel:", err);
+    alert("Export failed. See console for details.");
+  }
+};
+
+// Login Validation
+window.validateLogin = () => {
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+  const errorBox = document.getElementById("login-error");
+
+  if (user === "Admin" && pass === "admin2025") {
+    document.getElementById("login-overlay").style.display = "none";
+    document.getElementById("attendance-panel").style.display = "block";
+    loadParticipants();
+  } else {
+    errorBox.textContent = "Invalid credentials. Try again.";
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>
