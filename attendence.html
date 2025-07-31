@@ -212,22 +212,22 @@ async function loadParticipants() {
   const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
   const map = new Map();
 
-  snap.forEach(doc => {
+    snap.forEach(doc => {
     const d = doc.data();
-    const key = `${d.regno}_${d.transaction_id}`;
+    const key = d.regno; // Use regno only to avoid duplicates
     if (!map.has(key)) {
       map.set(key, {
         id: doc.id,
         participant_no: d.participant_no,
         regno: d.regno,
         name: d.name,
-        txn: d.transaction_id,
         fn: d.fn || false,
         an: d.an || false,
         timestamp: d.timestamp || ""
       });
     }
   });
+
 
   const list = Array.from(map.values());
   list.sort((a, b) => a.participant_no - b.participant_no);
@@ -284,19 +284,19 @@ window.downloadAttendance = async () => {
     const snapshot = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
     const map = new Map();
 
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      const key = `${d.regno}_${d.transaction_id}`;
-      if (!map.has(key)) {
-        map.set(key, {
-          RegisterNo: d.regno || "",
-          Name: d.name || "",
-          FN: d.fn ? "Present" : "Absent",
-          AN: d.an ? "Present" : "Absent",
-          Timestamp: d.timestamp || ""
-        });
-      }
-    });
+      snapshot.forEach(doc => {
+    const d = doc.data();
+    const key = d.regno; // Use regno only to avoid duplicates
+    if (!map.has(key)) {
+      map.set(key, {
+        RegisterNo: d.regno || "",
+        Name: d.name || "",
+        FN: d.fn ? "Present" : "Absent",
+        AN: d.an ? "Present" : "Absent",
+        Timestamp: d.timestamp || ""
+      });
+    }
+  });
 
     const list = Array.from(map.values());
     if (list.length === 0) {
