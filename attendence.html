@@ -76,19 +76,6 @@
       transform: scale(1.05);
     }
 
-    .terminate-btn {
-      background: #ff3b30;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 999px;
-      cursor: pointer;
-    }
-
-    .terminate-btn:hover {
-      background: #e00e00;
-    }
-
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -96,6 +83,15 @@
       margin-bottom: 16px;
       flex-wrap: wrap;
       gap: 10px;
+    }
+
+    #filter-bar {
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+
+    #filter-bar label {
+      cursor: pointer;
     }
 
     /* Login Overlay */
@@ -171,6 +167,11 @@
     <button class="btn" onclick="saveAttendance()">Save Attendance</button>
     <button class="btn" onclick="downloadAttendance()">Download Excel</button>
   </div>
+
+  <div id="filter-bar">
+    <label><input type="checkbox" id="showOnlyVerified" checked onchange="loadParticipants()" /> Show only Transaction Verified</label>
+  </div>
+
   <table id="attendanceTable">
     <thead>
       <tr>
@@ -205,19 +206,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const EVENT_ID = "api-maze-2025";
-
 const tableBody = document.querySelector('#attendanceTable tbody');
 
 async function loadParticipants() {
+  const showOnlyVerified = document.getElementById('showOnlyVerified')?.checked ?? true;
   const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
   const map = new Map();
 
-    snap.forEach(doc => {
-    const d = doc.data();
-    const key = d.regno; // Use regno only to avoid duplicates
-    if (!map.has(key)) {
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    const key = d.regno;
+
+    if ((!showOnlyVerified || d.verified === true) && !map.has(key)) {
       map.set(key, {
-        id: doc.id,
+        id: docSnap.id,
         participant_no: d.participant_no,
         regno: d.regno,
         name: d.name,
@@ -228,11 +230,9 @@ async function loadParticipants() {
     }
   });
 
-
-  const list = Array.from(map.values());
-  list.sort((a, b) => a.participant_no - b.participant_no);
-
+  const list = Array.from(map.values()).sort((a, b) => a.participant_no - b.participant_no);
   tableBody.innerHTML = "";
+
   list.forEach((p, index) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -265,7 +265,6 @@ window.saveAttendance = async () => {
     });
 
     await Promise.all(updates);
-
     saveStatus.textContent = "Saved ✅";
     saveStatus.style.color = "lightgreen";
   } catch (error) {
@@ -274,9 +273,7 @@ window.saveAttendance = async () => {
     saveStatus.style.color = "red";
   }
 
-  setTimeout(() => {
-    saveStatus.textContent = "";
-  }, 3000);
+  setTimeout(() => saveStatus.textContent = "", 3000);
 };
 
 window.downloadAttendance = async () => {
@@ -284,19 +281,21 @@ window.downloadAttendance = async () => {
     const snapshot = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
     const map = new Map();
 
-      snapshot.forEach(doc => {
-    const d = doc.data();
-    const key = d.regno; // Use regno only to avoid duplicates
-    if (!map.has(key)) {
-      map.set(key, {
-        RegisterNo: d.regno || "",
-        Name: d.name || "",
-        FN: d.fn ? "Present" : "Absent",
-        AN: d.an ? "Present" : "Absent",
-        Timestamp: d.timestamp || ""
-      });
-    }
-  });
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if (d.transaction_verified === true) {
+        const key = d.regno;
+        if (!map.has(key)) {
+          map.set(key, {
+            RegisterNo: d.regno || "",
+            Name: d.name || "",
+            FN: d.fn ? "Present" : "Absent",
+            AN: d.an ? "Present" : "Absent",
+            Timestamp: d.timestamp || ""
+          });
+        }
+      }
+    });
 
     const list = Array.from(map.values());
     if (list.length === 0) {
