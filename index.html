@@ -44,6 +44,7 @@
 .profile-menu button:hover {
   color: #00ffcc;
 }
+
   </style>
 </head>
 <body>
@@ -100,29 +101,173 @@
   </section>
 
   <!-- Events Section -->
-  <div class="container">
-    <section class="events-section glass" id="events">
-      <h2 class="section-title">UPCOMING EVENTS</h2>
+ <!-- Events Section -->
+<div class="container">
+  <section class="events-section glass" id="events">
+    <h2 class="section-title">EVENTS 2K25</h2>
+
+    <!-- Slider Wrapper -->
+    <div class="events-wrapper">
       <div class="events-grid">
+        <!-- Event 1 -->
         <div class="event-card glass reveal">
           <img src="img/image 40.png" alt="API Maze Event">
-          <h3>API MAZE</h3>
+          <h3>API MAZE<br><p>( Coding Event )</p><p>2 AUG 2025</p></h3>
           <div class="event-buttons">
             <a href="img/API MAZE.pdf" class="btn-glass">Learn More</a>
             <a href="apimaze.html" class="btn-glass register-btn" data-requires-auth="true" disabled>Closed</a>
           </div>
         </div>
+
+        <!-- Event 2 -->
         <div class="event-card glass reveal">
-          <img src="img/image 41.png" alt="Gen AI Hackathon">
-          <h3>GEN AI HACKATHON</h3>
+          <img src="img/edu.webp" alt="Edu Hackathon">
+          <h3>EDU HACK<br><p>( Hackathon )</p><p>19 SEP 2025</p></h3>
           <div class="event-buttons">
             <button class="btn-glass">Learn More</button>
-            <button class="btn-glass disabled" disabled>Not Open</button>
+            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
+          </div>
+        </div>
+
+        <!-- Event 3 -->
+        <div class="event-card glass reveal">
+          <img src="img/techtide.webp" alt="Another Event">
+          <h3>TechTide<br><p>VINTRA</p></h3>
+          <div class="event-buttons">
+            <button class="btn-glass">Learn More</button>
+            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
+          </div>
+        </div>
+
+        <!-- Event 4 -->
+        <div class="event-card glass reveal">
+          <img src="img/ui.png" alt="Another Event">
+          <h3>UI Wars<br><p>( Coding Event )</p><p>JAN 2026</p></h3>
+          <div class="event-buttons">
+            <button class="btn-glass">Learn More</button>
+            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
+          </div>
+        </div>
+        <div class="event-card glass reveal">
+          <img src="img/image 41.png" alt="Another Event">
+          <h3>GenAI X<br><p>( Hackathon )</p><p>FEB 2026</p></h3>
+          <div class="event-buttons">
+            <button class="btn-glass">Learn More</button>
+            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
+          </div>
+        </div>
+
+        <div class="event-card glass reveal">
+          <img src="img/sfi.png" alt="Another Event">
+          <h3>SOLVE FOR INDIA<br><p>EUPHORIA</p></h3>
+          <div class="event-buttons">
+            <button class="btn-glass">Learn More</button>
+            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
           </div>
         </div>
       </div>
-    </section>
-  </div>
+    </div>
+
+    <!-- Nav Buttons -->
+    <button class="prev">&#10094;</button>
+    <button class="next">&#10095;</button>
+  </section>
+</div>
+<style>
+/* === Events Section Styling === */
+.events-section {
+  position: relative;
+  text-align: center;
+  padding: 40px 20px;
+  overflow: hidden;
+}
+
+.events-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.events-grid {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 95%;
+}
+
+.event-card {
+  flex: 0 0 50%;   /* Desktop: 2 per row */
+  max-width: 50%;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+/* Nav arrows */
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 22px;
+  border-radius: 50%;
+  z-index: 10;
+}
+.prev { left: 10px; }
+.next { right: 10px; }
+
+/* === Mobile Fix === */
+@media (max-width: 768px) {
+  .events-grid {
+    transform: none !important; /* disable slider */
+    flex-direction: column;     /* stack vertically */
+  }
+
+  .event-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .prev, .next {
+    display: none; /* hide arrows on mobile */
+  }
+}
+</style>
+<script>
+let currentIndex = 0;
+const grid = document.querySelector(".events-grid");
+const cards = document.querySelectorAll(".event-card");
+const perPage = 2; 
+const totalSlides = Math.ceil(cards.length / perPage);
+
+function updateSlide() {
+  // only slide if desktop
+  if (window.innerWidth > 768) {
+    const shiftPercent = (100 / totalSlides) * currentIndex;
+    grid.style.transform = `translateX(-${shiftPercent}%)`;
+  } else {
+    grid.style.transform = "none"; // reset for mobile
+  }
+}
+
+document.querySelector(".next").addEventListener("click", () => {
+  if (currentIndex <= totalSlides + 4) {
+    currentIndex++;
+    updateSlide();
+  }
+});
+
+document.querySelector(".prev").addEventListener("click", () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    updateSlide();
+  }
+});
+
+window.addEventListener("resize", updateSlide); // re-check when resizing
+updateSlide();
+</script>
 
   <!-- Faculty Coordinators Section -->
   <section class="team-section" id="faculty">
@@ -670,7 +815,7 @@
      EVENT PASS FEATURE
   ----------------------- */
   const EVENT_ID   = "api-maze-2025";
-  const EVENT_NAME = "API MAZE";
+  const EVENT_NAME = "EDU HACK";
   const EVENT_DATE = "2025-08-02";
   const ORG_NAME   = "10X Club – KARE Student Chapter";
   const LOGO_KARE  = "img/klu.png";
