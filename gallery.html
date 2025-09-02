@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10X Family • Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a; /* Ninja dark background */
+      background-image: radial-gradient(circle at top left, rgba(0, 200, 255, 0.08), transparent 70%),
+                        radial-gradient(circle at bottom right, rgba(255, 0, 150, 0.08), transparent 70%);
+      background-attachment: fixed;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      padding: 50px 20px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0, 200, 255, 0.8),
+                   0 0 20px rgba(0, 200, 255, 0.5);
+      margin-bottom: 12px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    .gallery-container {
+      width: 100%;
+      max-width: 750px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .event-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 25px;
+      padding: 20px;
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-align: center;
+    }
+
+    .event-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0, 200, 255, 0.25);
+    }
+
+    .event-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 18px;
+      margin-bottom: 15px;
+    }
+
+    .event-card h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .event-card p {
+      font-size: 1rem;
+      opacity: 0.75;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      background: rgba(0, 200, 255, 0.15);
+      border: 1px solid rgba(0, 200, 255, 0.4);
+      color: #00eaff;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 14px;
+      transition: 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      background: rgba(0, 200, 255, 0.3);
+      border-color: rgba(0, 200, 255, 0.6);
+      color: #fff;
+      text-shadow: 0 0 8px #00eaff;
+    }
+
+    /* 📱 Mobile Responsiveness */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .event-card h2 {
+        font-size: 1.3rem;
+      }
+      .event-card p {
+        font-size: 0.9rem;
+      }
+      .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 40px 15px 15px;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      .gallery-container {
+        padding: 10px;
+        gap: 25px;
+      }
+      .event-card {
+        padding: 15px;
+        border-radius: 18px;
+      }
+      .event-card h2 {
+        font-size: 1.1rem;
+      }
+      .btn {
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>10X Family</h1>
+    <p>Our journey through events & memories ⚡</p>
+  </header>
+
+  <div class="gallery-container">
+    <!-- Event 1 -->
+    <div class="event-card">
+      <img src="img/am1.HEIC" alt="Hackathon 2025 Group Photo">
+      <img src="img/am2.HEIC" alt="Hackathon 2025 Group Photo">
+      <h2>API MAZE 2025</h2>
+      <p>AUG 2, 2025 • KARE</p>
+      <a href="https://drive.google.com/drive/folders/1fLlQjNPrslTbBnaEJ__owQKudzqBQIQK?usp=share_link" target="_blank" class="btn">View Full Album</a>
+    </div>
+
+    <!-- Event 2 -->
+    <div class="event-card">
+      <img src="img/jj.heic" alt="Workshop Group Photo">
+      <h2>JOURNEY TO JOB SUCCESS</h2>
+      <p>AUG 9, 2025 • KARE</p>
+      <a href="https://drive.google.com/drive/folders/1-0b1vmssRTA5WNcrHNsvgjWeVDWyW-5S?usp=sharing" target="_blank" class="btn">View Full Album</a>
+    </div>
+  </div>
+
+</body>
+</html>
