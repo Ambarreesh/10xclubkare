@@ -8,14 +8,12 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
 
-<!-- QR Code -->
+<!-- QR Code (optional) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
-  /* same design system from your API MAZE */
   :root{
     --glass: rgba(255,255,255,0.08);
-    --glass-strong: rgba(255,255,255,0.15);
     --border: rgba(255,255,255,0.18);
     --white: #fff;
     --accent: #1657ff;
@@ -41,33 +39,29 @@
     background: var(--glass);
     border:1px solid var(--border);
     backdrop-filter: blur(18px) saturate(180%);
-    -webkit-backdrop-filter: blur(18px) saturate(180%);
     border-radius: var(--radius);
     box-shadow: 0 24px 40px rgba(0,0,0,.3);
   }
   header.hero{ display:flex; gap:24px; align-items:center; padding:32px 28px; margin:24px 0 40px; flex-wrap:wrap; position:relative; overflow:hidden; }
-  header.hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%); transform:skewX(-20deg) translateX(-100%); animation:shine 5s infinite; }
-  @keyframes shine{ 0%{ transform:skewX(-20deg) translateX(-120%);} 100%{transform:skewX(-20deg) translateX(120%);} }
   .logos{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
   .logos img{ height:70px; object-fit:contain; background: rgba(255,255,255,0.04); border-radius:14px; padding:8px 12px; }
   .hero h1{ font-size:2.2rem; margin:0; }
   .tag{ display:inline-block; margin-top:8px; background:rgba(255,255,255,0.08); padding:6px 12px; border-radius:999px; font-size:0.9rem; letter-spacing:1px; }
   .grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap:28px; align-items:start; }
   .event-card{ padding:24px 22px; }
-  .event-card h2{ margin:0 0 12px; }
   form#regForm{ padding:32px 26px; display:flex; flex-direction:column; gap:18px; }
   label{ font-size:.9rem; color:#e7e7e7; }
   input, select{ width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; padding:12px 14px; outline:none; transition:border .25s; }
   input:focus, select:focus{ border-color: var(--accent); }
-  .btn{ border:none; border-radius:999px; padding:14px 24px; font-weight:700; cursor:pointer; transition:all .25s; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+  .btn{ border:none; border-radius:999px; padding:12px 18px; font-weight:700; cursor:pointer; transition:all .25s; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
   .btn-primary{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; }
-  .btn-primary:hover{ transform:translateY(-1px) scale(1.01); }
-  .btn-ghost{ background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.15);}
-  .price{ font-size:1.5rem; font-weight:700; }
-  .team-list li{ background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; margin-top:6px; }
+  .btn-ghost{ background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+  .team-list li{ background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; margin-top:6px; display:flex; justify-content:space-between; align-items:center; }
+  .small{ font-size:0.85rem; opacity:0.9; }
   .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px; }
-  .modal{ max-width:480px; width:100%; padding:24px; position:relative; }
-  .close-x{ position:absolute; right:14px; top:12px; font-size:22px; cursor:pointer; opacity:.7; }
+  .modal{ max-width:520px; width:100%; padding:22px; position:relative; }
+  .close-x{ position:absolute; right:14px; top:12px; font-size:22px; cursor:pointer; opacity:.8; }
+  .remove-btn{ background:transparent; border:0; color:#ffdddd; padding:6px 8px; border-radius:8px; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -84,12 +78,8 @@
   </header>
 
   <div class="grid">
-    <!-- Event Info -->
-    
     <section class="event-card glass">
- 
       <img src="img/edu hack.png" height="200px" width="200px" style="border-radius:12px;"/>
- 
       <h2>Event Details</h2>
       <ul style="line-height:1.8;margin:0 0 18px 18px;">
         <li>24hr Hackathon – Build innovative apps & solutions for our university</li>
@@ -99,11 +89,9 @@
       </ul>
     </section>
 
-    <!-- Registration -->
     <section class="glass">
       <form id="regForm">
         <h2>Register Your Team</h2>
-        
         <div>
           <label for="teamName">Team Name</label>
           <input id="teamName" name="teamName" required />
@@ -112,12 +100,15 @@
         <div>
           <label>Team Members (min 3, max 5)</label>
           <ul class="team-list" id="teamList"></ul>
-          <button type="button" class="btn btn-ghost" id="addMemberBtn">+ Add Member</button>
+          <div style="margin-top:10px; display:flex; gap:10px;">
+            <button type="button" class="btn btn-ghost" id="addMemberBtn">+ Add Member</button>
+            <button type="button" class="btn" id="clearMembersBtn">Clear Members</button>
+          </div>
         </div>
 
         <div>
           <label>Total Amount</label>
-          <input id="totalAmount" value="₹ 0.00" disabled />
+          <input id="totalAmountInput" value="₹ 0.00" disabled />
         </div>
 
         <div>
@@ -135,59 +126,61 @@
     <h3>Add Team Member</h3>
     <div>
       <label>Name</label>
-      <input id="memberName" required/>
+      <input id="memberName" />
     </div>
     <div>
       <label>Register No</label>
-      <input id="memberRegno" required/>
+      <input id="memberRegno" />
     </div>
     <div>
-        <label>Department</label>
-        <select id="memberDept" name="dept" required>
-              <option value="">Select</option>
-              <option>IT</option>
-              <option>CSE</option>
-              <option>ECE</option>
-              <option>EEE</option>
-              <option>MECH</option>
-              <option>CIVIL</option>
-              <option>AIDS</option>
-              <option>AIML</option>
-              <option>Other</option>
-            </select>
+      <label>Department</label>
+      <select id="memberDept" name="dept">
+        <option value="">Select</option>
+        <option>IT</option>
+        <option>CSE</option>
+        <option>ECE</option>
+        <option>EEE</option>
+        <option>MECH</option>
+        <option>CIVIL</option>
+        <option>AIDS</option>
+        <option>AIML</option>
+        <option>Other</option>
+      </select>
     </div>
     <div>
-        <label>Year</label>
-        <select id="memberYear" name="year" required>
-              <option value="">Select</option>
-              <option>1st Year</option>
-              <option>2nd Year</option>
-              <option>3rd Year</option>
-              <option>4th Year</option>
-            </select>
+      <label>Year</label>
+      <select id="memberYear" name="year">
+        <option value="">Select</option>
+        <option>1st Year</option>
+        <option>2nd Year</option>
+        <option>3rd Year</option>
+        <option>4th Year</option>
+      </select>
     </div>
     <div>
-        <label>Email ID (only use klu id)</label>
-        <input id="memberEmail" type="email" required/>
+      <label>Email ID (only use klu id)</label>
+      <input id="memberEmail" type="email" />
     </div>
     <br>
-    <button class="btn btn-primary" id="saveMember">Add</button>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn btn-ghost" id="cancelAddMember">Cancel</button>
+      <button class="btn btn-primary" id="saveMember">Add</button>
+    </div>
   </div>
 </div>
 
-<!-- PAYMENT MODAL (QR + Txn ID entry) -->
+<!-- PAYMENT MODAL -->
 <div class="modal-overlay" id="paymentOverlay">
   <div class="modal glass" id="paymentCard">
     <span class="close-x" id="closePayment">&times;</span>
-    <h3>Pay <span id="totalAmount"></span> via UPI</h3>
-    <div class="divider"></div>
+    <h3>Pay <span id="totalAmountText">₹ 0.00</span> via UPI</h3>
 
-    <div class="qrpay-box">
-  <img id="payQRImage" src="img/qr.jpeg" alt="Scan to Pay" width="200" height="200" style="border-radius:12px;" />
-  <div style="opacity:.8; font-size:.9rem;" id="upiText"></div>
-</div>
+    <div class="qrpay-box" style="display:flex; gap:18px; align-items:center; margin-top:12px;">
+      <img id="payQRImage" src="img/qr.jpeg" alt="Scan to Pay" width="170" height="170" style="border-radius:12px;" />
+      <div style="opacity:.9; font-size:.95rem;" id="upiText"></div>
+    </div>
 
-    <form id="paymentForm" style="display:flex; flex-direction:column; gap:14px;">
+    <form id="paymentForm" style="display:flex; flex-direction:column; gap:14px; margin-top:14px;">
       <div>
         <label for="txnId">Transaction / UTR ID (required)</label>
         <input id="txnId" name="txnId" required placeholder="e.g., 3245XXXXXXXX" />
@@ -198,13 +191,15 @@
       </div>
       <div>
         <label for="paidAmount">Amount Paid</label>
-        <input id="paidAmount" name="paidAmount" type="number" value="100" disabled/>
+        <input id="paidAmountInput" name="paidAmount" type="number" value="0" disabled/>
       </div>
 
-      <button type="submit" class="btn btn-primary" id="completePaymentBtn">
-        <span class="btn-text" disabled>Complete Payment</span>
-        <span class="btn-spinner"></span>
-      </button>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button type="button" class="btn btn-ghost" id="cancelPayment">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="completePaymentBtn">
+          <span class="btn-text">Complete Payment</span>
+        </button>
+      </div>
     </form>
   </div>
 </div>
@@ -214,7 +209,7 @@
   <div class="modal glass">
     <span class="close-x" id="closeSuccess">&times;</span>
     <h3>Payment Submitted</h3>
-    <div class="divider"></div>
+    <div style="margin-top:10px;"></div>
     <p style="text-align:center; line-height:1.6;">
       Thank you! You will get your entry pass in your profile at 10xclubkare.vercel.app.
     </p>
@@ -228,13 +223,20 @@
 </footer>
 
 <script type="module">
-/* ---------- Firebase ---------- */
+/* ---------- Firebase (Modular) ---------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getFirestore, collection, doc, setDoc, getDocs, query, where, serverTimestamp 
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = { 
+const firebaseConfig = {
   apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
   authDomain: "eduhack-432fd.firebaseapp.com",
   projectId: "eduhack-432fd",
@@ -244,187 +246,283 @@ const firebaseConfig = {
   measurementId: "G-WCKZ62NM6N"
 };
 const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const db = getFirestore(app);
 
 /* ---------- Constants ---------- */
-const EVENT_ID   = "edu-hack-2025";
+const EVENT_ID = "edu-hack-2025";
 const MEMBER_FEE = 300;
-const UPI_ID     = "sundaradhira-1@okicici";
-const UPI_NAME   = "Sundarrajan R";
+const UPI_ID = "sundaradhira-1@okicici";
+const UPI_NAME = "Sundarrajan R";
 
 /* ---------- Elements ---------- */
-const addMemberBtn   = document.getElementById('addMemberBtn');
-const memberOverlay  = document.getElementById('memberOverlay');
-const closeMember    = document.getElementById('closeMember');
-const saveMember     = document.getElementById('saveMember');
-const memberName     = document.getElementById('memberName');
-const memberRegno    = document.getElementById('memberRegno');
-const memberDept     = document.getElementById('memberDept');
-const memberYear     = document.getElementById('memberYear');
-const memberEmail    = document.getElementById('memberEmail');
-const teamNameInput  = document.getElementById('teamName');   // Team Name input
-const teamList       = document.getElementById('teamList');
-const totalAmount    = document.getElementById('totalAmount');
-const payBtn         = document.getElementById('payBtn');
+const addMemberBtn = document.getElementById('addMemberBtn');
+const memberOverlay = document.getElementById('memberOverlay');
+const closeMember = document.getElementById('closeMember');
+const saveMember = document.getElementById('saveMember');
+const cancelAddMember = document.getElementById('cancelAddMember');
+const memberName = document.getElementById('memberName');
+const memberRegno = document.getElementById('memberRegno');
+const memberDept = document.getElementById('memberDept');
+const memberYear = document.getElementById('memberYear');
+const memberEmail = document.getElementById('memberEmail');
+const teamNameInput = document.getElementById('teamName');
+const teamList = document.getElementById('teamList');
+const totalAmountInput = document.getElementById('totalAmountInput');
+const payBtn = document.getElementById('payBtn');
+const clearMembersBtn = document.getElementById('clearMembersBtn');
 
-const paymentOverlay     = document.getElementById('paymentOverlay');
-const closePayment       = document.getElementById('closePayment');
-const paymentForm        = document.getElementById('paymentForm');
-const txnIdInput         = document.getElementById('txnId');
-const payerNameInput     = document.getElementById('payerName');
-const paidAmountInput    = document.getElementById('paidAmount');
+const paymentOverlay = document.getElementById('paymentOverlay');
+const closePayment = document.getElementById('closePayment');
+const cancelPayment = document.getElementById('cancelPayment');
+const paymentForm = document.getElementById('paymentForm');
+const txnIdInput = document.getElementById('txnId');
+const payerNameInput = document.getElementById('payerName');
+const paidAmountInput = document.getElementById('paidAmountInput');
 const completePaymentBtn = document.getElementById('completePaymentBtn');
-const completeBtnText    = completePaymentBtn?.querySelector('.btn-text');
-const completeBtnSpin    = completePaymentBtn?.querySelector('.btn-spinner');
+const totalAmountText = document.getElementById('totalAmountText');
+const upiTextEl = document.getElementById('upiText');
 
 const successOverlay = document.getElementById('successOverlay');
-const closeSuccess   = document.getElementById('closeSuccess');
-const okSuccess      = document.getElementById('okSuccess');
-const upiTextEl      = document.getElementById('upiText');
+const closeSuccess = document.getElementById('closeSuccess');
+const okSuccess = document.getElementById('okSuccess');
 
 let members = [];
 let submitting = false;
 
-/* ---------- Add Member ---------- */
-addMemberBtn.onclick = ()=> memberOverlay.style.display="flex";
-closeMember.onclick  = ()=> memberOverlay.style.display="none";
-
-saveMember.onclick = ()=>{
-  const name  = memberName.value.trim();
-  const reg   = memberRegno.value.trim();
-  const dept  = memberDept.value.trim();
-  const year  = memberYear.value.trim();
-  const email = memberEmail.value.trim();
-
-  if(!name || !reg || !dept || !year || !email){ alert("Fill all fields"); return; }
-  if(members.length>=5){ alert("Max 5 members only"); return; }
-
-  members.push({name, reg, dept, year, email});
-  renderMembers();
-
-  memberName.value = "";
-  memberRegno.value = "";
-  memberDept.value = "";
-  memberYear.value = "";
-  memberEmail.value = "";
-  memberOverlay.style.display="none";
-};
-
-function renderMembers(){
-  teamList.innerHTML = "";
-  members.forEach((m,i)=>{
-    const li=document.createElement("li");
-    li.textContent = `${i+1}. ${m.name} (${m.reg}) - ${m.dept}, ${m.year} - ${m.email}`;
-    teamList.appendChild(li);
-  });
-  totalAmount.value = `₹ ${members.length*MEMBER_FEE}.00`;
-}
-
-/* ---------- Show Payment Modal ---------- */
-payBtn.onclick = ()=>{
-  if(members.length<3){ alert("Add at least 3 members"); return; }
-  if(!teamNameInput.value.trim()){ alert("Enter Team Name"); return; }
-
-  const amount = members.length*MEMBER_FEE;
-  paidAmountInput.value = amount;
-  upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
-  paymentOverlay.style.display="flex";
-};
-
-closePayment.onclick = ()=> paymentOverlay.style.display="none";
-paymentOverlay.addEventListener('click', (e)=>{ if(e.target===paymentOverlay) paymentOverlay.style.display="none"; });
-
-closeSuccess.onclick = ()=> successOverlay.style.display="none";
-okSuccess.onclick    = ()=> successOverlay.style.display="none";
-successOverlay.addEventListener('click', (e)=>{ if(e.target===successOverlay) successOverlay.style.display="none"; });
-
-/* ---------- Helpers ---------- */
+/* ---------- Utility Helpers ---------- */
+function normalizeReg(reg){ return (reg||"").trim().toUpperCase(); }
 function setCompleteBtnLoading(state){
   if(state){
     completePaymentBtn.disabled = true;
-    completeBtnSpin.style.display = 'inline-block';
-    completeBtnText.textContent = 'Processing...';
-  }else{
+    completePaymentBtn.textContent = 'Processing...';
+  } else {
     completePaymentBtn.disabled = false;
-    completeBtnSpin.style.display = 'none';
-    completeBtnText.textContent = 'Complete Payment';
+    completePaymentBtn.textContent = 'Complete Payment';
   }
 }
 function generateToken(teamName){
-  const suffix = Math.floor(Math.random()*900+100);
-  return `EDH-${teamName}-${suffix}`;
+  const clean = (teamName||'TEAM').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,10);
+  const suffix = Math.floor(Math.random()*9000+1000);
+  return `EDH-${clean}-${suffix}`;
 }
+
+/* ---------- Member UI & Logic ---------- */
+addMemberBtn.addEventListener('click', ()=>{ memberOverlay.style.display = 'flex'; });
+closeMember.addEventListener('click', ()=>{ memberOverlay.style.display = 'none'; });
+cancelAddMember.addEventListener('click', (e)=>{ e.preventDefault(); memberOverlay.style.display = 'none'; });
+
+clearMembersBtn.addEventListener('click', ()=>{
+  if(confirm('Clear all added members?')){
+    members = [];
+    renderMembers();
+  }
+});
+
+saveMember.addEventListener('click', (e)=>{
+  e.preventDefault();
+  const name = (memberName.value||'').trim();
+  const reg  = (memberRegno.value||'').trim();
+  const dept = (memberDept.value||'').trim();
+  const year = (memberYear.value||'').trim();
+  const email= (memberEmail.value||'').trim();
+
+  if(!name || !reg || !dept || !year || !email){ alert('Please fill all fields'); return; }
+  if(members.length >=5){ alert('Maximum 5 members allowed'); return; }
+
+  const normalized = normalizeReg(reg);
+  // prevent duplicate register no in same team
+  if(members.some(m => normalizeReg(m.reg) === normalized)){
+    alert('This register number is already added to the team');
+    return;
+  }
+
+  members.push({ name, reg, dept, year, email });
+  renderMembers();
+
+  // reset modal fields
+  memberName.value = '';
+  memberRegno.value = '';
+  memberDept.value = '';
+  memberYear.value = '';
+  memberEmail.value = '';
+  memberOverlay.style.display = 'none';
+});
+
+function removeMember(index){
+  members.splice(index,1);
+  renderMembers();
+}
+
+function renderMembers(){
+  teamList.innerHTML = '';
+  members.forEach((m,i)=>{
+    const li = document.createElement('li');
+    const left = document.createElement('div');
+    left.innerHTML = `<strong>${i+1}. ${m.name}</strong> <div class="small">${m.reg} — ${m.dept}, ${m.year} — ${m.email}</div>`;
+    const right = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.className = 'remove-btn';
+    btn.textContent = 'Remove';
+    btn.addEventListener('click', ()=> removeMember(i));
+    right.appendChild(btn);
+    li.appendChild(left);
+    li.appendChild(right);
+    teamList.appendChild(li);
+  });
+  totalAmountInput.value = `₹ ${members.length*MEMBER_FEE}.00`;
+}
+
+/* ---------- Firestore duplicate-check helpers ---------- */
 async function isDuplicateTxn(txnId){
-  const q=query(collection(db,"events",EVENT_ID,"registrations"), where("transaction_id","==",txnId));
-  const snap=await getDocs(q);
+  if(!txnId) return false;
+  const q = query(collection(db, 'events', EVENT_ID, 'registrations'), where('transaction_id', '==', txnId));
+  const snap = await getDocs(q);
   return !snap.empty;
 }
 
-/* ---------- Payment Submit ---------- */
+// returns array of objects { reg, team_name, registration_id }
+async function findDuplicateRegistrations(regnos){
+  if(!regnos || regnos.length===0) return [];
+  try{
+    // Firestore supports array-contains-any up to 10 values — our max is 5
+    const q = query(collection(db, 'events', EVENT_ID, 'registrations'), where('members_regnos', 'array-contains-any', regnos));
+    const snap = await getDocs(q);
+    const conflicts = [];
+    snap.forEach(docSnap => {
+      const data = docSnap.data() || {};
+      const existingRegnos = (data.members_regnos || []).map(r => (r||'').toUpperCase());
+      const teamName = data.team_name || '';
+      const registrationId = docSnap.id;
+      regnos.forEach(r => {
+        if(existingRegnos.includes(r)){
+          conflicts.push({ reg: r, team_name: teamName, registration_id: registrationId });
+        }
+      });
+    });
+    // deduplicate by reg
+    const uniq = {};
+    conflicts.forEach(c => { if(!uniq[c.reg]) uniq[c.reg] = c; });
+    return Object.values(uniq);
+  }catch(err){
+    console.error('Error querying duplicates:', err);
+    return [];
+  }
+}
+
+/* ---------- Payment flow ---------- */
+payBtn.addEventListener('click', ()=>{
+  if(members.length < 3){ alert('Add at least 3 members'); return; }
+  if(!teamNameInput.value.trim()){ alert('Enter Team Name'); return; }
+  const amount = members.length * MEMBER_FEE;
+  paidAmountInput.value = amount; // show in modal
+  totalAmountText.textContent = `₹ ${amount}.00`;
+  upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
+  paymentOverlay.style.display = 'flex';
+});
+
+closePayment.addEventListener('click', ()=> paymentOverlay.style.display = 'none');
+cancelPayment.addEventListener('click', ()=> paymentOverlay.style.display = 'none');
+successOverlay && okSuccess && okSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
+
+paymentOverlay.addEventListener('click', (e)=>{ if(e.target === paymentOverlay) paymentOverlay.style.display = 'none'; });
+successOverlay.addEventListener('click', (e)=>{ if(e.target === successOverlay) successOverlay.style.display = 'none'; });
+
+/* ---------- Submit Payment & Save ---------- */
 paymentForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   if(submitting) return;
-  submitting=true;
+  submitting = true;
   setCompleteBtnLoading(true);
 
-  const txnId   = txnIdInput.value.trim();
-  const payer   = payerNameInput.value.trim();
-  const amount  = Number(paidAmountInput.value);
+  const txnIdRaw = (txnIdInput.value||'').trim();
+  const txnId = txnIdRaw;
+  const payer = (payerNameInput.value||'').trim();
+  const amount = Number(paidAmountInput.value) || (members.length*MEMBER_FEE);
   const teamName = teamNameInput.value.trim();
 
-  if(!txnId){ alert("Enter Transaction / UTR ID"); setCompleteBtnLoading(false); submitting=false; return; }
-
-  // ✅ Duplicate check
-  if(await isDuplicateTxn(txnId)){ 
-    alert("⚠️ This Transaction ID is already registered!"); 
-    setCompleteBtnLoading(false); 
-    submitting=false; 
-    return; 
-  }
+  if(!txnId){ alert('Enter Transaction / UTR ID'); setCompleteBtnLoading(false); submitting=false; return; }
 
   try{
-    const tokenId = generateToken(teamName);
-    const paidAt  = new Date().toISOString();
+    // run duplicate checks in parallel
+    const regnos = members.map(m => normalizeReg(m.reg));
+    const [txnExists, regConflicts] = await Promise.all([
+      isDuplicateTxn(txnId),
+      findDuplicateRegistrations(regnos)
+    ]);
 
-    await savePaymentToFirestore({
+    if(txnExists){
+      alert('This Transaction ID is already registered. If you paid and didn\'t get confirmation, contact the organizers.');
+      setCompleteBtnLoading(false); submitting=false; return;
+    }
+
+    // Filter conflicts to those registered in OTHER teams (team name differs)
+    const regConflictsOther = regConflicts.filter(c => {
+      const existingTeam = (c.team_name || '').toString().trim().toLowerCase();
+      const curTeam = (teamName || '').toString().trim().toLowerCase();
+      // If existingTeam is empty, treat as conflict (registered but team unknown)
+      return existingTeam === '' ? true : (existingTeam !== curTeam);
+    });
+
+    if(regConflictsOther && regConflictsOther.length > 0){
+      const msgs = regConflictsOther.map(c => `${c.reg}${c.team_name ? ' — already registered in team: ' + c.team_name : ''}`);
+      alert('Duplicate register numbers found (already registered in other team):\n' + msgs.join('\n'));
+      setCompleteBtnLoading(false); submitting=false; return;
+    }
+
+    // If there are regConflicts but all belong to the same team name entered (possible edit), allow saving.
+    if(regConflicts && regConflicts.length > 0 && regConflictsOther.length === 0){
+      console.log('Found existing registrations but all belong to the same team name. Proceeding to save (assumed edit).');
+    }
+
+    // all clear — prepare data and save
+    const tokenId = generateToken(teamName);
+    const paidAt = new Date().toISOString();
+
+    // normalize member regnos for storage
+    const members_regnos = members.map(m => normalizeReg(m.reg));
+
+    const payload = {
       event: EVENT_ID,
       team_name: teamName,
-      members,
+      members: members,
+      members_regnos,
       total_members: members.length,
       amount,
-      status: "submitted",
+      status: 'submitted',
       paid_at: paidAt,
       token: tokenId,
       transaction_id: txnId,
       payer_name: payer || null,
       upi_id: UPI_ID,
       verified: false
-    });
+    };
 
-    paymentOverlay.style.display="none";
-    successOverlay.style.display="flex";
-    members=[];
+    // save to Firestore (auto id)
+    const colRef = collection(db, 'events', EVENT_ID, 'registrations');
+    const newDocRef = doc(colRef);
+    await setDoc(newDocRef, { ...payload, id: newDocRef.id, createdAt: serverTimestamp() });
+
+    paymentOverlay.style.display = 'none';
+    successOverlay.style.display = 'flex';
+
+    // reset
+    members = [];
     renderMembers();
-    teamNameInput.value="";
+    teamNameInput.value = '';
+    txnIdInput.value = '';
+    payerNameInput.value = '';
+
   }catch(err){
-    console.error("Firestore error:", err);
-    alert("Something went wrong. Please try again.");
+    console.error('Error saving registration:', err);
+    alert('Something went wrong while saving. Please try again or contact the organizer.');
   }finally{
-    submitting=false;
+    submitting = false;
     setCompleteBtnLoading(false);
   }
 });
 
-/* ---------- Firestore ---------- */
-async function savePaymentToFirestore(data){
-  const colRef = collection(db, "events", EVENT_ID, "registrations");
-  const ref    = doc(colRef);
-  await setDoc(ref, {
-    ...data,
-    id: ref.id,
-    createdAt: serverTimestamp()
-  }, { merge:true });
-}
+/* ---------- Initial render ---------- */
+renderMembers();
 </script>
 </body>
 </html>
