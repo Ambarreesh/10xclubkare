@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EDU HACK CONSOLE|10X CLUB KARE</title>
+<title>EDU HACK |10X CLUB</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,8 +75,8 @@
   .icon-btn.active-mentor { background: var(--st-red); color: #fff; box-shadow: 0 0 15px var(--st-red); animation: pulse 1s infinite; }
   @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-  .tabs { display: flex; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .tab-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; padding: 15px 0; cursor: pointer; position: relative; transition: 0.3s; letter-spacing: 0.5px; }
+  .tabs { display: flex; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); overflow-x: auto; padding-bottom: 5px; }
+  .tab-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; padding: 15px 0; cursor: pointer; position: relative; transition: 0.3s; letter-spacing: 0.5px; white-space: nowrap; }
   .tab-btn:hover, .tab-btn.active { color: #fff; }
   .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: var(--st-red); box-shadow: 0 0 15px var(--st-red); }
 
@@ -93,12 +93,16 @@
   .btn-primary:hover { background: #ff1f4b; box-shadow: 0 6px 30px rgba(255,0,51,0.5); }
   .btn-google { background: #fff; display: flex; align-items: center; gap: 12px; padding: 16px 32px; border-radius: 99px; font-size: 1.1rem; box-shadow: 0 10px 40px rgba(255,255,255,0.1); }
 
-  /* UPDATES FEED */
+  /* FEED & TIMELINE */
   .updates-box { max-height: 150px; overflow-y: auto; margin-bottom: 30px; border: 1px solid var(--st-red); background: rgba(255,0,51,0.05); padding: 15px; border-radius: 12px; display: none; }
   .updates-box.has-content { display: block; animation: slideDown 0.5s ease; }
   .update-item { font-size: 0.9rem; margin-bottom: 8px; border-bottom: 1px solid rgba(255,0,51,0.2); padding-bottom: 8px; }
   .update-time { font-size: 0.75rem; color: var(--st-red); font-weight: bold; margin-right: 8px; }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .timeline { border-left: 2px solid rgba(255,255,255,0.1); margin-left: 10px; padding-left: 40px; padding-top: 10px; }
+  .timeline-item { position: relative; margin-bottom: 40px; }
+  .timeline-item::before { content: ''; position: absolute; left: -46px; top: 4px; width: 14px; height: 14px; background: #000; border: 3px solid var(--st-red); border-radius: 50%; box-shadow: 0 0 15px var(--st-red); }
+  .timeline-time { font-size: 0.9rem; color: var(--st-red); font-weight: bold; margin-bottom: 6px; display: block; letter-spacing: 1px;}
 
   .status-badge { padding: 6px 14px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-pending { background: rgba(255, 165, 0, 0.15); color: orange; border: 1px solid rgba(255, 165, 0, 0.3); }
@@ -108,6 +112,7 @@
   .hidden-section { display: none; }
   .show-section { display: block; animation: fadeIn 0.6s var(--ease-apple); }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
   @media(max-width: 768px){ .glitch-logo { font-size: 3rem; } .header-left { flex-direction: column; align-items: flex-start; gap: 10px; } .mini-title { font-size: 1.4rem; } .course-item { flex-direction: column; align-items: flex-start; } input { width: 100%; } .tabs { overflow-x: auto; } }
 </style>
@@ -165,21 +170,21 @@
     <div class="glass-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2 style="margin:0; font-family:var(--font-title); color:var(--st-red); font-size:2rem;">INFOSYS MODULES</h2>
-        <span style="font-size:0.9rem; color:var(--text-secondary);">36 Hours Requirement</span>
+        <span style="font-size:0.9rem; color:var(--text-secondary);">36 Hours Requirement [cite: 50, 72]</span>
       </div>
-      <p style="color:var(--text-secondary); margin-bottom:30px;">Complete courses. Paste Google Drive link of certificates.</p>
+      <p style="color:var(--text-secondary); margin-bottom:30px;">Paste Google Drive link of your certificates.</p>
       
       <div id="courseList">
         <div class="course-item">
-          <div class="course-info"><h3 style="margin:0;">Modern AI Masterclass</h3><span style="font-size:0.8rem; opacity:0.7;">16 Hours</span></div>
+          <div class="course-info"><h3 style="margin:0;">Modern Artificial Intelligence Masterclass</h3><span style="font-size:0.8rem; opacity:0.7;">16 Hours </span></div>
           <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert1"><button class="btn btn-primary" onclick="submitCert(1)" id="btnCert1">Verify</button></div>
         </div>
         <div class="course-item">
-          <div class="course-info"><h3 style="margin:0;">Introduction To AI</h3><span style="font-size:0.8rem; opacity:0.7;">13 Hours</span></div>
+          <div class="course-info"><h3 style="margin:0;">Introduction To Artificial Intelligence</h3><span style="font-size:0.8rem; opacity:0.7;">13 Hours </span></div>
           <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert2"><button class="btn btn-primary" onclick="submitCert(2)" id="btnCert2">Verify</button></div>
         </div>
         <div class="course-item">
-          <div class="course-info"><h3 style="margin:0;">Generative AI Applications</h3><span style="font-size:0.8rem; opacity:0.7;">7 Hours</span></div>
+          <div class="course-info"><h3 style="margin:0;">Generative AI: Intro And Applications</h3><span style="font-size:0.8rem; opacity:0.7;">7 Hours </span></div>
           <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert3"><button class="btn btn-primary" onclick="submitCert(3)" id="btnCert3">Verify</button></div>
         </div>
       </div>
@@ -221,10 +226,19 @@
     <div class="glass-card">
       <h2 style="font-family:var(--font-title); font-size:2rem; margin-bottom:40px; color:var(--st-red);">OPERATIONAL FLOW</h2>
       <div class="timeline">
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 05:00 PM</span><strong>Event Launch</strong><br><span style="color:var(--text-secondary);">Registration.</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 08:00 PM</span><strong>Phase 1: Analysis</strong><br><span style="color:var(--text-secondary);">Planning.</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 12:30 AM</span><strong>Review 1</strong><br><span style="color:var(--text-secondary);">Ideation Check.</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 03:00 PM</span><strong>Final Review</strong><br><span style="color:var(--text-secondary);">Presentations.</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 05:00 PM</span><strong>Event Launch</strong><br><span style="color:var(--text-secondary);">Welcome ceremony, introductions & rules. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 06:00 PM</span><strong>Domain Distribution</strong><br><span style="color:var(--text-secondary);">Teams receive random domains. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 06:30 PM</span><strong>Problem Statement Distribution</strong><br><span style="color:var(--text-secondary);">Teams brainstorm & select MSME problems. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 07:00 PM</span><strong>Dinner</strong><br><span style="color:var(--text-secondary);">Networking and strategizing. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 08:00 PM</span><strong>Phase 1: Analysis</strong><br><span style="color:var(--text-secondary);">Teams analyze problem, explore solutions. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 10:30 PM</span><strong>Refreshment 1</strong><br><span style="color:var(--text-secondary);">Evening refreshment break. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 11:30 PM</span><strong>Review 1</strong><br><span style="color:var(--text-secondary);">Mentors provide feedback on initial ideas. [cite: 77]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 07:00 AM</span><strong>Breakfast</strong><br><span style="color:var(--text-secondary);">Recharge break. [cite: 84]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 09:00 AM</span><strong>Review 2</strong><br><span style="color:var(--text-secondary);">Mentors evaluate projects. [cite: 84]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 12:00 PM</span><strong>Lunch</strong><br><span style="color:var(--text-secondary);">Midday meal break. [cite: 84]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 02:30 PM</span><strong>Final Refreshment</strong><br><span style="color:var(--text-secondary);">Last energy boost. [cite: 84]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 03:00 PM</span><strong>Last Review</strong><br><span style="color:var(--text-secondary);">Final project presentations and judging. [cite: 84]</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 04:00 PM</span><strong>Prize Distribution</strong><br><span style="color:var(--text-secondary);">Results announcement & closing remarks. [cite: 84]</span></div>
       </div>
     </div>
   </div>
@@ -236,7 +250,7 @@
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   // REPLACE WITH YOUR KEYS
-  const firebaseConfig = {
+ const firebaseConfig = {
   apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
   authDomain: "eduhack-432fd.firebaseapp.com",
   projectId: "eduhack-432fd",
@@ -251,6 +265,7 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
   const EVENT_ID = "edu-hack-2025";
+  // Updated Timer Date based on PDF: Dec 20, 2025 5:00 PM [cite: 77]
   const HACKATHON_START = new Date("Dec 20, 2025 17:00:00").getTime(); 
 
   let currentTeamId = null;
@@ -266,18 +281,19 @@
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      document.querySelector('#loginScreen p').innerHTML = `<span style="color:#fff;">Establish Connection...</span>`;
+      document.querySelector('#loginScreen p').innerHTML = `<span style="color:#fff;">Scanning Database...</span>`;
       try {
-        // CLIENT SIDE SEARCH (Safe fallback)
+        // CLIENT SIDE SEARCH (Required for Array of Objects structure)
         const snapshot = await getDocs(collection(db, 'events', EVENT_ID, 'registrations'));
         let found = false;
         snapshot.forEach((d) => {
           const data = d.data();
+          // Check 'members' array for email
           if (data.members && data.members.some(m => m.email?.toLowerCase().trim() === user.email.toLowerCase().trim())) {
             found = true; currentTeamId = d.id; setupRealtime(currentTeamId, user);
           }
         });
-        if (!found) { playSound('error'); alert("Access Denied"); await signOut(auth); }
+        if (!found) { playSound('error'); alert("Access Denied: Email not registered."); await signOut(auth); }
       } catch (err) { console.error(err); alert("Connection Failed"); }
     }
   });
@@ -288,7 +304,7 @@
       if (docSnap.exists()) updateUI(user, docSnap.data());
     });
 
-    // 2. Listen to Announcements (NEW FEATURE)
+    // 2. Listen to Announcements
     const q = query(collection(db, 'events', EVENT_ID, 'announcements'), orderBy('createdAt', 'desc'), limit(5));
     announcementsUnsub = onSnapshot(q, (snap) => {
       const box = document.getElementById('updatesBox');
@@ -346,7 +362,7 @@
   // LOGIC
   window.switchTab = (tabId) => { playSound('click'); document.querySelectorAll('.show-section').forEach(e=>e.classList.replace('show-section','hidden-section')); document.getElementById(tabId).classList.replace('hidden-section','show-section'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); };
 
-  // MENTOR BEACON (NEW FEATURE)
+  // MENTOR BEACON
   document.getElementById('mentorBtn').addEventListener('click', async () => {
     playSound('click');
     const isActive = document.getElementById('mentorBtn').classList.contains('active-mentor');
@@ -356,16 +372,18 @@
     }
   });
 
-  // FINAL SUBMISSION (NEW FEATURE)
+  // FINAL SUBMISSION
   window.submitFinal = async () => {
     playSound('click');
     const val = document.getElementById('finalRepo').value.trim();
     if(!val) return alert("Enter GitHub Link");
     if(confirm("Submit Final Project?")) {
+        const btn = document.getElementById('btnFinal');
+        btn.textContent = "Syncing...";
         try {
             await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.finalRepo': val, 'submissions.finalTime': new Date().toISOString() });
             playSound('success');
-        } catch(e) { alert("Failed"); }
+        } catch(e) { alert("Failed"); btn.textContent = "Retry"; }
     }
   };
 
@@ -384,11 +402,11 @@
     }
   }, 1000);
 
-  // Existing Submit Functions (Cert, Freeze, Round1) remain same...
-  window.submitCert = async (id) => { playSound('click'); const val = document.getElementById(`cert${id}`).value.trim(); if(!val) return alert("Link required"); try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { [`submissions.course${id}`]: val }); playSound('success'); } catch(e) { alert("Failed"); } };
-  document.getElementById('freezeBtn').addEventListener('click', async () => { playSound('click'); const title = document.getElementById('projectTitle').value.trim(); const topic = document.getElementById('projectTopic').value.trim(); if(!title) return alert("Missing fields"); if(confirm("Freeze?")) { try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.projectTitle': title, 'submissions.projectTopic': topic }); playSound('success'); } catch(e) { alert("Failed"); } } });
+  // Submission Functions
+  window.submitCert = async (id) => { playSound('click'); const val = document.getElementById(`cert${id}`).value.trim(); if(!val) return alert("Link required"); const btn = document.getElementById(`btnCert${id}`); btn.textContent = "Syncing..."; try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { [`submissions.course${id}`]: val }); playSound('success'); } catch(e) { alert("Failed"); btn.textContent = "Retry"; } };
+  document.getElementById('freezeBtn').addEventListener('click', async () => { playSound('click'); const title = document.getElementById('projectTitle').value.trim(); const topic = document.getElementById('projectTopic').value.trim(); if(!title) return alert("Missing fields"); if(confirm("Freeze?")) { const btn = document.getElementById('freezeBtn'); btn.textContent = "Freezing..."; try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.projectTitle': title, 'submissions.projectTopic': topic }); playSound('success'); } catch(e) { alert("Failed"); btn.textContent = "Retry"; } } });
   function lockTopicForm() { document.getElementById('projectTitle').disabled = true; document.getElementById('projectTopic').disabled = true; const btn = document.getElementById('freezeBtn'); btn.textContent = "Frozen"; btn.disabled = true; btn.classList.add('btn-ghost'); }
-  window.submitRound = async (r) => { playSound('click'); const val = document.getElementById('round1Link').value.trim(); if(!val) return alert("Link required"); try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.round1Link': val, 'submissions.round1Time': new Date().toISOString() }); playSound('success'); } catch(e) { alert("Failed"); } };
+  window.submitRound = async (r) => { playSound('click'); const val = document.getElementById('round1Link').value.trim(); if(!val) return alert("Link required"); const btn = document.getElementById('btnRound1'); btn.textContent = "Syncing..."; try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.round1Link': val, 'submissions.round1Time': new Date().toISOString() }); playSound('success'); } catch(e) { alert("Failed"); btn.textContent = "Retry"; } };
 </script>
 </body>
 </html>
