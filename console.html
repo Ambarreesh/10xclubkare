@@ -390,7 +390,7 @@
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   // REPLACE WITH YOUR ACTUAL KEYS FROM FIREBASE CONSOLE
-  const firebaseConfig = {
+ const firebaseConfig = {
   apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
   authDomain: "eduhack-432fd.firebaseapp.com",
   projectId: "eduhack-432fd",
@@ -407,7 +407,7 @@
 
   // CONSTANTS
   const EVENT_ID = "edu-hack-2025";
-  const HACKATHON_START = new Date("Dec 20, 2025 17:00:00").getTime(); // 
+  const HACKATHON_START = new Date("Dec 20, 2025 17:00:00").getTime(); 
 
   // STATE
   let currentTeamId = null;
@@ -424,9 +424,10 @@
   function playSound(type) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
 
   // ==========================================
-  // 2. AUTHENTICATION LOGIC
+  // 2. AUTHENTICATION LOGIC (NO DB EDIT VERSION)
   // ==========================================
   const loginBtn = document.getElementById('loginBtn');
+  const loginStatus = document.querySelector('#loginScreen p');
   
   loginBtn.addEventListener('click', () => {
     playSound('click');
@@ -438,31 +439,47 @@
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("Checking User:", user.email);
+      console.log("Authenticated with Google:", user.email);
+      loginStatus.innerHTML = `<span style="color:#fff;">Scanning Database for Agent Record...</span>`;
       
-      // Strict Check: Look for email in 'members_emails' array
-      const q = query(
-        collection(db, 'events', EVENT_ID, 'registrations'), 
-        where('members_emails', 'array-contains', user.email.toLowerCase())
-      );
-
       try {
-        const snapshot = await getDocs(q);
+        // --- CLIENT-SIDE FILTER STRATEGY ---
+        // 1. Fetch all registrations
+        const registrationsRef = collection(db, 'events', EVENT_ID, 'registrations');
+        const snapshot = await getDocs(registrationsRef);
         
-        if (!snapshot.empty) {
-          // Success: User is a participant
-          const docSnap = snapshot.docs[0];
-          teamData = docSnap.data();
-          currentTeamId = docSnap.id;
+        let found = false;
+        
+        // 2. Iterate and find the user inside the 'members' array of objects
+        snapshot.forEach((docSnapshot) => {
+          const data = docSnapshot.data();
           
+          if (data.members && Array.isArray(data.members)) {
+            // Check if any object in the array has the matching email
+            const isMember = data.members.some(member => 
+              member.email && member.email.toLowerCase().trim() === user.email.toLowerCase().trim()
+            );
+
+            if (isMember) {
+              // Found the user's team!
+              found = true;
+              teamData = data;
+              currentTeamId = docSnapshot.id;
+            }
+          }
+        });
+
+        if (found) {
           playSound('success');
           loadDashboard(user, teamData);
         } else {
-          // Fail: User not registered
+          // User not found in any team
           playSound('error');
-          alert("ACCESS DENIED: No registration found for " + user.email);
+          alert("ACCESS DENIED: No team registration found for " + user.email);
+          loginStatus.innerHTML = "Restricted Area. Authorized Participants Only.";
           await signOut(auth);
         }
+
       } catch (err) {
         console.error("DB Error:", err);
         alert("Database connection failed. Check console.");
