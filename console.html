@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EDU HACK | Operator Terminal</title>
+<title>EDU HACK | Command Center</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
     background: radial-gradient(circle at 50% -20%, #1a0005 0%, #000 80%);
   }
 
-  /* --- CRT & ATMOSPHERE EFFECTS --- */
+  /* --- ATMOSPHERE --- */
   body::after {
     content: " ";
     display: block;
@@ -60,7 +60,7 @@
   }
   @keyframes fogMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(5deg) scale(1.1); } }
 
-  /* --- LAYOUT --- */
+  /* --- APP LAYOUT --- */
   .app-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -99,7 +99,45 @@
     10% { text-shadow: 2px 2px 0px var(--st-red); }
   }
 
-  /* --- COMPONENTS --- */
+  /* --- HEADER & NAV --- */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0; margin-bottom: 40px; border-bottom: 1px solid var(--glass-border);
+  }
+  .header-left { display: flex; align-items: center; gap: 25px; }
+  .logos img { height: 45px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+  
+  .mini-title {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    color: #fff;
+    text-shadow: 2px 2px 0px var(--st-red);
+    letter-spacing: 2px;
+  }
+
+  .user-badge {
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 99px;
+    border: 1px solid var(--glass-border);
+    transition: 0.3s;
+  }
+  .user-badge:hover { background: rgba(255,255,255,0.08); }
+  
+  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--st-red); background-size: cover; border: 2px solid rgba(255,255,255,0.2); }
+  
+  .logout-btn {
+    background: rgba(255, 0, 51, 0.1); 
+    border: 1px solid rgba(255, 0, 51, 0.3);
+    color: var(--st-red);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: 0.3s;
+    margin-left: 10px;
+  }
+  .logout-btn:hover { background: var(--st-red); color: #fff; transform: scale(1.1); box-shadow: 0 0 15px var(--st-red); }
+
+  /* --- UI COMPONENTS --- */
   .glass-card {
     background: var(--glass-surface);
     backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -110,20 +148,6 @@
     transition: transform 0.3s ease;
   }
   
-  header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 0; margin-bottom: 40px; border-bottom: 1px solid var(--glass-border);
-  }
-  .logos img { height: 45px; margin-right: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-  
-  .user-badge {
-    display: flex; align-items: center; gap: 14px;
-    background: rgba(255,255,255,0.03); padding: 10px 20px; border-radius: 99px;
-    border: 1px solid var(--glass-border);
-  }
-  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--st-red); background-size: cover; border: 2px solid rgba(255,255,255,0.2); }
-
-  /* TABS */
   .tabs { display: flex; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .tab-btn {
     background: transparent; border: none; color: var(--text-secondary);
@@ -137,7 +161,6 @@
     background: var(--st-red); box-shadow: 0 0 15px var(--st-red);
   }
 
-  /* LISTS & INPUTS */
   .course-item {
     display: flex; align-items: center; justify-content: space-between;
     padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -160,19 +183,11 @@
   }
   .btn:hover { transform: scale(1.03); }
   .btn:active { transform: scale(0.98); }
-  
-  .btn-primary { 
-    background: var(--st-red); color: #fff; 
-    box-shadow: 0 4px 20px rgba(255,0,51,0.3); 
-  }
+  .btn-primary { background: var(--st-red); color: #fff; box-shadow: 0 4px 20px rgba(255,0,51,0.3); }
   .btn-primary:hover { background: #ff1f4b; box-shadow: 0 6px 30px rgba(255,0,51,0.5); }
-  
-  .btn-ghost { background: rgba(255,255,255,0.1); color: #fff; }
-  .btn-ghost:hover { background: rgba(255,255,255,0.2); }
-
   .btn-google { background: #fff; display: flex; align-items: center; gap: 12px; padding: 16px 32px; border-radius: 99px; font-size: 1.1rem; box-shadow: 0 10px 40px rgba(255,255,255,0.1); }
 
-  /* TIMELINE & STATUS */
+  /* --- TIMELINE --- */
   .timeline { border-left: 2px solid rgba(255,255,255,0.1); margin-left: 10px; padding-left: 40px; padding-top: 10px; }
   .timeline-item { position: relative; margin-bottom: 50px; }
   .timeline-item::before {
@@ -183,28 +198,24 @@
   .timeline-time { font-size: 0.9rem; color: var(--st-red); font-weight: bold; margin-bottom: 6px; display: block; letter-spacing: 1px;}
   
   .countdown-box { text-align: center; margin-bottom: 50px; }
-  .timer-display {
-    font-family: var(--font-title); font-size: 4rem; letter-spacing: 4px;
-    color: #fff; text-shadow: 0 0 30px rgba(255,0,51,0.4);
-  }
+  .timer-display { font-family: var(--font-title); font-size: 4rem; letter-spacing: 4px; color: #fff; text-shadow: 0 0 30px rgba(255,0,51,0.4); }
 
   .status-badge { padding: 6px 14px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-pending { background: rgba(255, 165, 0, 0.15); color: orange; border: 1px solid rgba(255, 165, 0, 0.3); }
   .status-open { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
 
-  /* UTILS */
+  /* --- UTILS --- */
   .hidden-section { display: none; }
   .show-section { display: block; animation: fadeIn 0.6s var(--ease-apple); }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Responsive */
   @media(max-width: 768px){
     .glitch-logo { font-size: 3rem; }
-    .timer-display { font-size: 2.5rem; }
+    .header-left { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .mini-title { font-size: 1.4rem; }
     .course-item { flex-direction: column; align-items: flex-start; }
     input { width: 100%; }
     .tabs { overflow-x: auto; padding-bottom: 10px; }
-    .tab-btn { white-space: nowrap; }
   }
 </style>
 </head>
@@ -227,16 +238,25 @@
 <div class="app-container" id="appContainer">
   
   <header>
-    <div class="logos">
-      <img src="img/klu.png" alt="KARE">
-      <img src="img/image 26.png" alt="10X Club">
-    </div>
-    <div class="user-badge">
-      <div class="user-avatar" id="userAvatar"></div>
-      <div>
-        <div style="font-size:0.95rem; font-weight:700; color:#fff;" id="userName">Loading...</div>
-        <div style="font-size:0.8rem; color:var(--text-secondary);" id="teamNameDisplay">Authenticating...</div>
+    <div class="header-left">
+      <div class="logos" style="display:flex; gap:15px;">
+        <img src="img/klu.png" alt="KARE">
+        <img src="img/image 26.png" alt="10X Club">
       </div>
+      <div class="mini-title">EDU HACK</div>
+    </div>
+    
+    <div style="display:flex; align-items:center;">
+      <div class="user-badge">
+        <div class="user-avatar" id="userAvatar"></div>
+        <div>
+          <div style="font-size:0.95rem; font-weight:700; color:#fff;" id="userName">Loading...</div>
+          <div style="font-size:0.8rem; color:var(--text-secondary);" id="teamNameDisplay">Authenticating...</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn" title="Disconnect Session">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
     </div>
   </header>
 
@@ -252,15 +272,15 @@
         <h2 style="margin:0; font-family:var(--font-title); color:var(--st-red); font-size:2rem;">INFOSYS MODULES</h2>
         <span style="font-size:0.9rem; color:var(--text-secondary);">36 Hours Requirement</span>
       </div>
-      <p style="color:var(--text-secondary); margin-bottom:30px; line-height:1.6;">
+      <p style="color:var(--text-secondary); margin-bottom:30px;">
         Complete the designated Infosys Springboard courses.<br>
-        Paste the Google Drive link of your certificate for verification.
+        Paste the Google Drive link of your certificate.
       </p>
       
       <div id="courseList">
         <div class="course-item">
           <div class="course-info">
-            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Modern Artificial Intelligence Masterclass</h3>
+            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Modern AI Masterclass</h3>
             <span style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; font-size:0.8rem;">16 Hours</span>
           </div>
           <div style="display:flex; gap:12px; width:100%; max-width:500px;">
@@ -271,7 +291,7 @@
 
         <div class="course-item">
           <div class="course-info">
-            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Introduction To Artificial Intelligence</h3>
+            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Introduction To AI</h3>
             <span style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; font-size:0.8rem;">13 Hours</span>
           </div>
           <div style="display:flex; gap:12px; width:100%; max-width:500px;">
@@ -282,7 +302,7 @@
 
         <div class="course-item">
           <div class="course-info">
-            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Generative AI: Intro & Applications</h3>
+            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Generative AI Applications</h3>
             <span style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; font-size:0.8rem;">7 Hours</span>
           </div>
           <div style="display:flex; gap:12px; width:100%; max-width:500px;">
@@ -308,7 +328,7 @@
       
       <div id="topicFormArea" style="opacity:0.5; pointer-events:none; transition:0.3s;">
         <div style="margin-bottom:20px;">
-          <label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Problem Statement / MSME Challenge</label>
+          <label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Problem Statement</label>
           <input type="text" id="projectTopic" style="width:100%;" placeholder="Enter selected problem statement...">
         </div>
         <div style="margin-bottom:25px;">
@@ -329,11 +349,6 @@
         <button class="btn btn-primary" onclick="submitRound(1)" id="btnRound1">Submit Idea</button>
       </div>
     </div>
-
-    <div class="glass-card" style="opacity:0.5; border-style:dashed;">
-      <h2 style="margin:0; font-size:1.3rem;">Round 2: Development</h2>
-      <p style="margin-top:10px; color:var(--st-red);">Status: Awaiting Round 1 Clearance</p>
-    </div>
   </div>
 
   <div id="timeline" class="hidden-section">
@@ -342,38 +357,19 @@
       <div class="timeline">
         <div class="timeline-item">
           <span class="timeline-time">DEC 20 • 05:00 PM</span>
-          <strong style="font-size:1.1rem;">Event Launch</strong><br>
-          <span style="color:var(--text-secondary);">Registration & Welcome Ceremony.</span>
+          <strong>Event Launch</strong><br><span style="color:var(--text-secondary);">Registration & Welcome.</span>
         </div>
         <div class="timeline-item">
           <span class="timeline-time">DEC 20 • 06:30 PM</span>
-          <strong style="font-size:1.1rem;">Problem Statement Distribution</strong><br>
-          <span style="color:var(--text-secondary);">Teams analyze and select real-world challenges.</span>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 20 • 08:00 PM</span>
-          <strong style="font-size:1.1rem;">Phase 1: Analysis</strong><br>
-          <span style="color:var(--text-secondary);">Explore solutions and plan execution.</span>
+          <strong>Problem Statement Distribution</strong><br><span style="color:var(--text-secondary);">Select real-world challenges.</span>
         </div>
         <div class="timeline-item">
           <span class="timeline-time">DEC 21 • 12:30 AM</span>
-          <strong style="font-size:1.1rem;">Review 1</strong><br>
-          <span style="color:var(--text-secondary);">Mentors provide feedback on initial ideas.</span>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 21 • 09:00 AM</span>
-          <strong style="font-size:1.1rem;">Review 2</strong><br>
-          <span style="color:var(--text-secondary);">Development Evaluation & Progress Check.</span>
+          <strong>Review 1</strong><br><span style="color:var(--text-secondary);">Mentors provide feedback.</span>
         </div>
         <div class="timeline-item">
           <span class="timeline-time">DEC 21 • 03:00 PM</span>
-          <strong style="font-size:1.1rem;">Final Review</strong><br>
-          <span style="color:var(--text-secondary);">Final project presentation and judging.</span>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 21 • 04:00 PM</span>
-          <strong style="font-size:1.1rem;">Prize Distribution</strong><br>
-          <span style="color:var(--text-secondary);">Awards ceremony and closing remarks.</span>
+          <strong>Final Review</strong><br><span style="color:var(--text-secondary);">Project presentation.</span>
         </div>
       </div>
     </div>
@@ -382,15 +378,13 @@
 </div>
 
 <script type="module">
-  // ==========================================
-  // 1. FIREBASE CONFIGURATION
-  // ==========================================
+  // --- CONFIGURATION ---
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  // REPLACE WITH YOUR ACTUAL KEYS FROM FIREBASE CONSOLE
- const firebaseConfig = {
+  // REPLACE WITH YOUR ACTUAL KEYS
+  const firebaseConfig = {
   apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
   authDomain: "eduhack-432fd.firebaseapp.com",
   projectId: "eduhack-432fd",
@@ -411,164 +405,166 @@
 
   // STATE
   let currentTeamId = null;
-  let teamData = null;
+  let unsubscribeListener = null;
 
   // SOUNDS
   const sounds = {
     click: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
     success: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
-    error: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3')
+    error: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'),
+    power: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3') // New logout sound
   };
   Object.values(sounds).forEach(s => s.volume = 0.3);
-
   function playSound(type) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
 
-  // ==========================================
-  // 2. AUTHENTICATION LOGIC (NO DB EDIT VERSION)
-  // ==========================================
+  // --- AUTH LOGIC ---
   const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
   const loginStatus = document.querySelector('#loginScreen p');
   
+  // LOGIN
   loginBtn.addEventListener('click', () => {
     playSound('click');
-    signInWithPopup(auth, provider).catch(err => {
-      console.error(err);
-      alert("Login Error: " + err.message);
-    });
+    signInWithPopup(auth, provider).catch(err => alert(err.message));
+  });
+
+  // LOGOUT
+  logoutBtn.addEventListener('click', async () => {
+    playSound('power');
+    if(unsubscribeListener) unsubscribeListener(); // Stop listening to DB
+    await signOut(auth);
+    window.location.reload();
   });
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("Authenticated with Google:", user.email);
-      loginStatus.innerHTML = `<span style="color:#fff;">Scanning Database for Agent Record...</span>`;
+      console.log("Logged in:", user.email);
+      loginStatus.innerHTML = `<span style="color:#fff;">Establish Connection...</span>`;
       
       try {
-        // --- CLIENT-SIDE FILTER STRATEGY ---
-        // 1. Fetch all registrations
+        // CLIENT-SIDE SEARCH (Due to DB Structure)
         const registrationsRef = collection(db, 'events', EVENT_ID, 'registrations');
         const snapshot = await getDocs(registrationsRef);
-        
         let found = false;
         
-        // 2. Iterate and find the user inside the 'members' array of objects
         snapshot.forEach((docSnapshot) => {
           const data = docSnapshot.data();
-          
           if (data.members && Array.isArray(data.members)) {
-            // Check if any object in the array has the matching email
             const isMember = data.members.some(member => 
               member.email && member.email.toLowerCase().trim() === user.email.toLowerCase().trim()
             );
 
             if (isMember) {
-              // Found the user's team!
               found = true;
-              teamData = data;
               currentTeamId = docSnapshot.id;
+              
+              // ** REAL-TIME LISTENER (The Google Dev Touch) **
+              // Instead of loading once, we subscribe to changes.
+              // If teammate updates Title, you see it instantly.
+              setupRealtimeListener(currentTeamId, user);
             }
           }
         });
 
-        if (found) {
-          playSound('success');
-          loadDashboard(user, teamData);
-        } else {
-          // User not found in any team
+        if (!found) {
           playSound('error');
           alert("ACCESS DENIED: No team registration found for " + user.email);
-          loginStatus.innerHTML = "Restricted Area. Authorized Participants Only.";
           await signOut(auth);
         }
 
       } catch (err) {
-        console.error("DB Error:", err);
-        alert("Database connection failed. Check console.");
+        console.error(err);
+        alert("Connection Failed");
       }
     }
   });
 
-  function loadDashboard(user, team) {
-    // Hide Login, Show App
+  function setupRealtimeListener(teamId, user) {
+    const docRef = doc(db, 'events', EVENT_ID, 'registrations', teamId);
+    
+    // This function runs every time the document changes in the Cloud
+    unsubscribeListener = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const teamData = docSnap.data();
+        updateUI(user, teamData);
+      }
+    });
+
+    // Hide Login
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appContainer').classList.add('visible');
+    playSound('success');
+  }
 
-    // Populate Header
+  function updateUI(user, team) {
+    // Header Info
     document.getElementById('userName').textContent = user.displayName.toUpperCase();
     document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
     document.getElementById('teamNameDisplay').textContent = `SQUAD: ${team.team_name.toUpperCase()}`;
 
-    // Populate Existing Data (If they refresh page)
+    // Load Data
     const subs = team.submissions || {};
     
-    // Restore Course Links
-    if(subs.course1) { document.getElementById('cert1').value = subs.course1; disableInput('cert1'); }
-    if(subs.course2) { document.getElementById('cert2').value = subs.course2; disableInput('cert2'); }
-    if(subs.course3) { document.getElementById('cert3').value = subs.course3; disableInput('cert3'); }
+    // Sync Certs
+    if(subs.course1) { setInputState('cert1', subs.course1); }
+    if(subs.course2) { setInputState('cert2', subs.course2); }
+    if(subs.course3) { setInputState('cert3', subs.course3); }
 
-    // Restore Project Title
+    // Sync Topic
     if(subs.projectTitle) {
       document.getElementById('projectTitle').value = subs.projectTitle;
       document.getElementById('projectTopic').value = subs.projectTopic || "";
       lockTopicForm();
     }
 
-    // Restore Round 1
+    // Sync Round 1
     if(subs.round1Link) {
       document.getElementById('round1Link').value = subs.round1Link;
-      disableInput('round1Link');
-      document.getElementById('btnRound1').textContent = "Submitted";
+      setInputState('round1Link', subs.round1Link, true); // true = button text change
     }
   }
 
-  // ==========================================
-  // 3. UI INTERACTION
-  // ==========================================
+  function setInputState(id, val, isRound1 = false) {
+    const el = document.getElementById(id);
+    if(el.value !== val) el.value = val; // Only update if different
+    el.disabled = true;
+    
+    const btnPrefix = isRound1 ? 'btnRound1' : 'btn' + id.charAt(0).toUpperCase() + id.slice(1);
+    const btn = document.getElementById(btnPrefix);
+    if(btn) { 
+      btn.textContent = isRound1 ? "Submitted" : "Verified"; 
+      btn.disabled = true; 
+    }
+  }
+
+  // --- UI TABS ---
   window.switchTab = (tabId) => {
     playSound('click');
-    // Hide all sections
     ['learning', 'hackathon', 'timeline'].forEach(id => {
-      const el = document.getElementById(id);
-      el.classList.remove('show-section');
-      el.classList.add('hidden-section');
+      document.getElementById(id).classList.remove('show-section');
+      document.getElementById(id).classList.add('hidden-section');
     });
-    // Show selected
     const target = document.getElementById(tabId);
     target.classList.remove('hidden-section');
     target.classList.add('show-section');
-
-    // Update buttons
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
   };
 
-  function disableInput(id) {
-    const el = document.getElementById(id);
-    el.disabled = true;
-    const btn = document.getElementById('btn' + id.charAt(0).toUpperCase() + id.slice(1)); 
-    if(btn) { btn.textContent = "Verified"; btn.disabled = true; }
-  }
-
-  // ==========================================
-  // 4. LOGIC: TIMER & TOPIC LOCK
-  // ==========================================
-  const timerInterval = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = HACKATHON_START - now;
-
+  // --- TIMER ---
+  setInterval(() => {
+    const distance = HACKATHON_START - new Date().getTime();
     if (distance < 0) {
-      // EVENT STARTED
       document.getElementById("timer").innerHTML = "LIVE";
       document.getElementById("topicStatus").textContent = "OPEN FOR SUBMISSION";
       document.getElementById("topicStatus").className = "status-badge status-open";
       
-      // Unlock Form (if not already frozen by user)
       const formArea = document.getElementById("topicFormArea");
       if (!document.getElementById('projectTitle').disabled) {
         formArea.style.opacity = "1";
         formArea.style.pointerEvents = "auto";
       }
     } else {
-      // COUNTDOWN
       const d = Math.floor(distance / (1000 * 60 * 60 * 24));
       const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -577,42 +573,37 @@
     }
   }, 1000);
 
-  // ==========================================
-  // 5. DATA SUBMISSION
-  // ==========================================
-  
-  // Submit Certificates
+  // --- ACTIONS ---
   window.submitCert = async (id) => {
     playSound('click');
     const val = document.getElementById(`cert${id}`).value.trim();
-    if(!val) return alert("Please enter a valid link");
-
+    if(!val) return alert("Please enter link");
+    
+    const btn = document.getElementById(`btnCert${id}`);
+    btn.textContent = "Syncing...";
+    
     try {
-      const docRef = doc(db, 'events', EVENT_ID, 'registrations', currentTeamId);
-      await updateDoc(docRef, { [`submissions.course${id}`]: val });
+      await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { [`submissions.course${id}`]: val });
       playSound('success');
-      disableInput(`cert${id}`);
-    } catch(e) { console.error(e); alert("Save failed"); }
+    } catch(e) { console.error(e); alert("Failed"); btn.textContent = "Retry"; }
   };
 
-  // Freeze Topic
   document.getElementById('freezeBtn').addEventListener('click', async () => {
     playSound('click');
     const title = document.getElementById('projectTitle').value.trim();
     const topic = document.getElementById('projectTopic').value.trim();
-    
-    if(!title || !topic) return alert("Both fields are required.");
+    if(!title || !topic) return alert("Required fields missing");
 
-    if(confirm("Confirm: Once frozen, you cannot change the topic or title.")) {
+    if(confirm("Confirm Freeze?")) {
+      const btn = document.getElementById('freezeBtn');
+      btn.textContent = "Freezing...";
       try {
-        const docRef = doc(db, 'events', EVENT_ID, 'registrations', currentTeamId);
-        await updateDoc(docRef, { 
+        await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 
           'submissions.projectTitle': title,
           'submissions.projectTopic': topic
         });
         playSound('success');
-        lockTopicForm();
-      } catch(e) { console.error(e); alert("Save failed"); }
+      } catch(e) { console.error(e); alert("Failed"); btn.textContent = "Retry"; }
     }
   });
 
@@ -625,23 +616,21 @@
     btn.classList.add('btn-ghost');
   }
 
-  // Submit Round 1
-  window.submitRound = async (roundId) => {
+  window.submitRound = async (r) => {
     playSound('click');
     const val = document.getElementById('round1Link').value.trim();
-    if(!val) return alert("Please enter PPT Drive Link");
+    if(!val) return alert("Paste Drive Link");
+
+    const btn = document.getElementById('btnRound1');
+    btn.textContent = "Syncing...";
 
     try {
-      const docRef = doc(db, 'events', EVENT_ID, 'registrations', currentTeamId);
-      await updateDoc(docRef, { 
+      await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 
         'submissions.round1Link': val,
         'submissions.round1Time': new Date().toISOString()
       });
       playSound('success');
-      document.getElementById('round1Link').disabled = true;
-      document.getElementById('btnRound1').textContent = "Submitted";
-      document.getElementById('btnRound1').disabled = true;
-    } catch(e) { console.error(e); alert("Save failed"); }
+    } catch(e) { console.error(e); alert("Failed"); btn.textContent = "Retry"; }
   }
 
 </script>
