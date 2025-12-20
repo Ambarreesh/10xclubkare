@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>EDU HACK 24hrs Hackathon | 10X Club KARE</title>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
 
-<!-- QR Code (optional) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
@@ -112,14 +110,13 @@
         </div>
 
         <div>
-          <button type="button" class="btn btn-primary" id="payBtn" disabled>Open soon</button>
+          <button type="button" class="btn btn-primary" id="payBtn" >Continue</button>
         </div>
       </form>
     </section>
   </div>
 </div>
 
-<!-- Add Member Modal -->
 <div class="modal-overlay" id="memberOverlay">
   <div class="modal glass">
     <span class="close-x" id="closeMember">&times;</span>
@@ -169,7 +166,6 @@
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
 <div class="modal-overlay" id="paymentOverlay">
   <div class="modal glass" id="paymentCard">
     <span class="close-x" id="closePayment">&times;</span>
@@ -204,7 +200,6 @@
   </div>
 </div>
 
-<!-- SUCCESS POPUP -->
 <div class="modal-overlay" id="successOverlay">
   <div class="modal glass">
     <span class="close-x" id="closeSuccess">&times;</span>
@@ -291,6 +286,8 @@ let submitting = false;
 
 /* ---------- Utility Helpers ---------- */
 function normalizeReg(reg){ return (reg||"").trim().toUpperCase(); }
+function normalizeEmail(email){ return (email||"").trim().toLowerCase(); }
+
 function setCompleteBtnLoading(state){
   if(state){
     completePaymentBtn.disabled = true;
@@ -329,10 +326,17 @@ saveMember.addEventListener('click', (e)=>{
   if(!name || !reg || !dept || !year || !email){ alert('Please fill all fields'); return; }
   if(members.length >=5){ alert('Maximum 5 members allowed'); return; }
 
-  const normalized = normalizeReg(reg);
-  // prevent duplicate register no in same team
-  if(members.some(m => normalizeReg(m.reg) === normalized)){
+  const normalizedReg = normalizeReg(reg);
+  const normalizedEmail = normalizeEmail(email);
+
+  // Check duplicate Reg No in current local list (Local Check)
+  if(members.some(m => normalizeReg(m.reg) === normalizedReg)){
     alert('This register number is already added to the team');
+    return;
+  }
+  // Check duplicate Email in current local list (Local Check)
+  if(members.some(m => normalizeEmail(m.email) === normalizedEmail)){
+    alert('This email ID is already added to the team');
     return;
   }
 
@@ -372,49 +376,70 @@ function renderMembers(){
   totalAmountInput.value = `₹ ${members.length*MEMBER_FEE}.00`;
 }
 
-/* ---------- Firestore duplicate-check helpers ---------- */
+/* ---------- Firestore Duplicate Check Helpers (DB Check) ---------- */
+
 async function isDuplicateTxn(txnId){
   if(!txnId) return false;
+  // Check if Transaction ID exists in DB
   const q = query(collection(db, 'events', EVENT_ID, 'registrations'), where('transaction_id', '==', txnId));
   const snap = await getDocs(q);
   return !snap.empty;
 }
 
-// returns array of objects { reg, team_name, registration_id }
 async function findDuplicateRegistrations(regnos){
   if(!regnos || regnos.length===0) return [];
   try{
-    // Firestore supports array-contains-any up to 10 values — our max is 5
+    // Check if any Reg No exists in DB members_regnos array
     const q = query(collection(db, 'events', EVENT_ID, 'registrations'), where('members_regnos', 'array-contains-any', regnos));
     const snap = await getDocs(q);
     const conflicts = [];
     snap.forEach(docSnap => {
       const data = docSnap.data() || {};
       const existingRegnos = (data.members_regnos || []).map(r => (r||'').toUpperCase());
-      const teamName = data.team_name || '';
-      const registrationId = docSnap.id;
+      const teamName = data.team_name || 'Unknown Team';
       regnos.forEach(r => {
         if(existingRegnos.includes(r)){
-          conflicts.push({ reg: r, team_name: teamName, registration_id: registrationId });
+          conflicts.push({ type:'reg', value: r, team_name: teamName });
         }
       });
     });
-    // deduplicate by reg
-    const uniq = {};
-    conflicts.forEach(c => { if(!uniq[c.reg]) uniq[c.reg] = c; });
-    return Object.values(uniq);
-  }catch(err){
-    console.error('Error querying duplicates:', err);
+    return conflicts;
+  } catch(err){
+    console.error('Error querying Reg duplicates:', err);
     return [];
   }
 }
 
-/* ---------- Payment flow ---------- */
+async function findDuplicateEmails(emails){
+  if(!emails || emails.length===0) return [];
+  try{
+    // Check if any Email exists in DB members_emails array
+    const q = query(collection(db, 'events', EVENT_ID, 'registrations'), where('members_emails', 'array-contains-any', emails));
+    const snap = await getDocs(q);
+    const conflicts = [];
+    snap.forEach(docSnap => {
+      const data = docSnap.data() || {};
+      const existingEmails = (data.members_emails || []).map(e => (e||'').toLowerCase());
+      const teamName = data.team_name || 'Unknown Team';
+      emails.forEach(e => {
+        if(existingEmails.includes(e)){
+          conflicts.push({ type:'email', value: e, team_name: teamName });
+        }
+      });
+    });
+    return conflicts;
+  } catch(err){
+    console.error('Error querying Email duplicates:', err);
+    return [];
+  }
+}
+
+/* ---------- Payment & Submission Logic ---------- */
 payBtn.addEventListener('click', ()=>{
   if(members.length < 3){ alert('Add at least 3 members'); return; }
   if(!teamNameInput.value.trim()){ alert('Enter Team Name'); return; }
   const amount = members.length * MEMBER_FEE;
-  paidAmountInput.value = amount; // show in modal
+  paidAmountInput.value = amount;
   totalAmountText.textContent = `₹ ${amount}.00`;
   upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
   paymentOverlay.style.display = 'flex';
@@ -427,7 +452,6 @@ successOverlay && okSuccess && okSuccess.addEventListener('click', ()=> successO
 paymentOverlay.addEventListener('click', (e)=>{ if(e.target === paymentOverlay) paymentOverlay.style.display = 'none'; });
 successOverlay.addEventListener('click', (e)=>{ if(e.target === successOverlay) successOverlay.style.display = 'none'; });
 
-/* ---------- Submit Payment & Save ---------- */
 paymentForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   if(submitting) return;
@@ -443,49 +467,51 @@ paymentForm.addEventListener('submit', async (e)=>{
   if(!txnId){ alert('Enter Transaction / UTR ID'); setCompleteBtnLoading(false); submitting=false; return; }
 
   try{
-    // run duplicate checks in parallel
+    // Prepare data for verification
     const regnos = members.map(m => normalizeReg(m.reg));
-    const [txnExists, regConflicts] = await Promise.all([
+    const emails = members.map(m => normalizeEmail(m.email));
+
+    // RUN CHECKS IN PARALLEL
+    const [txnExists, regConflicts, emailConflicts] = await Promise.all([
       isDuplicateTxn(txnId),
-      findDuplicateRegistrations(regnos)
+      findDuplicateRegistrations(regnos),
+      findDuplicateEmails(emails)
     ]);
 
+    // 1. Check Transaction ID
     if(txnExists){
-      alert('This Transaction ID is already registered. If you paid and didn\'t get confirmation, contact the organizers.');
+      alert('⚠️ Payment Error: This Transaction ID is already registered.');
       setCompleteBtnLoading(false); submitting=false; return;
     }
 
-    // Filter conflicts to those registered in OTHER teams (team name differs)
-    const regConflictsOther = regConflicts.filter(c => {
-      const existingTeam = (c.team_name || '').toString().trim().toLowerCase();
-      const curTeam = (teamName || '').toString().trim().toLowerCase();
-      // If existingTeam is empty, treat as conflict (registered but team unknown)
-      return existingTeam === '' ? true : (existingTeam !== curTeam);
-    });
-
-    if(regConflictsOther && regConflictsOther.length > 0){
-      const msgs = regConflictsOther.map(c => `${c.reg}${c.team_name ? ' — already registered in team: ' + c.team_name : ''}`);
-      alert('Duplicate register numbers found (already registered in other team):\n' + msgs.join('\n'));
+    // 2. Check Register Numbers
+    // NOTE: We block ALL conflicts found in DB, even if Team Name is the same.
+    if(regConflicts.length > 0){
+      const msgs = regConflicts.map(c => `- ${c.value} (Registered in: ${c.team_name})`);
+      alert('⚠️ Registration Error:\nThe following Register Numbers are already registered:\n\n' + msgs.join('\n'));
       setCompleteBtnLoading(false); submitting=false; return;
     }
 
-    // If there are regConflicts but all belong to the same team name entered (possible edit), allow saving.
-    if(regConflicts && regConflicts.length > 0 && regConflictsOther.length === 0){
-      console.log('Found existing registrations but all belong to the same team name. Proceeding to save (assumed edit).');
+    // 3. Check Emails
+    // NOTE: We block ALL conflicts found in DB.
+    if(emailConflicts.length > 0){
+      const msgs = emailConflicts.map(c => `- ${c.value} (Registered in: ${c.team_name})`);
+      alert('⚠️ Registration Error:\nThe following Email IDs are already registered:\n\n' + msgs.join('\n'));
+      setCompleteBtnLoading(false); submitting=false; return;
     }
 
-    // all clear — prepare data and save
+    // ALL CLEAR - SAVE DATA
     const tokenId = generateToken(teamName);
     const paidAt = new Date().toISOString();
-
-    // normalize member regnos for storage
-    const members_regnos = members.map(m => normalizeReg(m.reg));
+    const members_regnos = regnos;
+    const members_emails = emails;
 
     const payload = {
       event: EVENT_ID,
       team_name: teamName,
       members: members,
-      members_regnos,
+      members_regnos, 
+      members_emails, 
       total_members: members.length,
       amount,
       status: 'submitted',
@@ -497,7 +523,6 @@ paymentForm.addEventListener('submit', async (e)=>{
       verified: false
     };
 
-    // save to Firestore (auto id)
     const colRef = collection(db, 'events', EVENT_ID, 'registrations');
     const newDocRef = doc(colRef);
     await setDoc(newDocRef, { ...payload, id: newDocRef.id, createdAt: serverTimestamp() });
@@ -505,7 +530,7 @@ paymentForm.addEventListener('submit', async (e)=>{
     paymentOverlay.style.display = 'none';
     successOverlay.style.display = 'flex';
 
-    // reset
+    // Reset Form
     members = [];
     renderMembers();
     teamNameInput.value = '';
@@ -514,7 +539,7 @@ paymentForm.addEventListener('submit', async (e)=>{
 
   }catch(err){
     console.error('Error saving registration:', err);
-    alert('Something went wrong while saving. Please try again or contact the organizer.');
+    alert('Something went wrong. Please check your internet connection or contact support.');
   }finally{
     submitting = false;
     setCompleteBtnLoading(false);
