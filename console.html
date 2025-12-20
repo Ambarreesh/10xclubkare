@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EDU HACK | Command Center</title>
+<title>EDU HACK CONSOLE|10X CLUB KARE</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,185 +38,78 @@
 
   /* --- ATMOSPHERE --- */
   body::after {
-    content: " ";
-    display: block;
-    position: fixed;
-    top: 0; left: 0; bottom: 0; right: 0;
+    content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 100;
-    background-size: 100% 2px, 3px 100%;
-    pointer-events: none;
-    opacity: 0.6;
+    z-index: 100; background-size: 100% 2px, 3px 100%; pointer-events: none; opacity: 0.6;
   }
-
   .fog-layer {
-    position: fixed;
-    top: -50%; left: -50%; width: 200%; height: 200%;
+    position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
     background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJnoiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2cpIiBvcGFjaXR5PSIwLjAzIi8+PC9zdmc+');
-    opacity: 0.35;
-    pointer-events: none;
-    z-index: 0;
-    animation: fogMove 60s linear infinite;
+    opacity: 0.35; pointer-events: none; z-index: 0; animation: fogMove 60s linear infinite;
   }
   @keyframes fogMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(5deg) scale(1.1); } }
 
   /* --- APP LAYOUT --- */
-  .app-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    position: relative;
-    z-index: 10;
-    display: none;
-    opacity: 0;
-    transition: opacity 1s var(--ease-apple);
-    padding-bottom: 100px;
-  }
+  .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; display: none; opacity: 0; transition: opacity 1s var(--ease-apple); padding-bottom: 100px; }
   .app-container.visible { display: block; opacity: 1; }
 
-  /* --- LOGIN SCREEN --- */
-  .login-screen {
-    position: fixed; inset: 0; z-index: 20;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: #050505;
-    transition: transform 0.8s var(--ease-apple), opacity 0.8s;
-  }
+  /* --- LOGIN --- */
+  .login-screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #050505; transition: transform 0.8s var(--ease-apple), opacity 0.8s; }
   .login-screen.hidden { transform: scale(1.1); opacity: 0; pointer-events: none; }
+  .glitch-logo { font-family: var(--font-title); font-size: 5rem; color: #fff; text-shadow: 3px 3px 0px var(--st-red); margin-bottom: 20px; animation: glitch 3s infinite; text-align: center; line-height: 1; }
+  @keyframes glitch { 0% { text-shadow: 2px 2px 0px var(--st-red); } 5% { text-shadow: -2px -2px 0px #00ccff; } 10% { text-shadow: 2px 2px 0px var(--st-red); } }
 
-  .glitch-logo {
-    font-family: var(--font-title);
-    font-size: 5rem;
-    color: #fff;
-    text-shadow: 3px 3px 0px var(--st-red);
-    margin-bottom: 20px;
-    animation: glitch 3s infinite;
-    text-align: center;
-    line-height: 1;
-  }
-  @keyframes glitch {
-    0% { text-shadow: 2px 2px 0px var(--st-red); }
-    5% { text-shadow: -2px -2px 0px #00ccff; }
-    10% { text-shadow: 2px 2px 0px var(--st-red); }
-  }
-
-  /* --- HEADER & NAV --- */
-  header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 0; margin-bottom: 40px; border-bottom: 1px solid var(--glass-border);
-  }
+  /* --- COMPONENTS --- */
+  .glass-card { background: var(--glass-surface); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 30px; margin-bottom: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.3s ease; }
+  
+  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 40px; border-bottom: 1px solid var(--glass-border); }
   .header-left { display: flex; align-items: center; gap: 25px; }
   .logos img { height: 45px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-  
-  .mini-title {
-    font-family: var(--font-title);
-    font-size: 1.8rem;
-    color: #fff;
-    text-shadow: 2px 2px 0px var(--st-red);
-    letter-spacing: 2px;
-  }
+  .mini-title { font-family: var(--font-title); font-size: 1.8rem; color: #fff; text-shadow: 2px 2px 0px var(--st-red); letter-spacing: 2px; }
 
-  .user-badge {
-    display: flex; align-items: center; gap: 14px;
-    background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 99px;
-    border: 1px solid var(--glass-border);
-    transition: 0.3s;
-  }
-  .user-badge:hover { background: rgba(255,255,255,0.08); }
-  
+  .user-badge { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 99px; border: 1px solid var(--glass-border); }
   .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--st-red); background-size: cover; border: 2px solid rgba(255,255,255,0.2); }
   
-  .logout-btn {
-    background: rgba(255, 0, 51, 0.1); 
-    border: 1px solid rgba(255, 0, 51, 0.3);
-    color: var(--st-red);
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: 0.3s;
-    margin-left: 10px;
-  }
-  .logout-btn:hover { background: var(--st-red); color: #fff; transform: scale(1.1); box-shadow: 0 0 15px var(--st-red); }
+  .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; margin-left: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; }
+  .icon-btn:hover { background: #fff; color: #000; transform: scale(1.1); }
+  .icon-btn.active-mentor { background: var(--st-red); color: #fff; box-shadow: 0 0 15px var(--st-red); animation: pulse 1s infinite; }
+  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-  /* --- UI COMPONENTS --- */
-  .glass-card {
-    background: var(--glass-surface);
-    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    padding: 30px; margin-bottom: 24px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease;
-  }
-  
   .tabs { display: flex; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .tab-btn {
-    background: transparent; border: none; color: var(--text-secondary);
-    font-size: 0.95rem; font-weight: 600; padding: 15px 0; cursor: pointer;
-    position: relative; transition: 0.3s; letter-spacing: 0.5px;
-  }
-  .tab-btn:hover { color: #fff; }
-  .tab-btn.active { color: #fff; }
-  .tab-btn.active::after {
-    content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px;
-    background: var(--st-red); box-shadow: 0 0 15px var(--st-red);
-  }
+  .tab-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; padding: 15px 0; cursor: pointer; position: relative; transition: 0.3s; letter-spacing: 0.5px; }
+  .tab-btn:hover, .tab-btn.active { color: #fff; }
+  .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: var(--st-red); box-shadow: 0 0 15px var(--st-red); }
 
-  .course-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.06);
-    flex-wrap: wrap; gap: 20px;
-  }
+  .course-item { display: flex; align-items: center; justify-content: space-between; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; gap: 20px; }
   .course-item:last-child { border-bottom: none; }
   
-  input {
-    background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
-    color: #fff; padding: 12px 18px; border-radius: 12px; font-family: var(--font-main);
-    width: 280px; transition: 0.3s; font-size: 0.95rem;
-  }
+  input { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #fff; padding: 12px 18px; border-radius: 12px; font-family: var(--font-main); width: 280px; transition: 0.3s; font-size: 0.95rem; }
   input:focus { border-color: var(--st-red); box-shadow: 0 0 0 3px rgba(255,0,51,0.2); background: rgba(0,0,0,0.6); }
   input:disabled { opacity: 0.5; cursor: not-allowed; border-style: dashed; }
 
-  .btn {
-    background: #fff; color: #000; border: none; padding: 12px 24px;
-    border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;
-    font-family: var(--font-main);
-  }
+  .btn { background: #fff; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: var(--font-main); }
   .btn:hover { transform: scale(1.03); }
-  .btn:active { transform: scale(0.98); }
   .btn-primary { background: var(--st-red); color: #fff; box-shadow: 0 4px 20px rgba(255,0,51,0.3); }
   .btn-primary:hover { background: #ff1f4b; box-shadow: 0 6px 30px rgba(255,0,51,0.5); }
   .btn-google { background: #fff; display: flex; align-items: center; gap: 12px; padding: 16px 32px; border-radius: 99px; font-size: 1.1rem; box-shadow: 0 10px 40px rgba(255,255,255,0.1); }
 
-  /* --- TIMELINE --- */
-  .timeline { border-left: 2px solid rgba(255,255,255,0.1); margin-left: 10px; padding-left: 40px; padding-top: 10px; }
-  .timeline-item { position: relative; margin-bottom: 50px; }
-  .timeline-item::before {
-    content: ''; position: absolute; left: -46px; top: 4px;
-    width: 14px; height: 14px; background: #000; border: 3px solid var(--st-red); border-radius: 50%;
-    box-shadow: 0 0 15px var(--st-red);
-  }
-  .timeline-time { font-size: 0.9rem; color: var(--st-red); font-weight: bold; margin-bottom: 6px; display: block; letter-spacing: 1px;}
-  
-  .countdown-box { text-align: center; margin-bottom: 50px; }
-  .timer-display { font-family: var(--font-title); font-size: 4rem; letter-spacing: 4px; color: #fff; text-shadow: 0 0 30px rgba(255,0,51,0.4); }
+  /* UPDATES FEED */
+  .updates-box { max-height: 150px; overflow-y: auto; margin-bottom: 30px; border: 1px solid var(--st-red); background: rgba(255,0,51,0.05); padding: 15px; border-radius: 12px; display: none; }
+  .updates-box.has-content { display: block; animation: slideDown 0.5s ease; }
+  .update-item { font-size: 0.9rem; margin-bottom: 8px; border-bottom: 1px solid rgba(255,0,51,0.2); padding-bottom: 8px; }
+  .update-time { font-size: 0.75rem; color: var(--st-red); font-weight: bold; margin-right: 8px; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
   .status-badge { padding: 6px 14px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-pending { background: rgba(255, 165, 0, 0.15); color: orange; border: 1px solid rgba(255, 165, 0, 0.3); }
   .status-open { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
+  .timer-display { font-family: var(--font-title); font-size: 4rem; letter-spacing: 4px; color: #fff; text-shadow: 0 0 30px rgba(255,0,51,0.4); text-align: center; margin-bottom: 40px; }
 
-  /* --- UTILS --- */
   .hidden-section { display: none; }
   .show-section { display: block; animation: fadeIn 0.6s var(--ease-apple); }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-  @media(max-width: 768px){
-    .glitch-logo { font-size: 3rem; }
-    .header-left { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .mini-title { font-size: 1.4rem; }
-    .course-item { flex-direction: column; align-items: flex-start; }
-    input { width: 100%; }
-    .tabs { overflow-x: auto; padding-bottom: 10px; }
-  }
+  @media(max-width: 768px){ .glitch-logo { font-size: 3rem; } .header-left { flex-direction: column; align-items: flex-start; gap: 10px; } .mini-title { font-size: 1.4rem; } .course-item { flex-direction: column; align-items: flex-start; } input { width: 100%; } .tabs { overflow-x: auto; } }
 </style>
 </head>
 <body>
@@ -224,19 +117,17 @@
 <div class="fog-layer"></div>
 
 <div class="login-screen" id="loginScreen">
-  <div class="glitch-logo">EDU HACK<br><span style="font-size:0.4em; letter-spacing:0.3em; color:#fff;">OPERATOR ACCESS</span></div>
+  <div class="glitch-logo">EDU HACK<br><span style="font-size:0.4em; letter-spacing:0.3em; color:#fff;">PLAYGROUND</span></div>
   <p style="color:var(--text-secondary); margin-bottom:40px; font-size:1.1rem; text-align:center;">
     Restricted Area. Authorized Participants Only.<br>
     <span style="font-size:0.85rem; opacity:0.6;">System Verification via KARE Database</span>
   </p>
   <button class="btn btn-google" id="loginBtn">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="24">
-    Sign in with Google
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="24"> Sign in with Google
   </button>
 </div>
 
 <div class="app-container" id="appContainer">
-  
   <header>
     <div class="header-left">
       <div class="logos" style="display:flex; gap:15px;">
@@ -245,7 +136,6 @@
       </div>
       <div class="mini-title">EDU HACK</div>
     </div>
-    
     <div style="display:flex; align-items:center;">
       <div class="user-badge">
         <div class="user-avatar" id="userAvatar"></div>
@@ -254,11 +144,16 @@
           <div style="font-size:0.8rem; color:var(--text-secondary);" id="teamNameDisplay">Authenticating...</div>
         </div>
       </div>
-      <button class="logout-btn" id="logoutBtn" title="Disconnect Session">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      <button class="icon-btn" id="mentorBtn" title="Request Mentor Support">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>
+      </button>
+      <button class="icon-btn" id="logoutBtn" title="Disconnect Session" style="background:rgba(255,0,51,0.1); border-color:rgba(255,0,51,0.3); color:var(--st-red);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
       </button>
     </div>
   </header>
+
+  <div id="updatesBox" class="updates-box"></div>
 
   <nav class="tabs">
     <button class="tab-btn active" onclick="switchTab('learning')">PHASE 1: TRAINING</button>
@@ -272,81 +167,52 @@
         <h2 style="margin:0; font-family:var(--font-title); color:var(--st-red); font-size:2rem;">INFOSYS MODULES</h2>
         <span style="font-size:0.9rem; color:var(--text-secondary);">36 Hours Requirement</span>
       </div>
-      <p style="color:var(--text-secondary); margin-bottom:30px;">
-        Complete the designated Infosys Springboard courses.<br>
-        Paste the Google Drive link of your certificate.
-      </p>
+      <p style="color:var(--text-secondary); margin-bottom:30px;">Complete courses. Paste Google Drive link of certificates.</p>
       
       <div id="courseList">
         <div class="course-item">
-          <div class="course-info">
-            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Modern AI Masterclass</h3>
-            <span style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; font-size:0.8rem;">16 Hours</span>
-          </div>
-          <div style="display:flex; gap:12px; width:100%; max-width:500px;">
-            <input type="text" placeholder="Paste Drive Link..." id="cert1">
-            <button class="btn btn-primary" onclick="submitCert(1)" id="btnCert1">Verify</button>
-          </div>
+          <div class="course-info"><h3 style="margin:0;">Modern AI Masterclass</h3><span style="font-size:0.8rem; opacity:0.7;">16 Hours</span></div>
+          <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert1"><button class="btn btn-primary" onclick="submitCert(1)" id="btnCert1">Verify</button></div>
         </div>
-
         <div class="course-item">
-          <div class="course-info">
-            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Introduction To AI</h3>
-            <span style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; font-size:0.8rem;">13 Hours</span>
-          </div>
-          <div style="display:flex; gap:12px; width:100%; max-width:500px;">
-            <input type="text" placeholder="Paste Drive Link..." id="cert2">
-            <button class="btn btn-primary" onclick="submitCert(2)" id="btnCert2">Verify</button>
-          </div>
+          <div class="course-info"><h3 style="margin:0;">Introduction To AI</h3><span style="font-size:0.8rem; opacity:0.7;">13 Hours</span></div>
+          <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert2"><button class="btn btn-primary" onclick="submitCert(2)" id="btnCert2">Verify</button></div>
         </div>
-
         <div class="course-item">
-          <div class="course-info">
-            <h3 style="margin:0 0 6px 0; font-size:1.1rem;">Generative AI Applications</h3>
-            <span style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; font-size:0.8rem;">7 Hours</span>
-          </div>
-          <div style="display:flex; gap:12px; width:100%; max-width:500px;">
-            <input type="text" placeholder="Paste Drive Link..." id="cert3">
-            <button class="btn btn-primary" onclick="submitCert(3)" id="btnCert3">Verify</button>
-          </div>
+          <div class="course-info"><h3 style="margin:0;">Generative AI Applications</h3><span style="font-size:0.8rem; opacity:0.7;">7 Hours</span></div>
+          <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert3"><button class="btn btn-primary" onclick="submitCert(3)" id="btnCert3">Verify</button></div>
         </div>
       </div>
     </div>
   </div>
 
   <div id="hackathon" class="hidden-section">
-    <div class="countdown-box">
-      <div style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:15px; letter-spacing:2px;">MISSION START T-MINUS</div>
-      <div class="timer-display" id="timer">--:--:--:--</div>
-    </div>
+    <div class="timer-display" id="timer">--:--:--:--</div>
 
     <div class="glass-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
         <h2 style="margin:0; font-size:1.5rem;">Project Definition</h2>
         <span class="status-badge status-pending" id="topicStatus">LOCKED UNTIL 5 PM</span>
       </div>
-      
       <div id="topicFormArea" style="opacity:0.5; pointer-events:none; transition:0.3s;">
-        <div style="margin-bottom:20px;">
-          <label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Problem Statement</label>
-          <input type="text" id="projectTopic" style="width:100%;" placeholder="Enter selected problem statement...">
-        </div>
-        <div style="margin-bottom:25px;">
-          <label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Project Title</label>
-          <input type="text" id="projectTitle" style="width:100%;" placeholder="Enter innovative title...">
-        </div>
+        <div style="margin-bottom:20px;"><label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Problem Statement</label><input type="text" id="projectTopic" style="width:100%;"></div>
+        <div style="margin-bottom:25px;"><label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Project Title</label><input type="text" id="projectTitle" style="width:100%;"></div>
         <button class="btn btn-primary" id="freezeBtn">Freeze Topic (Irreversible)</button>
       </div>
     </div>
 
     <div class="glass-card">
       <h2 style="margin:0 0 10px 0; font-size:1.5rem;">Round 1: Ideation Phase</h2>
-      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:20px;">
-        Prepare a presentation detailing your implementation strategy.
-      </p>
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:20px;">Detailed Implementation Strategy (PPT)</p>
+      <div style="display:flex; gap:15px; flex-wrap:wrap;"><input type="text" id="round1Link" placeholder="Paste PPT Drive Link..." style="flex:1;"><button class="btn btn-primary" onclick="submitRound(1)" id="btnRound1">Submit Idea</button></div>
+    </div>
+
+    <div class="glass-card" style="border: 1px dashed var(--st-red);">
+      <h2 style="margin:0 0 10px 0; font-size:1.5rem; color:var(--st-red);">Final Submission</h2>
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:20px;">Required for Evaluation. GitHub Repository + Demo Video.</p>
       <div style="display:flex; gap:15px; flex-wrap:wrap;">
-        <input type="text" id="round1Link" placeholder="Paste PPT Drive Link..." style="flex:1; min-width:250px;">
-        <button class="btn btn-primary" onclick="submitRound(1)" id="btnRound1">Submit Idea</button>
+        <input type="text" id="finalRepo" placeholder="GitHub Repository Link" style="flex:1;">
+        <button class="btn btn-primary" onclick="submitFinal()" id="btnFinal">Submit Final Project</button>
       </div>
     </div>
   </div>
@@ -355,284 +221,173 @@
     <div class="glass-card">
       <h2 style="font-family:var(--font-title); font-size:2rem; margin-bottom:40px; color:var(--st-red);">OPERATIONAL FLOW</h2>
       <div class="timeline">
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 20 • 05:00 PM</span>
-          <strong>Event Launch</strong><br><span style="color:var(--text-secondary);">Registration & Welcome.</span>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 20 • 06:30 PM</span>
-          <strong>Problem Statement Distribution</strong><br><span style="color:var(--text-secondary);">Select real-world challenges.</span>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 21 • 12:30 AM</span>
-          <strong>Review 1</strong><br><span style="color:var(--text-secondary);">Mentors provide feedback.</span>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-time">DEC 21 • 03:00 PM</span>
-          <strong>Final Review</strong><br><span style="color:var(--text-secondary);">Project presentation.</span>
-        </div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 05:00 PM</span><strong>Event Launch</strong><br><span style="color:var(--text-secondary);">Registration.</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 20 • 08:00 PM</span><strong>Phase 1: Analysis</strong><br><span style="color:var(--text-secondary);">Planning.</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 12:30 AM</span><strong>Review 1</strong><br><span style="color:var(--text-secondary);">Ideation Check.</span></div>
+        <div class="timeline-item"><span class="timeline-time">DEC 21 • 03:00 PM</span><strong>Final Review</strong><br><span style="color:var(--text-secondary);">Presentations.</span></div>
       </div>
     </div>
   </div>
-
 </div>
 
 <script type="module">
-  // --- CONFIGURATION ---
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  // REPLACE WITH YOUR ACTUAL KEYS
+  // REPLACE WITH YOUR KEYS
   const firebaseConfig = {
-  apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
-  authDomain: "eduhack-432fd.firebaseapp.com",
-  projectId: "eduhack-432fd",
-  storageBucket: "eduhack-432fd.firebasestorage.app",
-  messagingSenderId: "160252785408",
-  appId: "1:160252785408:web:6a22e465982e3e510979e5",
-  measurementId: "G-WCKZ62NM6N"
-};
+    apiKey: "YOUR_API_KEY",
+    authDomain: "eduhack-432fd.firebaseapp.com",
+    projectId: "eduhack-432fd",
+    storageBucket: "eduhack-432fd.firebasestorage.app",
+    messagingSenderId: "160252785408",
+    appId: "1:160252785408:web:6a22e465982e3e510979e5"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
-
-  // CONSTANTS
   const EVENT_ID = "edu-hack-2025";
   const HACKATHON_START = new Date("Dec 20, 2025 17:00:00").getTime(); 
 
-  // STATE
   let currentTeamId = null;
-  let unsubscribeListener = null;
-
-  // SOUNDS
-  const sounds = {
-    click: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
-    success: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
-    error: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'),
-    power: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3') // New logout sound
-  };
+  let teamUnsub = null;
+  let announcementsUnsub = null;
+  const sounds = { click: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'), success: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'), error: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'), power: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3') };
   Object.values(sounds).forEach(s => s.volume = 0.3);
   function playSound(type) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
 
-  // --- AUTH LOGIC ---
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const loginStatus = document.querySelector('#loginScreen p');
-  
-  // LOGIN
-  loginBtn.addEventListener('click', () => {
-    playSound('click');
-    signInWithPopup(auth, provider).catch(err => alert(err.message));
-  });
-
-  // LOGOUT
-  logoutBtn.addEventListener('click', async () => {
-    playSound('power');
-    if(unsubscribeListener) unsubscribeListener(); // Stop listening to DB
-    await signOut(auth);
-    window.location.reload();
-  });
+  // AUTH
+  document.getElementById('loginBtn').addEventListener('click', () => { playSound('click'); signInWithPopup(auth, provider).catch(err => alert(err.message)); });
+  document.getElementById('logoutBtn').addEventListener('click', async () => { playSound('power'); if(teamUnsub) teamUnsub(); if(announcementsUnsub) announcementsUnsub(); await signOut(auth); window.location.reload(); });
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("Logged in:", user.email);
-      loginStatus.innerHTML = `<span style="color:#fff;">Establish Connection...</span>`;
-      
+      document.querySelector('#loginScreen p').innerHTML = `<span style="color:#fff;">Establish Connection...</span>`;
       try {
-        // CLIENT-SIDE SEARCH (Due to DB Structure)
-        const registrationsRef = collection(db, 'events', EVENT_ID, 'registrations');
-        const snapshot = await getDocs(registrationsRef);
+        // CLIENT SIDE SEARCH (Safe fallback)
+        const snapshot = await getDocs(collection(db, 'events', EVENT_ID, 'registrations'));
         let found = false;
-        
-        snapshot.forEach((docSnapshot) => {
-          const data = docSnapshot.data();
-          if (data.members && Array.isArray(data.members)) {
-            const isMember = data.members.some(member => 
-              member.email && member.email.toLowerCase().trim() === user.email.toLowerCase().trim()
-            );
-
-            if (isMember) {
-              found = true;
-              currentTeamId = docSnapshot.id;
-              
-              // ** REAL-TIME LISTENER (The Google Dev Touch) **
-              // Instead of loading once, we subscribe to changes.
-              // If teammate updates Title, you see it instantly.
-              setupRealtimeListener(currentTeamId, user);
-            }
+        snapshot.forEach((d) => {
+          const data = d.data();
+          if (data.members && data.members.some(m => m.email?.toLowerCase().trim() === user.email.toLowerCase().trim())) {
+            found = true; currentTeamId = d.id; setupRealtime(currentTeamId, user);
           }
         });
-
-        if (!found) {
-          playSound('error');
-          alert("ACCESS DENIED: No team registration found for " + user.email);
-          await signOut(auth);
-        }
-
-      } catch (err) {
-        console.error(err);
-        alert("Connection Failed");
-      }
+        if (!found) { playSound('error'); alert("Access Denied"); await signOut(auth); }
+      } catch (err) { console.error(err); alert("Connection Failed"); }
     }
   });
 
-  function setupRealtimeListener(teamId, user) {
-    const docRef = doc(db, 'events', EVENT_ID, 'registrations', teamId);
-    
-    // This function runs every time the document changes in the Cloud
-    unsubscribeListener = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const teamData = docSnap.data();
-        updateUI(user, teamData);
+  function setupRealtime(teamId, user) {
+    // 1. Listen to Team Data
+    teamUnsub = onSnapshot(doc(db, 'events', EVENT_ID, 'registrations', teamId), (docSnap) => {
+      if (docSnap.exists()) updateUI(user, docSnap.data());
+    });
+
+    // 2. Listen to Announcements (NEW FEATURE)
+    const q = query(collection(db, 'events', EVENT_ID, 'announcements'), orderBy('createdAt', 'desc'), limit(5));
+    announcementsUnsub = onSnapshot(q, (snap) => {
+      const box = document.getElementById('updatesBox');
+      box.innerHTML = '';
+      if(!snap.empty) {
+        box.classList.add('has-content');
+        snap.forEach(d => {
+           const msg = d.data();
+           box.innerHTML += `<div class="update-item"><span class="update-time">${new Date(msg.createdAt.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span> ${msg.message}</div>`;
+        });
       }
     });
 
-    // Hide Login
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appContainer').classList.add('visible');
     playSound('success');
   }
 
   function updateUI(user, team) {
-    // Header Info
     document.getElementById('userName').textContent = user.displayName.toUpperCase();
     document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
     document.getElementById('teamNameDisplay').textContent = `SQUAD: ${team.team_name.toUpperCase()}`;
-
-    // Load Data
-    const subs = team.submissions || {};
     
-    // Sync Certs
-    if(subs.course1) { setInputState('cert1', subs.course1); }
-    if(subs.course2) { setInputState('cert2', subs.course2); }
-    if(subs.course3) { setInputState('cert3', subs.course3); }
+    // Mentor Button State
+    const mBtn = document.getElementById('mentorBtn');
+    if(team.needsMentor) mBtn.classList.add('active-mentor');
+    else mBtn.classList.remove('active-mentor');
 
-    // Sync Topic
+    const subs = team.submissions || {};
+    if(subs.course1) setInputState('cert1', subs.course1);
+    if(subs.course2) setInputState('cert2', subs.course2);
+    if(subs.course3) setInputState('cert3', subs.course3);
     if(subs.projectTitle) {
       document.getElementById('projectTitle').value = subs.projectTitle;
       document.getElementById('projectTopic').value = subs.projectTopic || "";
       lockTopicForm();
     }
-
-    // Sync Round 1
-    if(subs.round1Link) {
-      document.getElementById('round1Link').value = subs.round1Link;
-      setInputState('round1Link', subs.round1Link, true); // true = button text change
+    if(subs.round1Link) setInputState('round1Link', subs.round1Link, true);
+    if(subs.finalRepo) {
+        document.getElementById('finalRepo').value = subs.finalRepo;
+        document.getElementById('finalRepo').disabled = true;
+        document.getElementById('btnFinal').textContent = "Submitted";
+        document.getElementById('btnFinal').disabled = true;
     }
   }
 
-  function setInputState(id, val, isRound1 = false) {
+  function setInputState(id, val, isRound1=false) {
     const el = document.getElementById(id);
-    if(el.value !== val) el.value = val; // Only update if different
+    if(el.value !== val) el.value = val;
     el.disabled = true;
-    
-    const btnPrefix = isRound1 ? 'btnRound1' : 'btn' + id.charAt(0).toUpperCase() + id.slice(1);
-    const btn = document.getElementById(btnPrefix);
-    if(btn) { 
-      btn.textContent = isRound1 ? "Submitted" : "Verified"; 
-      btn.disabled = true; 
-    }
+    const btn = document.getElementById(isRound1 ? 'btnRound1' : `btn${id.charAt(0).toUpperCase() + id.slice(1)}`);
+    if(btn) { btn.textContent = isRound1 ? "Submitted" : "Verified"; btn.disabled = true; }
   }
 
-  // --- UI TABS ---
-  window.switchTab = (tabId) => {
+  // LOGIC
+  window.switchTab = (tabId) => { playSound('click'); document.querySelectorAll('.show-section').forEach(e=>e.classList.replace('show-section','hidden-section')); document.getElementById(tabId).classList.replace('hidden-section','show-section'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); };
+
+  // MENTOR BEACON (NEW FEATURE)
+  document.getElementById('mentorBtn').addEventListener('click', async () => {
     playSound('click');
-    ['learning', 'hackathon', 'timeline'].forEach(id => {
-      document.getElementById(id).classList.remove('show-section');
-      document.getElementById(id).classList.add('hidden-section');
-    });
-    const target = document.getElementById(tabId);
-    target.classList.remove('hidden-section');
-    target.classList.add('show-section');
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-  };
-
-  // --- TIMER ---
-  setInterval(() => {
-    const distance = HACKATHON_START - new Date().getTime();
-    if (distance < 0) {
-      document.getElementById("timer").innerHTML = "LIVE";
-      document.getElementById("topicStatus").textContent = "OPEN FOR SUBMISSION";
-      document.getElementById("topicStatus").className = "status-badge status-open";
-      
-      const formArea = document.getElementById("topicFormArea");
-      if (!document.getElementById('projectTitle').disabled) {
-        formArea.style.opacity = "1";
-        formArea.style.pointerEvents = "auto";
-      }
-    } else {
-      const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((distance % (1000 * 60)) / 1000);
-      document.getElementById("timer").innerHTML = `${d}d ${h}h ${m}m ${s}s`;
-    }
-  }, 1000);
-
-  // --- ACTIONS ---
-  window.submitCert = async (id) => {
-    playSound('click');
-    const val = document.getElementById(`cert${id}`).value.trim();
-    if(!val) return alert("Please enter link");
-    
-    const btn = document.getElementById(`btnCert${id}`);
-    btn.textContent = "Syncing...";
-    
-    try {
-      await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { [`submissions.course${id}`]: val });
-      playSound('success');
-    } catch(e) { console.error(e); alert("Failed"); btn.textContent = "Retry"; }
-  };
-
-  document.getElementById('freezeBtn').addEventListener('click', async () => {
-    playSound('click');
-    const title = document.getElementById('projectTitle').value.trim();
-    const topic = document.getElementById('projectTopic').value.trim();
-    if(!title || !topic) return alert("Required fields missing");
-
-    if(confirm("Confirm Freeze?")) {
-      const btn = document.getElementById('freezeBtn');
-      btn.textContent = "Freezing...";
-      try {
-        await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 
-          'submissions.projectTitle': title,
-          'submissions.projectTopic': topic
-        });
-        playSound('success');
-      } catch(e) { console.error(e); alert("Failed"); btn.textContent = "Retry"; }
+    const isActive = document.getElementById('mentorBtn').classList.contains('active-mentor');
+    const msg = isActive ? "Cancel Mentor Request?" : "Request Mentor Support?";
+    if(confirm(msg)) {
+      await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { needsMentor: !isActive });
     }
   });
 
-  function lockTopicForm() {
-    document.getElementById('projectTitle').disabled = true;
-    document.getElementById('projectTopic').disabled = true;
-    const btn = document.getElementById('freezeBtn');
-    btn.textContent = "Topic Frozen";
-    btn.disabled = true;
-    btn.classList.add('btn-ghost');
-  }
-
-  window.submitRound = async (r) => {
+  // FINAL SUBMISSION (NEW FEATURE)
+  window.submitFinal = async () => {
     playSound('click');
-    const val = document.getElementById('round1Link').value.trim();
-    if(!val) return alert("Paste Drive Link");
+    const val = document.getElementById('finalRepo').value.trim();
+    if(!val) return alert("Enter GitHub Link");
+    if(confirm("Submit Final Project?")) {
+        try {
+            await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.finalRepo': val, 'submissions.finalTime': new Date().toISOString() });
+            playSound('success');
+        } catch(e) { alert("Failed"); }
+    }
+  };
 
-    const btn = document.getElementById('btnRound1');
-    btn.textContent = "Syncing...";
+  setInterval(() => {
+    const dist = HACKATHON_START - new Date().getTime();
+    if (dist < 0) {
+      document.getElementById("timer").innerHTML = "LIVE";
+      document.getElementById("topicStatus").textContent = "OPEN";
+      document.getElementById("topicStatus").className = "status-badge status-open";
+      if (!document.getElementById('projectTitle').disabled) { document.getElementById("topicFormArea").style.opacity = "1"; document.getElementById("topicFormArea").style.pointerEvents = "auto"; }
+    } else {
+      const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+      const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+      document.getElementById("timer").innerHTML = `${d}d ${h}h ${m}m`;
+    }
+  }, 1000);
 
-    try {
-      await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 
-        'submissions.round1Link': val,
-        'submissions.round1Time': new Date().toISOString()
-      });
-      playSound('success');
-    } catch(e) { console.error(e); alert("Failed"); btn.textContent = "Retry"; }
-  }
-
+  // Existing Submit Functions (Cert, Freeze, Round1) remain same...
+  window.submitCert = async (id) => { playSound('click'); const val = document.getElementById(`cert${id}`).value.trim(); if(!val) return alert("Link required"); try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { [`submissions.course${id}`]: val }); playSound('success'); } catch(e) { alert("Failed"); } };
+  document.getElementById('freezeBtn').addEventListener('click', async () => { playSound('click'); const title = document.getElementById('projectTitle').value.trim(); const topic = document.getElementById('projectTopic').value.trim(); if(!title) return alert("Missing fields"); if(confirm("Freeze?")) { try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.projectTitle': title, 'submissions.projectTopic': topic }); playSound('success'); } catch(e) { alert("Failed"); } } });
+  function lockTopicForm() { document.getElementById('projectTitle').disabled = true; document.getElementById('projectTopic').disabled = true; const btn = document.getElementById('freezeBtn'); btn.textContent = "Frozen"; btn.disabled = true; btn.classList.add('btn-ghost'); }
+  window.submitRound = async (r) => { playSound('click'); const val = document.getElementById('round1Link').value.trim(); if(!val) return alert("Link required"); try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.round1Link': val, 'submissions.round1Time': new Date().toISOString() }); playSound('success'); } catch(e) { alert("Failed"); } };
 </script>
 </body>
 </html>
