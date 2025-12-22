@@ -389,7 +389,7 @@ getEl('clearMembersBtn').addEventListener('click', ()=>{
 getEl('saveMember').addEventListener('click', () => {
   // Regex Strict Validation
   const emailRegex = /^[a-zA-Z0-9._%+-]+@klu\.ac\.in$/;
-  const regRegex = /^[0-9]{10}$/; 
+  const regRegex = /^[0-11]{12}$/; 
 
   const m = {
     name: getEl('memberName').value.trim(),
@@ -403,7 +403,7 @@ getEl('saveMember').addEventListener('click', () => {
   if(!regRegex.test(m.reg)) return showToast("Invalid Register No. (Need 10 digits)");
   if(!emailRegex.test(m.email)) return showToast("Use valid KLU Email ID (@klu.ac.in)");
   
-  if(members.length >= 5) return showToast("Squad is full (Max 5)");
+  if(members.length >= 4) return showToast("Squad is full (Max 4)");
   if(members.some(x => x.reg === m.reg)) return showToast("Agent already in squad");
   if(members.some(x => x.email === m.email)) return showToast("Email already listed");
 
