@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EduHack 26 • Evaluation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+:root {
+  --glass-bg: rgba(20, 20, 25, 0.6);
+  --glass-border: rgba(255, 59, 48, 0.3);
+  --text-primary: #ededed;
+  --text-secondary: #a1a1a6;
+  --stranger-red: #ff3b30;
+  font-family: "SF Pro Display", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 50% 10%, #2a0a0a, #000000); 
+  color: var(--text-primary);
+  padding: 30px 20px;
+  min-height: 100vh;
+}
+
+.container { max-width: 1250px; margin: auto; }
+
+.card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 30px;
+  backdrop-filter: blur(40px) saturate(120%);
+  -webkit-backdrop-filter: blur(40px) saturate(120%);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+
+h2 {
+  font-family: "Merriweather", serif;
+  font-size: 36px;
+  margin: 0 0 5px 0;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--stranger-red);
+  text-shadow: 0 0 10px rgba(255, 59, 48, 0.6);
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.download-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--stranger-red);
+  border-radius: 12px;
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--stranger-red);
+  cursor: pointer;
+  transition: 0.3s;
+}
+.download-btn:hover {
+  background: var(--stranger-red);
+  color: black;
+  box-shadow: 0 0 25px rgba(255, 59, 48, 0.6);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+th {
+  text-align: left;
+  padding: 16px;
+  color: var(--stranger-red);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: top; /* Align to top for multiline lists */
+}
+
+/* Column Styling */
+.rank-col { font-weight: 700; color: var(--text-secondary); width: 40px; }
+.team-name { font-weight: 700; font-size: 16px; color: white; display: block; margin-bottom: 4px; }
+.member-list { line-height: 1.6; color: var(--text-secondary); }
+.reg-list { line-height: 1.6; color: #888; font-variant-numeric: tabular-nums; }
+.dept-list { line-height: 1.6; }
+.dept-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.1);
+  color: #ddd;
+  margin-bottom: 2px;
+}
+
+.score-cell { 
+  text-align: center; 
+  vertical-align: middle; 
+  font-variant-numeric: tabular-nums; 
+  font-weight: 500; 
+}
+.total-score {
+  text-align: right;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--stranger-red);
+  text-shadow: 0 0 10px rgba(255, 59, 48, 0.4);
+}
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="card">
+      <h2>EduHack 26</h2>
+      <div class="subtitle">10X Club KARE • Evaluation Dashboard</div>
+      
+      <div class="action-bar">
+        <div style="font-size:13px; color:var(--text-secondary);">
+          Sorted by Highest Total Score
+        </div>
+        <button class="download-btn" onclick="downloadExcel()">
+          ⬇ Download CSV Report
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table id="evalTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>Members</th>
+              <th>Reg No</th>
+              <th>Dept</th>
+              <th style="text-align:center">R1<br><span style="opacity:0.5; font-size:10px">(20)</span></th>
+              <th style="text-align:center">R2<br><span style="opacity:0.5; font-size:10px">(50)</span></th>
+              <th style="text-align:center">R3<br><span style="opacity:0.5; font-size:10px">(30)</span></th>
+              <th style="text-align:right">Total<br><span style="opacity:0.5; font-size:10px">(100)</span></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
+  authDomain: "eduhack-432fd.firebaseapp.com",
+  projectId: "eduhack-432fd",
+  storageBucket: "eduhack-432fd.firebasestorage.app",
+  messagingSenderId: "160252785408",
+  appId: "1:160252785408:web:6a22e465982e3e510979e5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const EVENT_ID = "edu-hack-2025"; 
+
+const tbody = document.getElementById("tbody");
+
+function renderEvaluation(list) {
+  // 1. Calculate Scores
+  let processed = list.map(team => {
+    const r1 = Number(team.marks?.r1 || 0);
+    const r2 = Number(team.marks?.r2 || 0);
+    const r3 = Number(team.marks?.r3 || 0);
+    const total = r1 + r2 + r3;
+    return { ...team, r1, r2, r3, total };
+  });
+
+  // 2. Sort High to Low
+  processed.sort((a, b) => b.total - a.total);
+
+  tbody.innerHTML = "";
+  let rank = 1;
+
+  processed.forEach(team => {
+    // Generate vertical lists for Members, Reg, and Dept
+    const membersList = (team.members || []).map(m => `<div>${escapeHtml(m.name)}</div>`).join("");
+    const regList = (team.members || []).map(m => `<div>${escapeHtml(m.reg)}</div>`).join("");
+    // Create a badge for every single member's department
+    const deptList = (team.members || []).map(m => 
+      `<div><span class="dept-badge">${escapeHtml(m.dept || "-")}</span></div>`
+    ).join("");
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td class="rank-col">#${rank++}</td>
+      <td style="vertical-align:top">
+        <span class="team-name">${escapeHtml(team.team_name || "Unknown")}</span>
+      </td>
+      <td class="member-list">${membersList}</td>
+      <td class="reg-list">${regList}</td>
+      <td class="dept-list">${deptList}</td>
+      
+      <td class="score-cell">${team.r1}</td>
+      <td class="score-cell">${team.r2}</td>
+      <td class="score-cell">${team.r3}</td>
+      <td class="score-cell total-score">${team.total}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function startListener() {
+  const col = collection(db, "events", EVENT_ID, "registrations");
+  const q = query(col); 
+  onSnapshot(q, snap => {
+    const teams = [];
+    snap.forEach(s => teams.push({ id: s.id, ...s.data() }));
+    renderEvaluation(teams);
+  });
+}
+startListener();
+
+function escapeHtml(s=""){ 
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+}
+
+// Updated Excel Download to include all individual departments
+window.downloadExcel = function () {
+  const rows = [];
+  rows.push(["Rank", "Team Name", "Member Name", "Reg No", "Department", "R1", "R2", "R3", "Total"]);
+
+  const trs = document.querySelectorAll("#tbody tr");
+  
+  trs.forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    
+    // Helper to get text separated by newlines for Excel cells
+    const getTextLines = (idx) => {
+       // Replace HTML divs with newlines for plain text extraction
+       return tds[idx].innerText.trim();
+    };
+
+    let rank = tds[0].innerText.replace("#","");
+    let team = tds[1].innerText;
+    let members = getTextLines(2);
+    let regs = getTextLines(3);
+    let depts = getTextLines(4);
+    let r1 = tds[5].innerText;
+    let r2 = tds[6].innerText;
+    let r3 = tds[7].innerText;
+    let total = tds[8].innerText;
+
+    rows.push([rank, team, members, regs, depts, r1, r2, r3, total]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  
+  // Set column widths for better readability in Excel
+  ws['!cols'] = [{wch:5}, {wch:20}, {wch:25}, {wch:15}, {wch:10}, {wch:5}, {wch:5}, {wch:5}, {wch:8}];
+
+  XLSX.utils.book_append_sheet(wb, ws, "Evaluation");
+  XLSX.writeFile(wb, "EduHack26_Results.xlsx");
+};
+</script>
+</body>
+</html>
