@@ -3,142 +3,145 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>EduHack 2025 • Attendance</title>
+<title>EduHack 26 • Attendance Sheet</title>
 
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap" rel="stylesheet">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-:root {
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.25);
-  --glass-shadow: rgba(0, 0, 0, 0.4);
-  --present: #34c759; /* iOS green */
-  --absent: #ff3b30;  /* iOS red */
-  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
-}
-body {
-  margin: 0;
-  background: linear-gradient(135deg, #0d0d0f, #1b1c20);
-  color: white;
-  padding: 20px;
-  -webkit-font-smoothing: antialiased;
-}
-.container {
-  max-width: 1100px;
-  margin: auto;
-}
-.card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 20px;
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  box-shadow: 0 8px 32px var(--glass-shadow);
-}
-h2 {
-  margin: 0 0 15px 0;
-  font-size: 22px;
-  font-weight: 700;
-}
-.download-btn {
-  display: inline-block;
-  margin-bottom: 15px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  border-radius: 14px;
-  background: var(--glass-bg);
-  color: white;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  cursor: pointer;
-  transition: 0.2s;
-}
-.download-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-}
-th, td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-th {
-  background: rgba(255, 255, 255, 0.05);
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-td.member-col {
-  text-align: left;
-}
-.status {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-}
-.status.present {
-  background: var(--present);
-  color: #fff;
-}
-.status.absent {
-  background: var(--absent);
-  color: #fff;
-}
-.status.pending {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ddd;
-}
-.small {
-  font-size: 13px;
-  opacity: 0.8;
-}
+    body {
+        margin: 0;
+        padding: 40px;
+        background: #f4f4f9;
+        font-family: 'Inter', sans-serif;
+        color: #000;
+    }
+
+    .container {
+        max-width: 1000px; /* Standard A4 width approx */
+        margin: auto;
+        background: white;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Header styling */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 20px;
+    }
+
+    h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+    p { margin: 5px 0 0 0; color: #555; font-size: 14px; }
+
+    /* Controls (Hidden during print) */
+    .controls {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    button {
+        padding: 10px 16px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+    button:hover { background: #eee; }
+    .btn-print { background: #000; color: #fff; border: 1px solid #000; }
+    .btn-print:hover { background: #333; }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    th {
+        text-align: left;
+        border: 1px solid #000;
+        padding: 10px;
+        background: #eee;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    td {
+        border: 1px solid #000;
+        padding: 8px 10px;
+        vertical-align: middle;
+    }
+
+    /* Signature Column Sizing */
+    .sig-col {
+        width: 120px; /* Enough space for a signature */
+    }
+
+    /* Visual grouping helper */
+    tr.new-team-start td {
+        border-top: 2px solid #000;
+    }
+
+    /* PRINT STYLES - Crucial for hard copy */
+    @media print {
+        body { background: white; padding: 0; }
+        .container { box-shadow: none; padding: 0; max-width: 100%; }
+        .controls { display: none !important; }
+        .header { margin-top: 0; }
+        table { font-size: 11pt; }
+        /* Ensure table headers repeat on new pages */
+        thead { display: table-header-group; }
+        tr { break-inside: avoid; }
+    }
 </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h2>EduHack 2025 • Attendance</h2>
-      <div class="small">10X Club – KARE • Kalasalingam Academy of Research and Education</div>
-      
-      <!-- Download button -->
-      <button class="download-btn" onclick="downloadExcel()">⬇ Download as Excel</button>
 
-      <table id="attendanceTable">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Team</th>
-            <th>Member</th>
-            <th>Reg No</th>
-            <th>Oct 11<br>5:00 PM</th>
-            <th>Oct 11<br>8:00 PM</th>
-            <th>Oct 12<br>9:00 AM</th>
-            <th>Oct 12<br>1:00 PM</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
+    <div class="controls">
+        <button class="btn-print" onclick="window.print()">🖨️ Print Sheet</button>
+        <button onclick="downloadExcel()">⬇ Download Excel</button>
     </div>
-  </div>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>EduHack 26 • Attendance Sheet</h1>
+                <p>10X Club KARE • Physical Sign-in Copy</p>
+            </div>
+            <div style="text-align: right;">
+                <p>Date: ________________</p>
+                <p>Session: ________________</p>
+            </div>
+        </div>
+
+        <table id="attTable">
+            <thead>
+                <tr>
+                    <th style="width: 30px;">#</th>
+                    <th>Team Name</th>
+                    <th>Student Name</th>
+                    <th>Reg No</th>
+                    <th>Dept</th>
+                    <th class="sig-col">Sign (In)</th>
+                    <th class="sig-col">Sign (Out)</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <tr><td colspan="7" style="text-align:center; padding:20px;">Loading Data...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getFirestore, collection, query, orderBy, onSnapshot 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
@@ -148,68 +151,96 @@ const firebaseConfig = {
   messagingSenderId: "160252785408",
   appId: "1:160252785408:web:6a22e465982e3e510979e5"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-const EVENT_ID = "edu-hack-2025";
-const ATT_SLOTS = [
-  "2025-10-11-17:00",
-  "2025-10-11-20:00",
-  "2025-10-12-09:00",
-  "2025-10-12-13:00"
-];
+const EVENT_ID = "edu-hack-2025"; 
 
 const tbody = document.getElementById("tbody");
+let fullParticipantList = []; // Store for Excel export
 
-function renderAttendance(list) {
-  tbody.innerHTML = "";
-  let counter = 1;
+function renderFlatList(teams) {
+    tbody.innerHTML = "";
+    fullParticipantList = [];
+    let counter = 1;
 
-  list.forEach(team => {
-    if (!team.verified) return; // show only verified teams
-    (team.members || []).forEach(member => {
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${counter++}</td>
-        <td>${escapeHtml(team.team_name || "-")}</td>
-        <td class="member-col">${escapeHtml(member.name || "-")}</td>
-        <td>${escapeHtml(member.reg || "-")}</td>
-        ${ATT_SLOTS.map(slot => {
-          const status = team.attendance?.[slot];
-          if (status === true) return `<td>Present</td>`;
-          if (status === false) return `<td>Absent</td>`;
-          return `<td>—</td>`;
-        }).join("")}
-      `;
-
-      tbody.appendChild(tr);
+    // 1. Flatten the data: Turn Teams into Individual Rows
+    teams.forEach(team => {
+        if(!team.members) return;
+        
+        team.members.forEach((member, index) => {
+            fullParticipantList.push({
+                rowId: counter,
+                teamName: team.team_name || "Unknown",
+                memberName: member.name || "-",
+                regNo: member.reg || "-",
+                dept: member.dept || "-",
+                isFirstMember: index === 0 // Mark first member to visually separate teams
+            });
+            counter++;
+        });
     });
-  });
+
+    // 2. Render HTML
+    fullParticipantList.forEach(p => {
+        const tr = document.createElement("tr");
+        
+        // Add a thicker border if it's the start of a new team for visual clarity
+        if(p.isFirstMember) {
+            tr.classList.add("new-team-start");
+        }
+
+        tr.innerHTML = `
+            <td style="text-align:center">${p.rowId}</td>
+            <td style="font-weight:600">${escapeHtml(p.teamName)}</td>
+            <td>${escapeHtml(p.memberName)}</td>
+            <td style="font-family:monospace">${escapeHtml(p.regNo)}</td>
+            <td>${escapeHtml(p.dept)}</td>
+            <td></td>
+            <td></td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
-// live listener
 function startListener() {
-  const col = collection(db, "events", EVENT_ID, "registrations");
-  const q = query(col, orderBy("createdAt", "asc"));
-  onSnapshot(q, snap => {
-    const teams = [];
-    snap.forEach(s => teams.push({ id: s.id, ...s.data() }));
-    renderAttendance(teams);
-  });
+    const col = collection(db, "events", EVENT_ID, "registrations");
+    // Sort by Team Name so teams appear together
+    const q = query(col, orderBy("team_name", "asc")); 
+    
+    onSnapshot(q, snap => {
+        const teams = [];
+        snap.forEach(s => teams.push({ id: s.id, ...s.data() }));
+        renderFlatList(teams);
+    });
 }
+
 startListener();
 
 function escapeHtml(s=""){ 
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 }
 
-// Excel download
+// Excel Export Logic
 window.downloadExcel = function () {
-  const table = document.getElementById("attendanceTable");
-  const wb = XLSX.utils.table_to_book(table, {sheet:"Attendance"});
-  XLSX.writeFile(wb, "EduHack-2025-Attendance.xlsx");
+    const ws_data = [
+        ["No", "Team Name", "Student Name", "Reg No", "Department", "Signature"] // Headers
+    ];
+
+    fullParticipantList.forEach(p => {
+        ws_data.push([p.rowId, p.teamName, p.memberName, p.regNo, p.dept, ""]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    
+    // Set column widths
+    ws['!cols'] = [{wch:5}, {wch:25}, {wch:25}, {wch:15}, {wch:10}, {wch:20}];
+
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+    XLSX.writeFile(wb, "EduHack_Printable_Attendance.xlsx");
 };
 </script>
+
 </body>
 </html>
