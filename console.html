@@ -3,410 +3,577 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EDU HACK |10X CLUB</title>
+<title>EDU HACK '26 | Operator Console</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rubik+Glitch&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Rubik+Glitch&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
   :root {
     --st-red: #ff0033;
-    --st-glow: rgba(255, 0, 51, 0.6);
+    --st-green: #00e676;
+    --st-blue: #00ccff;
+    --st-orange: #ffab00;
     --bg-dark: #050505;
-    --glass-surface: rgba(22, 22, 24, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --text-primary: #f5f5f7;
+    --glass-surface: rgba(20, 20, 20, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #e0e0e0;
     --text-secondary: #86868b;
-    --radius-lg: 24px;
-    --font-main: 'Inter', sans-serif;
+    --font-main: 'JetBrains Mono', monospace;
     --font-title: 'Rubik Glitch', cursive;
-    --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 
   * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
   body {
-    margin: 0;
-    font-family: var(--font-main);
-    background-color: var(--bg-dark);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-    background: radial-gradient(circle at 50% -20%, #1a0005 0%, #000 80%);
+    margin: 0; font-family: var(--font-main); background-color: var(--bg-dark);
+    color: var(--text-primary); min-height: 100vh; overflow-x: hidden;
+    background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
   }
 
-  /* --- ATMOSPHERE --- */
-  body::after {
+  /* SCANLINES */
+  body::before {
     content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 100; background-size: 100% 2px, 3px 100%; pointer-events: none; opacity: 0.6;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px; z-index: 100; pointer-events: none;
   }
-  .fog-layer {
-    position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJnoiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2cpIiBvcGFjaXR5PSIwLjAzIi8+PC9zdmc+');
-    opacity: 0.35; pointer-events: none; z-index: 0; animation: fogMove 60s linear infinite;
-  }
-  @keyframes fogMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(5deg) scale(1.1); } }
 
-  /* --- APP LAYOUT --- */
-  .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; display: none; opacity: 0; transition: opacity 1s var(--ease-apple); padding-bottom: 100px; }
+  /* LAYOUT */
+  .app-container {
+    max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 10;
+    display: none; opacity: 0; transition: opacity 1s ease; padding-bottom: 120px;
+  }
   .app-container.visible { display: block; opacity: 1; }
 
-  /* --- LOGIN --- */
-  .login-screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #050505; transition: transform 0.8s var(--ease-apple), opacity 0.8s; }
-  .login-screen.hidden { transform: scale(1.1); opacity: 0; pointer-events: none; }
-  .glitch-logo { font-family: var(--font-title); font-size: 5rem; color: #fff; text-shadow: 3px 3px 0px var(--st-red); margin-bottom: 20px; animation: glitch 3s infinite; text-align: center; line-height: 1; }
-  @keyframes glitch { 0% { text-shadow: 2px 2px 0px var(--st-red); } 5% { text-shadow: -2px -2px 0px #00ccff; } 10% { text-shadow: 2px 2px 0px var(--st-red); } }
+  /* LOGIN */
+  .login-screen {
+    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; background: #000; transition: 0.8s ease;
+  }
+  .login-screen.hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 
-  /* --- COMPONENTS --- */
-  .glass-card { background: var(--glass-surface); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 30px; margin-bottom: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.3s ease; }
+  .glitch-logo {
+    font-family: var(--font-title); font-size: 5rem; color: #fff;
+    text-shadow: 4px 4px 0px var(--st-red); margin-bottom: 20px;
+    animation: glitch 2.5s infinite alternate-reverse; text-align: center; line-height: 1;
+  }
+  @keyframes glitch {
+    0% { text-shadow: 2px 2px 0px var(--st-red); }
+    20% { text-shadow: -2px -2px 0px var(--st-blue); }
+    40% { text-shadow: 2px 2px 0px var(--st-red); }
+  }
+
+  /* HEADER */
+  header { border-bottom: 1px solid var(--glass-border); margin-bottom: 30px; padding-bottom: 20px; }
   
-  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 40px; border-bottom: 1px solid var(--glass-border); }
-  .header-left { display: flex; align-items: center; gap: 25px; }
-  .logos img { height: 45px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-  .mini-title { font-family: var(--font-title); font-size: 1.8rem; color: #fff; text-shadow: 2px 2px 0px var(--st-red); letter-spacing: 2px; }
+  .system-ticker {
+    font-size: 0.75rem; color: var(--st-green); background: rgba(0, 230, 118, 0.05);
+    padding: 8px; border: 1px solid rgba(0, 230, 118, 0.2); margin-bottom: 20px;
+    display: flex; justify-content: space-between;
+  }
 
-  .user-badge { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 99px; border: 1px solid var(--glass-border); }
-  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--st-red); background-size: cover; border: 2px solid rgba(255,255,255,0.2); }
+  .header-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
   
-  .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; margin-left: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; }
-  .icon-btn:hover { background: #fff; color: #000; transform: scale(1.1); }
-  .icon-btn.active-mentor { background: var(--st-red); color: #fff; box-shadow: 0 0 15px var(--st-red); animation: pulse 1s infinite; }
-  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+  .user-badge {
+    display: flex; align-items: center; gap: 15px;
+    background: rgba(255,255,255,0.03); padding: 10px 20px; border-radius: 4px;
+    border-left: 3px solid var(--st-red);
+  }
+  .user-avatar { width: 40px; height: 40px; background: #333; background-size: cover; border: 1px solid #fff; border-radius: 50%; }
 
-  .tabs { display: flex; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); overflow-x: auto; padding-bottom: 5px; }
-  .tab-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; padding: 15px 0; cursor: pointer; position: relative; transition: 0.3s; letter-spacing: 0.5px; white-space: nowrap; }
-  .tab-btn:hover, .tab-btn.active { color: #fff; }
-  .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: var(--st-red); box-shadow: 0 0 15px var(--st-red); }
+  .btn-logout {
+    background: transparent; border: 1px solid var(--st-red); color: var(--st-red);
+    padding: 6px 12px; font-family: var(--font-main); font-size: 0.75rem;
+    cursor: pointer; transition: 0.3s; margin-left: 10px;
+  }
+  .btn-logout:hover { background: var(--st-red); color: #fff; }
 
-  .course-item { display: flex; align-items: center; justify-content: space-between; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; gap: 20px; }
-  .course-item:last-child { border-bottom: none; }
-  
-  input { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #fff; padding: 12px 18px; border-radius: 12px; font-family: var(--font-main); width: 280px; transition: 0.3s; font-size: 0.95rem; }
-  input:focus { border-color: var(--st-red); box-shadow: 0 0 0 3px rgba(255,0,51,0.2); background: rgba(0,0,0,0.6); }
-  input:disabled { opacity: 0.5; cursor: not-allowed; border-style: dashed; }
+  /* TABS */
+  .tabs { display: flex; gap: 2px; margin-bottom: 30px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px; }
+  .tab-btn {
+    flex: 1; background: transparent; border: none; color: var(--text-secondary);
+    font-family: var(--font-main); font-size: 0.9rem; font-weight: 700;
+    padding: 16px; cursor: pointer; transition: 0.3s;
+  }
+  .tab-btn.active { color: #000; background: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
-  .btn { background: #fff; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: var(--font-main); }
-  .btn:hover { transform: scale(1.03); }
-  .btn-primary { background: var(--st-red); color: #fff; box-shadow: 0 4px 20px rgba(255,0,51,0.3); }
-  .btn-primary:hover { background: #ff1f4b; box-shadow: 0 6px 30px rgba(255,0,51,0.5); }
-  .btn-google { background: #fff; display: flex; align-items: center; gap: 12px; padding: 16px 32px; border-radius: 99px; font-size: 1.1rem; box-shadow: 0 10px 40px rgba(255,255,255,0.1); }
+  /* CARDS */
+  .glass-card {
+    background: var(--glass-surface); backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border); padding: 30px; margin-bottom: 24px;
+    position: relative;
+  }
+  .glass-card::before { content:''; position: absolute; top:0; left:0; width: 4px; height: 100%; background: var(--st-red); }
 
-  /* FEED & TIMELINE */
-  .updates-box { max-height: 150px; overflow-y: auto; margin-bottom: 30px; border: 1px solid var(--st-red); background: rgba(255,0,51,0.05); padding: 15px; border-radius: 12px; display: none; }
-  .updates-box.has-content { display: block; animation: slideDown 0.5s ease; }
-  .update-item { font-size: 0.9rem; margin-bottom: 8px; border-bottom: 1px solid rgba(255,0,51,0.2); padding-bottom: 8px; }
-  .update-time { font-size: 0.75rem; color: var(--st-red); font-weight: bold; margin-right: 8px; }
+  /* INPUTS & BTNS */
+  input {
+    background: #111; border: 1px solid #333; color: var(--st-green);
+    padding: 12px 18px; font-family: var(--font-main); width: 100%; margin-bottom: 10px;
+  }
+  .btn {
+    background: var(--st-red); color: #fff; border: none; padding: 12px 24px;
+    font-weight: 700; cursor: pointer; width: 100%; font-family: var(--font-main);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    text-decoration: none; display: inline-block; text-align: center;
+  }
+  .btn:hover { background: #ff3355; color: #fff; }
+  .btn:disabled { background: #333; color: #888; cursor: not-allowed; }
+  .btn-ghost { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
-  .timeline { border-left: 2px solid rgba(255,255,255,0.1); margin-left: 10px; padding-left: 40px; padding-top: 10px; }
-  .timeline-item { position: relative; margin-bottom: 40px; }
-  .timeline-item::before { content: ''; position: absolute; left: -46px; top: 4px; width: 14px; height: 14px; background: #000; border: 3px solid var(--st-red); border-radius: 50%; box-shadow: 0 0 15px var(--st-red); }
-  .timeline-time { font-size: 0.9rem; color: var(--st-red); font-weight: bold; margin-bottom: 6px; display: block; letter-spacing: 1px;}
+  /* MENTOR BTN */
+  .mentor-btn {
+    position: fixed; bottom: 30px; right: 30px; background: var(--st-orange); color: #000;
+    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(255, 171, 0, 0.4); cursor: pointer; z-index: 999; border: none;
+    animation: pulse 2s infinite;
+  }
+  .mentor-btn:hover { transform: scale(1.1); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 171, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0); } }
 
-  .status-badge { padding: 6px 14px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-  .status-pending { background: rgba(255, 165, 0, 0.15); color: orange; border: 1px solid rgba(255, 165, 0, 0.3); }
-  .status-open { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
-  .timer-display { font-family: var(--font-title); font-size: 4rem; letter-spacing: 4px; color: #fff; text-shadow: 0 0 30px rgba(255,0,51,0.4); text-align: center; margin-bottom: 40px; }
+  /* TIMER */
+  .timer-display {
+    font-family: var(--font-title); font-size: 5rem; color: #fff;
+    text-shadow: 0 0 20px rgba(255,0,51,0.6); margin: 20px 0;
+  }
 
   .hidden-section { display: none; }
-  .show-section { display: block; animation: fadeIn 0.6s var(--ease-apple); }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .show-section { display: block; animation: fadeIn 0.4s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .loc-badge { background: rgba(0, 204, 255, 0.15); color: var(--st-blue); padding: 4px 8px; font-size: 0.8rem; border: 1px solid rgba(0, 204, 255, 0.3); display: inline-block; margin-bottom: 10px;}
 
-  @media(max-width: 768px){ .glitch-logo { font-size: 3rem; } .header-left { flex-direction: column; align-items: flex-start; gap: 10px; } .mini-title { font-size: 1.4rem; } .course-item { flex-direction: column; align-items: flex-start; } input { width: 100%; } .tabs { overflow-x: auto; } }
+  @media(max-width: 768px){ 
+    .glitch-logo { font-size: 3rem; } 
+    .timer-display { font-size: 3rem; }
+    .header-main { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
 
-<div class="fog-layer"></div>
+<button class="mentor-btn" onclick="callMentor()" title="Call Mentor for Help">
+    <span class="material-icons">support_agent</span>
+</button>
 
 <div class="login-screen" id="loginScreen">
-  <div class="glitch-logo">EDU HACK<br><span style="font-size:0.4em; letter-spacing:0.3em; color:#fff;">PLAYGROUND</span></div>
-  <p style="color:var(--text-secondary); margin-bottom:40px; font-size:1.1rem; text-align:center;">
-    Restricted Area. Authorized Participants Only.<br>
-    <span style="font-size:0.85rem; opacity:0.6;">System Verification via KARE Database</span>
-  </p>
-  <button class="btn btn-google" id="loginBtn">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="24"> Sign in with Google
+  <div class="glitch-logo">EDU HACK<br>'26</div>
+  <button class="btn" style="width:auto; min-width:250px; background:#fff; color:#000;" id="loginBtn">
+    AUTHENTICATE IDENTITY
   </button>
 </div>
 
 <div class="app-container" id="appContainer">
+  
+  <div class="system-ticker">
+    <span>SYSTEM: ONLINE</span>
+    <span>EVENT: EDU HACK '26</span>
+    <span>LOCATION: KARE</span>
+    <span>NET: SECURE</span>
+  </div>
+
   <header>
-    <div class="header-left">
-      <div class="logos" style="display:flex; gap:15px;">
-        <img src="img/klu.png" alt="KARE">
-        <img src="img/image 26.png" alt="10X Club">
+    <div class="header-main">
+      <div class="logos">
+        <h1 style="margin:0; font-size:1.8rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> PLAYGROUND</span></h1>
+        <span style="font-size:0.8rem; color:var(--text-secondary);">10X CLUB KARE</span>
       </div>
-      <div class="mini-title">EDU HACK</div>
-    </div>
-    <div style="display:flex; align-items:center;">
       <div class="user-badge">
         <div class="user-avatar" id="userAvatar"></div>
         <div>
-          <div style="font-size:0.95rem; font-weight:700; color:#fff;" id="userName">Loading...</div>
-          <div style="font-size:0.8rem; color:var(--text-secondary);" id="teamNameDisplay">Authenticating...</div>
+          <div id="userName" style="font-weight:700;">UNKNOWN</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
+            TEAM: <span id="teamNameDisplay" style="color:var(--st-green); font-weight:bold; font-size:0.9rem;">CONNECTING...</span>
+          </div>
         </div>
+        <button class="btn-logout" onclick="logout()">LOGOUT</button>
       </div>
-      <button class="icon-btn" id="mentorBtn" title="Request Mentor Support">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>
-      </button>
-      <button class="icon-btn" id="logoutBtn" title="Disconnect Session" style="background:rgba(255,0,51,0.1); border-color:rgba(255,0,51,0.3); color:var(--st-red);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-      </button>
     </div>
   </header>
 
-  <div id="updatesBox" class="updates-box"></div>
-
   <nav class="tabs">
-    <button class="tab-btn active" onclick="switchTab('learning')">PHASE 1: TRAINING</button>
-    <button class="tab-btn" onclick="switchTab('hackathon')">PHASE 2: HACKATHON</button>
-    <button class="tab-btn" onclick="switchTab('timeline')">MISSION TIMELINE</button>
+    <button class="tab-btn active" onclick="switchTab('learning')">Phase 1: Learning</button>
+    <button class="tab-btn" onclick="switchTab('hackathon')">Phase 2: Hackathon</button>
+    <button class="tab-btn" onclick="switchTab('timeline')">Mission Log</button>
   </nav>
 
   <div id="learning" class="show-section">
     <div class="glass-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0; font-family:var(--font-title); color:var(--st-red); font-size:2rem;">INFOSYS MODULES</h2>
-        <span style="font-size:0.9rem; color:var(--text-secondary);">36 Hours Requirement [cite: 50, 72]</span>
-      </div>
-      <p style="color:var(--text-secondary); margin-bottom:30px;">Paste Google Drive link of your certificates.</p>
-      
-      <div id="courseList">
-        <div class="course-item">
-          <div class="course-info"><h3 style="margin:0;">Modern Artificial Intelligence Masterclass</h3><span style="font-size:0.8rem; opacity:0.7;">16 Hours </span></div>
-          <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert1"><button class="btn btn-primary" onclick="submitCert(1)" id="btnCert1">Verify</button></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
+            <h2 style="margin:0; color:var(--st-red);">ANGULAR BOOTCAMP</h2>
+            <a href="https://infyspringboard.onwingspan.com/web/en/app/toc/lex_20858515543254600000_shared/overview#iss=https:/infyspringboard.onwingspan.com/auth/realms/infyspringboard&iss=https://infyspringboard.onwingspan.com/auth/realms/infyspringboard" 
+               target="_blank" 
+               class="btn" 
+               style="width:auto; font-size:0.8rem; padding:10px 20px; border-radius:4px; clip-path:none;">
+               ACCESS COURSE MATERIAL <span class="material-icons" style="font-size:1rem; vertical-align:middle; margin-left:5px;">open_in_new</span>
+            </a>
         </div>
-        <div class="course-item">
-          <div class="course-info"><h3 style="margin:0;">Introduction To Artificial Intelligence</h3><span style="font-size:0.8rem; opacity:0.7;">13 Hours </span></div>
-          <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert2"><button class="btn btn-primary" onclick="submitCert(2)" id="btnCert2">Verify</button></div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+            
+            <div style="border:1px solid rgba(255,255,255,0.1); padding:15px;">
+                <strong style="color:var(--st-blue);">TASK 01 (Jan 05-08)</strong>
+                <p style="font-size:0.8rem; color:#888;">Fundamentals & UI</p>
+                <div class="loc-badge">📍 REPORT TO 8TH BLOCK</div>
+                <button class="btn btn-ghost" id="btnReview1" onclick="markVerified('review1')">CONFIRM SIGNATURE (JAN 09)</button>
+            </div>
+
+            <div style="border:1px solid rgba(255,255,255,0.1); padding:15px;">
+                <strong style="color:var(--st-blue);">TASK 02 (Jan 12-15)</strong>
+                <p style="font-size:0.8rem; color:#888;">Data & Services</p>
+                <div class="loc-badge">📍 REPORT TO 8TH BLOCK</div>
+                <button class="btn btn-ghost" id="btnReview2" onclick="markVerified('review2')">CONFIRM SIGNATURE (JAN 16)</button>
+            </div>
+
+            <div style="border:1px solid rgba(255,255,255,0.1); padding:15px;">
+                <strong style="color:var(--st-blue);">TASK 03 (Jan 19-23)</strong>
+                <p style="font-size:0.8rem; color:#888;">Routing</p>
+                <div class="loc-badge">📍 REPORT TO 8TH BLOCK</div>
+                <button class="btn btn-ghost" id="btnReview3" onclick="markVerified('review3')" style="margin-bottom:15px;">CONFIRM SIGNATURE (JAN 23)</button>
+                
+                <hr style="border-color:#333;">
+                <strong style="color:var(--st-green);">FINAL CERT (Jan 28)</strong>
+                <input type="text" id="finalCert" placeholder="Drive Link..." style="margin-top:10px;">
+                <button class="btn" id="btnFinal" onclick="submitFinal()">UPLOAD</button>
+            </div>
         </div>
-        <div class="course-item">
-          <div class="course-info"><h3 style="margin:0;">Generative AI: Intro And Applications</h3><span style="font-size:0.8rem; opacity:0.7;">7 Hours </span></div>
-          <div style="display:flex; gap:12px; width:100%; max-width:500px;"><input type="text" placeholder="Paste Drive Link..." id="cert3"><button class="btn btn-primary" onclick="submitCert(3)" id="btnCert3">Verify</button></div>
-        </div>
-      </div>
     </div>
   </div>
 
   <div id="hackathon" class="hidden-section">
-    <div class="timer-display" id="timer">--:--:--:--</div>
+    <div style="text-align:center; margin-bottom:40px;">
+      <div id="timerLabel" style="font-size:1rem; color:var(--st-red); letter-spacing:4px;">HACKATHON COMMENCES IN</div>
+      <div class="timer-display" id="timer">00:00:00:00</div>
+      <div id="timerTarget" style="color:var(--text-secondary);">TARGET: JAN 30, 2026 @ 17:00</div>
+    </div>
 
     <div class="glass-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h2 style="margin:0; font-size:1.5rem;">Project Definition</h2>
-        <span class="status-badge status-pending" id="topicStatus">LOCKED UNTIL 5 PM</span>
-      </div>
-      <div id="topicFormArea" style="opacity:0.5; pointer-events:none; transition:0.3s;">
-        <div style="margin-bottom:20px;"><label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Problem Statement</label><input type="text" id="projectTopic" style="width:100%;"></div>
-        <div style="margin-bottom:25px;"><label style="display:block; color:var(--text-secondary); margin-bottom:10px;">Project Title</label><input type="text" id="projectTitle" style="width:100%;"></div>
-        <button class="btn btn-primary" id="freezeBtn">Freeze Topic (Irreversible)</button>
+      <h2 style="color:var(--st-green);">PROJECT PROTOCOL</h2>
+      <div style="margin-bottom:20px;">
+          <input type="text" id="projectTopic" placeholder="Problem Statement ID...">
+          <input type="text" id="projectTitle" placeholder="Project Title...">
+          <button class="btn" id="freezeBtn">LOCK PROJECT DATA</button>
       </div>
     </div>
 
     <div class="glass-card">
-      <h2 style="margin:0 0 10px 0; font-size:1.5rem;">Round 1: Ideation Phase</h2>
-      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:20px;">Detailed Implementation Strategy (PPT)</p>
-      <div style="display:flex; gap:15px; flex-wrap:wrap;"><input type="text" id="round1Link" placeholder="Paste PPT Drive Link..." style="flex:1;"><button class="btn btn-primary" onclick="submitRound(1)" id="btnRound1">Submit Idea</button></div>
-    </div>
-
-    <div class="glass-card" style="border: 1px dashed var(--st-red);">
-      <h2 style="margin:0 0 10px 0; font-size:1.5rem; color:var(--st-red);">Final Submission</h2>
-      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:20px;">Required for Evaluation. GitHub Repository + Demo Video.</p>
-      <div style="display:flex; gap:15px; flex-wrap:wrap;">
-        <input type="text" id="finalRepo" placeholder="GitHub Repository Link" style="flex:1;">
-        <button class="btn btn-primary" onclick="submitFinal()" id="btnFinal">Submit Final Project</button>
+      <h3>SUBMISSIONS</h3>
+      <div style="margin-bottom:20px;">
+          <label style="font-size:0.8rem; color:#888;">ROUND 1: PLANNING PPT</label>
+          <div style="display:flex; gap:10px;">
+              <input type="text" id="round1Link" placeholder="PPT Link...">
+              <button class="btn" id="btnRound1" onclick="submitRound1()" style="width:auto;">SEND</button>
+          </div>
+      </div>
+      <div>
+          <label style="font-size:0.8rem; color:#888;">FINAL ROUND: GITHUB & PPT</label>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <input type="text" id="finalGithub" placeholder="GitHub Repo...">
+              <input type="text" id="finalPPT" placeholder="Final PPT...">
+          </div>
+          <button class="btn" id="btnFinalRound" onclick="submitFinalRound()">SUBMIT FINAL PROJECT</button>
       </div>
     </div>
   </div>
 
   <div id="timeline" class="hidden-section">
-    <div class="glass-card">
-      <h2 style="font-family:var(--font-title); font-size:2rem; margin-bottom:40px; color:var(--st-red);">OPERATIONAL FLOW</h2>
-      <div class="timeline">
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 05:00 PM</span><strong>Event Launch</strong><br><span style="color:var(--text-secondary);">Welcome ceremony, introductions & rules. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 06:00 PM</span><strong>Domain Distribution</strong><br><span style="color:var(--text-secondary);">Teams receive random domains. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 06:30 PM</span><strong>Problem Statement Distribution</strong><br><span style="color:var(--text-secondary);">Teams brainstorm & select MSME problems. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 07:00 PM</span><strong>Dinner</strong><br><span style="color:var(--text-secondary);">Networking and strategizing. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 08:00 PM</span><strong>Phase 1: Analysis</strong><br><span style="color:var(--text-secondary);">Teams analyze problem, explore solutions. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 10:30 PM</span><strong>Refreshment 1</strong><br><span style="color:var(--text-secondary);">Evening refreshment break. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 20 • 11:30 PM</span><strong>Review 1</strong><br><span style="color:var(--text-secondary);">Mentors provide feedback on initial ideas. [cite: 77]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 07:00 AM</span><strong>Breakfast</strong><br><span style="color:var(--text-secondary);">Recharge break. [cite: 84]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 09:00 AM</span><strong>Review 2</strong><br><span style="color:var(--text-secondary);">Mentors evaluate projects. [cite: 84]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 12:00 PM</span><strong>Lunch</strong><br><span style="color:var(--text-secondary);">Midday meal break. [cite: 84]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 02:30 PM</span><strong>Final Refreshment</strong><br><span style="color:var(--text-secondary);">Last energy boost. [cite: 84]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 03:00 PM</span><strong>Last Review</strong><br><span style="color:var(--text-secondary);">Final project presentations and judging. [cite: 84]</span></div>
-        <div class="timeline-item"><span class="timeline-time">DEC 21 • 04:00 PM</span><strong>Prize Distribution</strong><br><span style="color:var(--text-secondary);">Results announcement & closing remarks. [cite: 84]</span></div>
+      <div class="glass-card">
+          <h2 style="color:var(--st-red);">MISSION LOG</h2>
+          <ul style="list-style:none; padding:0; line-height:2;">
+              <li><span style="color:var(--st-blue);">JAN 05-08:</span> Angular Core</li>
+              <li><span style="color:var(--st-red);">JAN 09:</span> Review 1 (Offline)</li>
+              <li><span style="color:var(--st-blue);">JAN 12-15:</span> Data & Logic</li>
+              <li><span style="color:var(--st-red);">JAN 16:</span> Review 2 (Offline)</li>
+              <li><span style="color:var(--st-blue);">JAN 19-23:</span> Advanced Concepts</li>
+              <li><span style="color:var(--st-red);">JAN 23:</span> Review 3 (Offline)</li>
+              <li><span style="color:var(--st-green);">JAN 28:</span> Certificate Deadline</li>
+              <li style="border-top:1px dashed #333; margin-top:10px; padding-top:10px;">
+                  <span style="color:var(--st-orange);">JAN 30 5PM:</span> <strong>HACKATHON START</strong>
+              </li>
+               <li><span style="color:var(--st-blue);">5:00PM - 6:00PM :</span> Event Launch</li>
+                <li><span style="color:var(--st-blue);">6:00PM - 6:30PM :</span> Problem Statement Distribution</li>
+                <li><span style="color:var(--st-blue);">6:30PM - 7:00PM :</span> Project Planning</li>
+                <li><span style="color:var(--st-blue);">7:00PM - 8:15PM :</span> Dinner Break</li>
+                <li><span style="color:var(--st-blue);">8:15PM - 9:00PM :</span> Round 1 Submission</li>
+                <li><span style="color:var(--st-blue);">10:00PM :</span> Refreshment</li>
+                <li><span style="color:var(--st-blue);">11:00PM - 3:00AM :</span> Phase1 Work</li>
+                <li><span style="color:var(--st-blue);">3:00AM :</span> Refreshment</li>
+                <li><span style="color:var(--st-blue);">7:00AM - 9:00AM :</span> Breakfast/Get Ready</li>
+                <li><span style="color:var(--st-blue);">9:00AM - 10:00PM :</span> Review</li>
+                <li><span style="color:var(--st-blue);">10:00AM - 1:00PM :</span> Phase2 Work</li>
+                <li><span style="color:var(--st-blue);">1:00PM - 2:00PM :</span> Lunch Break</li>
+                <li><span style="color:var(--st-blue);">2:00PM - 3:00PM :</span> Final Touches</li>
+                <li><span style="color:var(--st-blue);">3:00PM :</span> Refreshment</li>
+                <li><span style="color:var(--st-blue);">3:30PM - 4:00PM :</span> Final Submission</li>
+                <li><span style="color:var(--st-blue);">4:00PM - 5:00PM :</span> Judging & Closing Ceremony</li>
+                <li><span style="color:var(--st-blue);">5:00PM :</span> Winners Announcement & Prize Distribution</li>
+                <li><span style="color:var(--st-red);">JAN 31 5PM:</span> <strong>HACKATHON END</strong>
+              </li>
+          </ul>
       </div>
-    </div>
   </div>
+
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, query, where, getDocs, addDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  // REPLACE WITH YOUR KEYS
- const firebaseConfig = {
-  apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
-  authDomain: "eduhack-432fd.firebaseapp.com",
-  projectId: "eduhack-432fd",
-  storageBucket: "eduhack-432fd.firebasestorage.app",
-  messagingSenderId: "160252785408",
-  appId: "1:160252785408:web:6a22e465982e3e510979e5",
-  measurementId: "G-WCKZ62NM6N"
-};
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-  const EVENT_ID = "edu-hack-2025";
-  // Updated Timer Date based on PDF: Dec 20, 2025 5:00 PM [cite: 77]
-  const HACKATHON_START = new Date("Dec 20, 2025 17:00:00").getTime(); 
-
-  let currentTeamId = null;
-  let teamUnsub = null;
-  let announcementsUnsub = null;
-  const sounds = { click: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'), success: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'), error: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'), power: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3') };
-  Object.values(sounds).forEach(s => s.volume = 0.3);
-  function playSound(type) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
-
-  // AUTH
-  document.getElementById('loginBtn').addEventListener('click', () => { playSound('click'); signInWithPopup(auth, provider).catch(err => alert(err.message)); });
-  document.getElementById('logoutBtn').addEventListener('click', async () => { playSound('power'); if(teamUnsub) teamUnsub(); if(announcementsUnsub) announcementsUnsub(); await signOut(auth); window.location.reload(); });
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      document.querySelector('#loginScreen p').innerHTML = `<span style="color:#fff;">Scanning Database...</span>`;
-      try {
-        // CLIENT SIDE SEARCH (Required for Array of Objects structure)
-        const snapshot = await getDocs(collection(db, 'events', EVENT_ID, 'registrations'));
-        let found = false;
-        snapshot.forEach((d) => {
-          const data = d.data();
-          // Check 'members' array for email
-          if (data.members && data.members.some(m => m.email?.toLowerCase().trim() === user.email.toLowerCase().trim())) {
-            found = true; currentTeamId = d.id; setupRealtime(currentTeamId, user);
-          }
-        });
-        if (!found) { playSound('error'); alert("Access Denied: Email not registered."); await signOut(auth); }
-      } catch (err) { console.error(err); alert("Connection Failed"); }
-    }
-  });
-
-  function setupRealtime(teamId, user) {
-    // 1. Listen to Team Data
-    teamUnsub = onSnapshot(doc(db, 'events', EVENT_ID, 'registrations', teamId), (docSnap) => {
-      if (docSnap.exists()) updateUI(user, docSnap.data());
-    });
-
-    // 2. Listen to Announcements
-    const q = query(collection(db, 'events', EVENT_ID, 'announcements'), orderBy('createdAt', 'desc'), limit(5));
-    announcementsUnsub = onSnapshot(q, (snap) => {
-      const box = document.getElementById('updatesBox');
-      box.innerHTML = '';
-      if(!snap.empty) {
-        box.classList.add('has-content');
-        snap.forEach(d => {
-           const msg = d.data();
-           box.innerHTML += `<div class="update-item"><span class="update-time">${new Date(msg.createdAt.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span> ${msg.message}</div>`;
-        });
-      }
-    });
-
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('appContainer').classList.add('visible');
-    playSound('success');
-  }
-
-  function updateUI(user, team) {
-    document.getElementById('userName').textContent = user.displayName.toUpperCase();
-    document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
-    document.getElementById('teamNameDisplay').textContent = `SQUAD: ${team.team_name.toUpperCase()}`;
-    
-    // Mentor Button State
-    const mBtn = document.getElementById('mentorBtn');
-    if(team.needsMentor) mBtn.classList.add('active-mentor');
-    else mBtn.classList.remove('active-mentor');
-
-    const subs = team.submissions || {};
-    if(subs.course1) setInputState('cert1', subs.course1);
-    if(subs.course2) setInputState('cert2', subs.course2);
-    if(subs.course3) setInputState('cert3', subs.course3);
-    if(subs.projectTitle) {
-      document.getElementById('projectTitle').value = subs.projectTitle;
-      document.getElementById('projectTopic').value = subs.projectTopic || "";
-      lockTopicForm();
-    }
-    if(subs.round1Link) setInputState('round1Link', subs.round1Link, true);
-    if(subs.finalRepo) {
-        document.getElementById('finalRepo').value = subs.finalRepo;
-        document.getElementById('finalRepo').disabled = true;
-        document.getElementById('btnFinal').textContent = "Submitted";
-        document.getElementById('btnFinal').disabled = true;
-    }
-  }
-
-  function setInputState(id, val, isRound1=false) {
-    const el = document.getElementById(id);
-    if(el.value !== val) el.value = val;
-    el.disabled = true;
-    const btn = document.getElementById(isRound1 ? 'btnRound1' : `btn${id.charAt(0).toUpperCase() + id.slice(1)}`);
-    if(btn) { btn.textContent = isRound1 ? "Submitted" : "Verified"; btn.disabled = true; }
-  }
-
-  // LOGIC
-  window.switchTab = (tabId) => { playSound('click'); document.querySelectorAll('.show-section').forEach(e=>e.classList.replace('show-section','hidden-section')); document.getElementById(tabId).classList.replace('hidden-section','show-section'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); };
-
-  // MENTOR BEACON
-  document.getElementById('mentorBtn').addEventListener('click', async () => {
-    playSound('click');
-    const isActive = document.getElementById('mentorBtn').classList.contains('active-mentor');
-    const msg = isActive ? "Cancel Mentor Request?" : "Request Mentor Support?";
-    if(confirm(msg)) {
-      await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { needsMentor: !isActive });
-    }
-  });
-
-  // FINAL SUBMISSION
-  window.submitFinal = async () => {
-    playSound('click');
-    const val = document.getElementById('finalRepo').value.trim();
-    if(!val) return alert("Enter GitHub Link");
-    if(confirm("Submit Final Project?")) {
-        const btn = document.getElementById('btnFinal');
-        btn.textContent = "Syncing...";
-        try {
-            await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.finalRepo': val, 'submissions.finalTime': new Date().toISOString() });
-            playSound('success');
-        } catch(e) { alert("Failed"); btn.textContent = "Retry"; }
-    }
+  // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
+    authDomain: "eduhack-432fd.firebaseapp.com",
+    projectId: "eduhack-432fd",
+    storageBucket: "eduhack-432fd.firebasestorage.app",
+    messagingSenderId: "160252785408",
+    appId: "1:160252785408:web:6a22e465982e3e510979e5"
   };
 
+  let app, db, auth;
+  try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+  } catch(e) { console.error("Firebase Config Error - Check keys"); }
+
+  const provider = new GoogleAuthProvider();
+  
+  // UPDATED EVENT ID TO MATCH DATABASE SCREENSHOT
+  const EVENT_ID = "edu-hack-2025";
+  
+  // EVENT DATES
+  const DATE_START = new Date("Jan 30, 2026 17:00:00").getTime(); 
+  const DATE_END = new Date("Jan 31, 2026 17:00:00").getTime(); 
+
+  let currentTeamId = null;
+  let currentUser = null;
+
+  // --- AUTH & DATA FETCH ---
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    if(auth) {
+        try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message); }
+    } else { alert("Firebase not configured."); }
+  });
+
+  if(auth) {
+      onAuthStateChanged(auth, async (user) => {
+          if(user) {
+              currentUser = user;
+              document.getElementById('loginScreen').classList.add('hidden');
+              document.getElementById('appContainer').classList.add('visible');
+              
+              document.getElementById('userName').textContent = user.displayName;
+              if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
+              
+              // === FETCH TEAM FROM DATABASE ===
+              if(db) {
+                  try {
+                      const registrationsRef = collection(db, "events", EVENT_ID, "registrations");
+                      const q = query(registrationsRef); 
+                      const querySnapshot = await getDocs(q);
+                      
+                      let myTeam = null;
+
+                      querySnapshot.forEach((doc) => {
+                          const data = doc.data();
+                          const members = data.members || [];
+                          const isMember = members.some(m => {
+                              const email = (typeof m === 'string' ? m : m.email);
+                              return email && email.toLowerCase() === user.email.toLowerCase();
+                          });
+
+                          if(isMember) {
+                              myTeam = data;
+                              currentTeamId = doc.id;
+                          }
+                      });
+
+                      if(myTeam) {
+                          loadDashboard(myTeam);
+                      } else {
+                          document.getElementById('teamNameDisplay').textContent = "UNREGISTERED";
+                      }
+
+                  } catch(e) { console.error("DB Error", e); }
+              }
+          } else {
+              // User logged out
+              document.getElementById('appContainer').classList.remove('visible');
+              document.getElementById('loginScreen').classList.remove('hidden');
+          }
+      });
+  }
+
+  function loadDashboard(team) {
+      // SET TEAM NAME FROM DB
+      document.getElementById('teamNameDisplay').textContent = team.team_name ? team.team_name.toUpperCase() : "UNKNOWN TEAM";
+      
+      // RESTORE SUBMISSIONS FROM DB
+      const subs = team.submissions || {};
+      if(subs.review1) disableBtn('btnReview1', "SIGNED (JAN 09)");
+      if(subs.review2) disableBtn('btnReview2', "SIGNED (JAN 16)");
+      if(subs.review3) disableBtn('btnReview3', "SIGNED (JAN 23)");
+      if(subs.finalCert) { document.getElementById('finalCert').value = subs.finalCert; disableBtn('btnFinal', "UPLOADED"); }
+      if(subs.projectTitle) {
+          document.getElementById('projectTitle').value = subs.projectTitle;
+          document.getElementById('projectTopic').value = subs.projectTopic || "";
+          document.getElementById('projectTitle').disabled = true;
+          document.getElementById('projectTopic').disabled = true;
+          document.getElementById('freezeBtn').textContent = "LOCKED";
+          document.getElementById('freezeBtn').disabled = true;
+      }
+      if(subs.round1Link) { document.getElementById('round1Link').value = subs.round1Link; disableBtn('btnRound1', "SENT"); }
+      if(subs.finalGithub) { 
+          document.getElementById('finalGithub').value = subs.finalGithub; 
+          document.getElementById('finalPPT').value = subs.finalPPT;
+          disableBtn('btnFinalRound', "SUBMITTED"); 
+      }
+  }
+
+  function disableBtn(id, text) {
+      const btn = document.getElementById(id);
+      if(btn) { 
+          btn.textContent = text; 
+          btn.disabled = true; 
+          btn.style.borderColor="#00e676"; 
+          btn.style.color="#00e676"; 
+      }
+  }
+
+  // --- ACTIONS ---
+  window.switchTab = (id) => {
+      document.querySelectorAll('.show-section').forEach(el => { el.classList.remove('show-section'); el.classList.add('hidden-section'); });
+      document.getElementById(id).classList.remove('hidden-section');
+      document.getElementById(id).classList.add('show-section');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+  }
+
+  window.logout = async () => {
+      if(confirm("Terminate Session?")) {
+          if(auth) await signOut(auth);
+          location.reload();
+      }
+  }
+
+  window.callMentor = async () => {
+      const btn = document.querySelector('.mentor-btn');
+      btn.style.animation = 'none'; 
+      if(confirm("ALERT: Request immediate mentor assistance to your location?")) {
+          try {
+              if(db && currentUser && currentTeamId) {
+                  await addDoc(collection(db, 'mentor_requests'), {
+                      team: document.getElementById('teamNameDisplay').textContent,
+                      teamId: currentTeamId,
+                      user: currentUser.displayName,
+                      timestamp: serverTimestamp(),
+                      status: 'urgent'
+                  });
+              }
+              alert("SIGNAL SENT. A MENTOR IS EN ROUTE.");
+          } catch(e) { alert("Signal Sent (Local Mode)."); }
+      }
+      btn.style.animation = 'pulse 2s infinite';
+  }
+
+  window.markVerified = async (id) => {
+      let dateLabel = "";
+      if(id === 'review1') dateLabel = " (JAN 09)";
+      if(id === 'review2') dateLabel = " (JAN 16)";
+      if(id === 'review3') dateLabel = " (JAN 23)";
+      
+      if(confirm(`Confirm signature obtained for ${id}?`)) {
+          // DB Update Logic
+          if(db && currentTeamId) {
+             const teamRef = doc(db, "events", EVENT_ID, "registrations", currentTeamId);
+             await updateDoc(teamRef, { [`submissions.${id}`]: true });
+          }
+          disableBtn('btn'+id.charAt(0).toUpperCase()+id.slice(1), "SIGNED" + dateLabel); 
+      }
+  }
+  
+  window.submitFinal = async () => { 
+      const val = document.getElementById('finalCert').value;
+      if(val && db && currentTeamId) {
+         const teamRef = doc(db, "events", EVENT_ID, "registrations", currentTeamId);
+         await updateDoc(teamRef, { [`submissions.finalCert`]: val });
+         disableBtn('btnFinal', "UPLOADED"); 
+      }
+  }
+  
+  window.submitRound1 = async () => {
+      const val = document.getElementById('round1Link').value;
+      if(val && db && currentTeamId) {
+         const teamRef = doc(db, "events", EVENT_ID, "registrations", currentTeamId);
+         await updateDoc(teamRef, { [`submissions.round1Link`]: val });
+         disableBtn('btnRound1', "SENT"); 
+      }
+  }
+
+  window.submitFinalRound = async () => {
+      const git = document.getElementById('finalGithub').value;
+      const ppt = document.getElementById('finalPPT').value;
+      if(git && ppt && db && currentTeamId) {
+         const teamRef = doc(db, "events", EVENT_ID, "registrations", currentTeamId);
+         await updateDoc(teamRef, { 
+             [`submissions.finalGithub`]: git,
+             [`submissions.finalPPT`]: ppt
+         });
+         disableBtn('btnFinalRound', "SUBMITTED"); 
+      }
+  }
+
+  document.getElementById('freezeBtn').addEventListener('click', async () => {
+      const title = document.getElementById('projectTitle').value;
+      const topic = document.getElementById('projectTopic').value;
+      if(title && topic && db && currentTeamId) {
+          if(confirm("Lock project details?")) {
+              const teamRef = doc(db, "events", EVENT_ID, "registrations", currentTeamId);
+              await updateDoc(teamRef, { 
+                  [`submissions.projectTitle`]: title,
+                  [`submissions.projectTopic`]: topic
+              });
+              document.getElementById('projectTitle').disabled = true;
+              document.getElementById('projectTopic').disabled = true;
+              document.getElementById('freezeBtn').textContent = "LOCKED";
+              document.getElementById('freezeBtn').disabled = true;
+          }
+      }
+  });
+
+  // --- TIMER LOGIC ---
   setInterval(() => {
-    const dist = HACKATHON_START - new Date().getTime();
-    if (dist < 0) {
-      document.getElementById("timer").innerHTML = "LIVE";
-      document.getElementById("topicStatus").textContent = "OPEN";
-      document.getElementById("topicStatus").className = "status-badge status-open";
-      if (!document.getElementById('projectTitle').disabled) { document.getElementById("topicFormArea").style.opacity = "1"; document.getElementById("topicFormArea").style.pointerEvents = "auto"; }
+    const now = new Date().getTime();
+    let distance, label, targetText;
+
+    if (now < DATE_START) {
+        distance = DATE_START - now;
+        label = "HACKATHON COMMENCES IN";
+        targetText = "TARGET: JAN 30, 2026 @ 17:00";
+    } else if (now >= DATE_START && now < DATE_END) {
+        distance = DATE_END - now;
+        label = "HACKATHON ENDS IN";
+        targetText = "DEADLINE: JAN 31, 2026 @ 17:00";
+        document.getElementById('timer').style.color = "#00e676";
+        document.getElementById('timer').style.textShadow = "0 0 20px rgba(0,230,118,0.6)";
     } else {
-      const d = Math.floor(dist / (1000 * 60 * 60 * 24));
-      const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
-      document.getElementById("timer").innerHTML = `${d}d ${h}h ${m}m`;
+        document.getElementById("timer").innerHTML = "SYSTEM OFFLINE";
+        document.getElementById("timerLabel").innerHTML = "EVENT CONCLUDED";
+        return;
     }
+
+    const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("timer").innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+    document.getElementById("timerLabel").innerHTML = label;
+    document.getElementById("timerTarget").innerHTML = targetText;
   }, 1000);
 
-  // Submission Functions
-  window.submitCert = async (id) => { playSound('click'); const val = document.getElementById(`cert${id}`).value.trim(); if(!val) return alert("Link required"); const btn = document.getElementById(`btnCert${id}`); btn.textContent = "Syncing..."; try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { [`submissions.course${id}`]: val }); playSound('success'); } catch(e) { alert("Failed"); btn.textContent = "Retry"; } };
-  document.getElementById('freezeBtn').addEventListener('click', async () => { playSound('click'); const title = document.getElementById('projectTitle').value.trim(); const topic = document.getElementById('projectTopic').value.trim(); if(!title) return alert("Missing fields"); if(confirm("Freeze?")) { const btn = document.getElementById('freezeBtn'); btn.textContent = "Freezing..."; try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.projectTitle': title, 'submissions.projectTopic': topic }); playSound('success'); } catch(e) { alert("Failed"); btn.textContent = "Retry"; } } });
-  function lockTopicForm() { document.getElementById('projectTitle').disabled = true; document.getElementById('projectTopic').disabled = true; const btn = document.getElementById('freezeBtn'); btn.textContent = "Frozen"; btn.disabled = true; btn.classList.add('btn-ghost'); }
-  window.submitRound = async (r) => { playSound('click'); const val = document.getElementById('round1Link').value.trim(); if(!val) return alert("Link required"); const btn = document.getElementById('btnRound1'); btn.textContent = "Syncing..."; try { await updateDoc(doc(db, 'events', EVENT_ID, 'registrations', currentTeamId), { 'submissions.round1Link': val, 'submissions.round1Time': new Date().toISOString() }); playSound('success'); } catch(e) { alert("Failed"); btn.textContent = "Retry"; } };
 </script>
 </body>
 </html>
