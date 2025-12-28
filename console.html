@@ -321,9 +321,8 @@
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS
-  
   const firebaseConfig = {
-    apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
+    apiKey: "YOUR_API_KEY_HERE",
     authDomain: "eduhack-432fd.firebaseapp.com",
     projectId: "eduhack-432fd",
     storageBucket: "eduhack-432fd.firebasestorage.app",
@@ -360,12 +359,6 @@
   if(auth) {
       onAuthStateChanged(auth, async (user) => {
           if(user) {
-              currentUser = user;
-              document.getElementById('loginScreen').classList.add('hidden');
-              document.getElementById('appContainer').classList.add('visible');
-              
-              document.getElementById('userName').textContent = user.displayName;
-              if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
               
               // === FETCH TEAM FROM DATABASE ===
               if(db) {
@@ -375,28 +368,52 @@
                       const querySnapshot = await getDocs(q);
                       
                       let myTeam = null;
+                      let isVerified = false;
+                      let isMember = false;
 
                       querySnapshot.forEach((doc) => {
                           const data = doc.data();
                           const members = data.members || [];
-                          const isMember = members.some(m => {
+                          const memberFound = members.some(m => {
                               const email = (typeof m === 'string' ? m : m.email);
                               return email && email.toLowerCase() === user.email.toLowerCase();
                           });
 
-                          if(isMember) {
-                              myTeam = data;
-                              currentTeamId = doc.id;
+                          if(memberFound) {
+                              isMember = true;
+                              if (data.verified === true) {
+                                  myTeam = data;
+                                  currentTeamId = doc.id;
+                                  isVerified = true;
+                              }
                           }
                       });
 
-                      if(myTeam) {
+                      if(isVerified && myTeam) {
+                          // SUCCESS: User is member AND verified
+                          currentUser = user;
+                          document.getElementById('loginScreen').classList.add('hidden');
+                          document.getElementById('appContainer').classList.add('visible');
+                          document.getElementById('userName').textContent = user.displayName;
+                          if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
                           loadDashboard(myTeam);
+                      } else if (isMember && !isVerified) {
+                          // FAIL: User found but not verified
+                          alert("ACCESS DENIED: Your registration is currently pending verification by the admin.");
+                          await signOut(auth);
+                          location.reload();
                       } else {
-                          document.getElementById('teamNameDisplay').textContent = "UNREGISTERED";
+                          // FAIL: User not found
+                          alert("ACCESS DENIED: No registration found for " + user.email);
+                          await signOut(auth);
+                          location.reload();
                       }
 
-                  } catch(e) { console.error("DB Error", e); }
+                  } catch(e) { 
+                      console.error("DB Error", e); 
+                      alert("System Error: Could not verify identity.");
+                      await signOut(auth);
+                  }
               }
           } else {
               // User logged out
