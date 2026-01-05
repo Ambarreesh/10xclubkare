@@ -164,6 +164,11 @@ function renderFlatList(teams) {
     fullParticipantList = [];
     let counter = 1;
 
+    if(teams.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px;">No Verified Teams Found</td></tr>`;
+        return;
+    }
+
     // 1. Flatten the data: Turn Teams into Individual Rows
     teams.forEach(team => {
         if(!team.members) return;
@@ -210,7 +215,13 @@ function startListener() {
     
     onSnapshot(q, snap => {
         const teams = [];
-        snap.forEach(s => teams.push({ id: s.id, ...s.data() }));
+        snap.forEach(s => {
+            const data = s.data();
+            // === FILTER CHECK: Only add if verified is TRUE ===
+            if (data.verified === true) {
+                teams.push({ id: s.id, ...data });
+            }
+        });
         renderFlatList(teams);
     });
 }
