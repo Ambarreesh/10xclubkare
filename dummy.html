@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EDU HACK '26 | Console</title>
+<title>EDU HACK '26 | Supreme Console</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
     --st-blue: #00ccff;
     --st-orange: #ffab00;
     --bg-dark: #050505;
-    --glass-surface: rgba(20, 20, 20, 0.85);
+    --glass-surface: rgba(20, 20, 20, 0.9);
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-primary: #e0e0e0;
     --text-secondary: #86868b;
@@ -25,63 +25,54 @@
     --font-title: 'Rubik Glitch', cursive;
   }
 
-  * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; outline: none; }
 
   body {
     margin: 0; font-family: var(--font-main); background-color: var(--bg-dark);
-    color: var(--text-primary); min-height: 100vh; overflow-x: hidden;
+    color: var(--text-primary); min-height: 100vh;
     background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
   }
 
+  /* SCANLINE EFFECT */
   body::before {
     content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
     background-size: 100% 4px; z-index: 100; pointer-events: none;
   }
 
+  /* WORLD-CLASS BROADCAST BAR */
+  .broadcast-bar {
+    background: var(--st-red); color: white; padding: 10px; font-size: 0.8rem;
+    text-align: center; font-weight: bold; letter-spacing: 2px;
+    animation: pulse-red 2s infinite; position: sticky; top: 0; z-index: 1000;
+  }
+  @keyframes pulse-red { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
   .app-container {
     max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 10;
-    display: none; opacity: 0; transition: opacity 1s ease; padding-bottom: 120px;
+    display: none; opacity: 0; transition: 1s ease; padding-bottom: 120px;
   }
   .app-container.visible { display: block; opacity: 1; }
 
   .login-screen {
-    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #000; transition: 0.8s ease;
+    position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; background: #000; transition: 0.8s;
   }
   .login-screen.hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 
   .glitch-logo {
     font-family: var(--font-title); font-size: 5rem; color: #fff;
     text-shadow: 4px 4px 0px var(--st-red); margin-bottom: 20px;
-    animation: glitch 2.5s infinite alternate-reverse; text-align: center; line-height: 1;
-  }
-  @keyframes glitch {
-    0% { text-shadow: 2px 2px 0px var(--st-red); }
-    20% { text-shadow: -2px -2px 0px var(--st-blue); }
-    40% { text-shadow: 2px 2px 0px var(--st-red); }
+    animation: glitch 2.5s infinite alternate-reverse; line-height: 1;
   }
 
   header { border-bottom: 1px solid var(--glass-border); margin-bottom: 30px; padding-bottom: 20px; }
-  
-  .system-ticker {
-    font-size: 0.75rem; color: var(--st-green); background: rgba(0, 230, 118, 0.05);
-    padding: 8px; border: 1px solid rgba(0, 230, 118, 0.2); margin-bottom: 20px;
-    display: flex; justify-content: space-between;
-  }
-
-  .user-badge {
-    display: flex; align-items: center; gap: 15px;
-    background: rgba(255,255,255,0.03); padding: 10px 20px; border-radius: 4px;
-    border-left: 3px solid var(--st-red);
-  }
-  .user-avatar { width: 40px; height: 40px; background: #333; background-size: cover; border: 1px solid #fff; border-radius: 50%; }
 
   .tabs { display: flex; gap: 2px; margin-bottom: 30px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px; }
   .tab-btn {
     flex: 1; background: transparent; border: none; color: var(--text-secondary);
-    font-family: var(--font-main); font-size: 0.9rem; font-weight: 700;
-    padding: 16px; cursor: pointer; transition: 0.3s;
+    font-family: var(--font-main); font-size: 0.8rem; font-weight: 700;
+    padding: 16px; cursor: pointer; transition: 0.3s; text-transform: uppercase;
   }
   .tab-btn.active { color: #000; background: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
@@ -92,167 +83,151 @@
   }
   .glass-card::before { content:''; position: absolute; top:0; left:0; width: 4px; height: 100%; background: var(--st-red); }
 
+  /* PROGRESS BAR */
+  .progress-container { height: 10px; background: #222; border-radius: 5px; margin: 20px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--st-green); width: 0%; transition: 1s ease; box-shadow: 0 0 10px var(--st-green); }
+
   input {
     background: #111; border: 1px solid #333; color: var(--st-green);
     padding: 12px 18px; font-family: var(--font-main); width: 100%; margin-bottom: 10px;
   }
+
   .btn {
     background: var(--st-red); color: #fff; border: none; padding: 12px 24px;
     font-weight: 700; cursor: pointer; width: 100%; font-family: var(--font-main);
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-    text-decoration: none; display: inline-block; text-align: center;
   }
-  .btn:hover { background: #ff3355; color: #fff; }
+  .btn:hover { background: #ff3355; box-shadow: 0 0 15px rgba(255, 0, 51, 0.4); }
   .btn:disabled { background: #333; color: #888; cursor: not-allowed; }
 
-  /* MENTOR BTN */
-  .mentor-btn {
-    position: fixed; bottom: 30px; right: 30px; background: var(--st-orange); color: #000;
-    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 20px rgba(255, 171, 0, 0.4); cursor: pointer; z-index: 999; border: none;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 171, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0); } }
-
-  .timer-display {
-    font-family: var(--font-title); font-size: 5rem; color: #fff;
-    text-shadow: 0 0 20px rgba(255,0,51,0.6); margin: 20px 0;
-  }
-
   .problem-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px; max-height: 600px; overflow-y: auto; padding-right: 10px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px; max-height: 500px; overflow-y: auto; padding-right: 10px;
   }
-  .problem-card {
+  .prob-card {
     background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px;
-    border-radius: 4px; position: relative; transition: 0.3s;
+    position: relative; transition: 0.3s; cursor: pointer;
   }
-  .problem-card.full { opacity: 0.5; border-color: var(--st-red); }
-  .problem-card.active { border-color: var(--st-blue); }
-  .occupancy-badge { 
-    position: absolute; top: 10px; right: 10px; font-size: 0.7rem; 
-    padding: 2px 8px; border-radius: 10px; background: #333;
+  .prob-card.locked { opacity: 0.4; border-color: var(--st-red); }
+  .prob-card:hover:not(.locked) { border-color: var(--st-blue); background: rgba(0, 204, 255, 0.05); }
+
+  .mentor-btn {
+    position: fixed; bottom: 30px; right: 30px; background: var(--st-orange);
+    width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(255, 171, 0, 0.4); cursor: pointer; z-index: 999; border: none;
   }
 
-  .hidden-section { display: none; }
-  .show-section { display: block; animation: fadeIn 0.4s ease-out; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
-  @media(max-width: 768px){ 
-    .glitch-logo { font-size: 3rem; } 
-    .timer-display { font-size: 3rem; }
-  }
+  .timer-display { font-family: var(--font-title); font-size: 5rem; color: #fff; text-shadow: 0 0 20px rgba(255,0,51,0.6); margin: 20px 0; }
+
+  .resource-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .res-link { background: rgba(255,255,255,0.05); padding: 10px; text-decoration: none; color: var(--st-blue); font-size: 0.7rem; border: 1px solid #333; text-align: center; }
+  .res-link:hover { background: var(--st-blue); color: #000; }
+
+  @media(max-width: 768px){ .glitch-logo { font-size: 3rem; } .timer-display { font-size: 3rem; } .resource-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<button class="mentor-btn" onclick="callMentor()" title="Call Mentor for Help">
+<div class="broadcast-bar" id="broadcast">SYSTEM MESSAGE: HACKATHON COMMENCING SOON. PREPARE YOUR TEAMS.</div>
+
+<button class="mentor-btn" onclick="callMentor()">
     <span class="material-icons">support_agent</span>
 </button>
 
 <div class="login-screen" id="loginScreen">
-  <div class="glitch-logo">EDU HACK<br>Console</div>
-  <button class="btn" style="width:auto; min-width:250px; background:#fff; color:#000;" id="loginBtn">
-    AUTHENTICATE IDENTITY
-  </button>
+  <div class="glitch-logo">EDU HACK<br>SUPREME</div>
+  <button class="btn" style="width:auto; min-width:280px; background:#fff; color:#000;" id="loginBtn">AUTHENTICATE ACCESS</button>
 </div>
 
 <div class="app-container" id="appContainer">
   
-  <div class="system-ticker">
-    <span>SYSTEM: ONLINE</span>
-    <span>PHASE 2: HACKATHON LIVE</span>
-    <span>CAPACITY: 2 TEAMS PER STATEMENT</span>
-    <span>NET: SECURE</span>
-  </div>
-
   <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-      <div class="logos">
-        <h1 style="margin:0; font-size:1.8rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> PLAYGROUND</span></h1>
-        <span style="font-size:0.8rem; color:var(--text-secondary);">10X CLUB KARE</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <div>
+        <h1 style="margin:0; font-size:1.8rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">10X CLUB | KARE CAMPUS</span>
       </div>
       <div class="user-badge">
         <div class="user-avatar" id="userAvatar"></div>
         <div>
-          <div id="userName" style="font-weight:700;">UNKNOWN</div>
-          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
-            TEAM: <span id="teamNameDisplay" style="color:var(--st-green); font-weight:bold;">CONNECTING...</span>
-          </div>
+          <div id="userName" style="font-weight:700;">USER_ALPHA</div>
+          <div style="font-size:0.7rem; color:var(--st-green);">TEAM: <span id="teamNameDisplay">...</span></div>
         </div>
-        <button class="btn-logout" onclick="logout()" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:4px 8px; cursor:pointer; font-size:0.7rem; margin-left:10px;">LOGOUT</button>
       </div>
     </div>
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" onclick="switchTab('hackathon')">Hackathon Console</button>
-    <button class="tab-btn" onclick="switchTab('problems')">Problem Statements</button>
+    <button class="tab-btn active" onclick="switchTab('hackathon')">Mission Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('problems')">Problem Matrix</button>
+    <button class="tab-btn" onclick="switchTab('resources')">Resources</button>
     <button class="tab-btn" onclick="switchTab('timeline')">Mission Log</button>
   </nav>
 
   <div id="hackathon" class="show-section">
-    <div style="text-align:center; margin-bottom:40px;">
-      <div id="timerLabel" style="font-size:1rem; color:var(--st-red); letter-spacing:4px;">HACKATHON COMMENCES IN</div>
+    <div style="text-align:center; margin-bottom:30px;">
+      <div id="timerLabel" style="font-size:0.8rem; letter-spacing:4px; color:var(--st-red);">REMAINING TIME</div>
       <div class="timer-display" id="timer">00:00:00:00</div>
-      <div id="timerTarget" style="color:var(--text-secondary);">TARGET: JAN 30, 2026 @ 17:00</div>
+      
+      <div style="max-width: 600px; margin: 0 auto;">
+          <div style="display:flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 5px;">
+              <span>MISSION PROGRESS</span>
+              <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-container"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
     </div>
 
     <div class="glass-card">
-      <h2 style="color:var(--st-green);">PROJECT PROTOCOL</h2>
-      <div style="margin-bottom:20px; display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px;">
-          <input type="number" id="projectTopic" placeholder="Statement ID (1-50)...">
-          <input type="text" id="projectTitle" placeholder="Your Project Title...">
-          <button class="btn" id="freezeBtn">LOCK PROJECT</button>
+      <h3 style="color:var(--st-green); margin-top:0;">1. PROTOCOL ACTIVATION</h3>
+      <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px;">
+          <input type="number" id="projectTopic" placeholder="Problem ID (1-50)">
+          <input type="text" id="projectTitle" placeholder="Your Unique Project Title...">
+          <button class="btn" id="freezeBtn">LOCK DATA</button>
       </div>
-      <p style="font-size: 0.75rem; color: var(--text-secondary);">*Once locked, project details cannot be modified without mentor intervention.</p>
     </div>
 
-    <div class="glass-card">
-      <h3>SUBMISSIONS</h3>
-      <div style="margin-bottom:20px;">
-          <label style="font-size:0.8rem; color:#888;">ROUND 1: PLANNING PPT (Due 8:15 PM)</label>
-          <div style="display:flex; gap:10px;">
-              <input type="text" id="round1Link" placeholder="PPT Link...">
-              <button class="btn" id="btnRound1" onclick="submitRound1()" style="width:auto;">SEND</button>
-          </div>
-      </div>
-      <div>
-          <label style="font-size:0.8rem; color:#888;">FINAL ROUND: GITHUB & PPT (Due 3:30 PM)</label>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-              <input type="text" id="finalGithub" placeholder="GitHub Repo...">
-              <input type="text" id="finalPPT" placeholder="Final PPT...">
-          </div>
-          <button class="btn" id="btnFinalRound" onclick="submitFinalRound()">SUBMIT FINAL PROJECT</button>
-      </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="glass-card">
+            <h3 style="color:var(--st-orange);">ROUND 1: PLANNING</h3>
+            <input type="text" id="round1Link" placeholder="Slide Deck Link (Google Drive)">
+            <button class="btn" id="btnRound1" onclick="submitRound1()">SUBMIT PLANNING</button>
+        </div>
+        <div class="glass-card">
+            <h3 style="color:var(--st-blue);">FINAL: DEPLOYMENT</h3>
+            <input type="text" id="finalGithub" placeholder="GitHub Repository">
+            <input type="text" id="finalPPT" placeholder="Final Presentation Link">
+            <button class="btn" id="btnFinalRound" onclick="submitFinalRound()">FINALIZE MISSION</button>
+        </div>
     </div>
   </div>
 
   <div id="problems" class="hidden-section">
     <div class="glass-card">
-        <h2 style="color:var(--st-blue);">AVAILABLE CHALLENGES</h2>
-        <div class="problem-grid" id="problemList">
-            </div>
+        <h2 style="color:var(--st-blue); margin-top:0;">PROBLEM MATRIX</h2>
+        <div class="problem-grid" id="problemList"></div>
     </div>
+  </div>
+
+  <div id="resources" class="hidden-section">
+      <div class="glass-card">
+          <h2 style="color:var(--st-orange);">DEVELOPER TOOLKIT</h2>
+          <div class="resource-grid">
+              <a href="#" class="res-link">Angular Official Docs</a>
+              <a href="#" class="res-link">Firebase Console</a>
+              <a href="#" class="res-link">Tailwind Cheat Sheet</a>
+              <a href="#" class="res-link">Material Icons List</a>
+              <a href="#" class="res-link">Devpost Best Practices</a>
+              <a href="#" class="res-link">Github Desktop Tool</a>
+          </div>
+      </div>
   </div>
 
   <div id="timeline" class="hidden-section">
       <div class="glass-card">
           <h2 style="color:var(--st-red);">MISSION LOG</h2>
-          <ul style="list-style:none; padding:0; line-height:1.8; font-size: 0.9rem;">
-              <li style="color: var(--text-secondary); opacity: 0.6;">JAN 05-23: Angular Bootcamp Phase [COMPLETE]</li>
-              <li style="color: var(--st-green);">JAN 30 5:00 PM: HACKATHON LAUNCH</li>
-              <li>5:00PM - 6:00PM : Event Launch</li>
-              <li>6:00PM - 6:30PM : Problem Statement Distribution</li>
-              <li>6:30PM - 7:00PM : Project Planning</li>
-              <li>7:00PM - 8:15PM : Dinner Break</li>
-              <li style="color: var(--st-red);">8:15PM - 9:00PM : ROUND 1 SUBMISSION</li>
-              <li>11:00PM - 3:00AM : Phase 1 Work</li>
-              <li style="color: var(--st-blue);">JAN 31 10:00 AM : Phase 2 Work</li>
-              <li style="color: var(--st-red);">3:30PM - 4:00PM : FINAL SUBMISSION</li>
-              <li>4:00PM - 5:00PM : Judging & Closing</li>
-              <li style="color: var(--st-green);">5:00 PM : Winners Announcement</li>
-          </ul>
+          <div id="logContent" style="font-size: 0.85rem; line-height: 2;">
+              </div>
       </div>
   </div>
 
@@ -260,7 +235,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, doc, updateDoc, serverTimestamp, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, query, getDocs, doc, updateDoc, serverTimestamp, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -282,59 +257,43 @@
 
   let currentTeamId = null;
   let currentUser = null;
-  let allProblemStats = {};
+  let stats = {};
 
   const problems = [
-    "Predictive Attendance Risk Analyzer", "Smart Academic Alert Notification Engine", "Automated Transcript Request Workflow",
-    "Unified Campus Portal SSO Prototype", "Intelligent Exam Seating Allocation", "Attendance Anomaly Detection System",
-    "Faculty Load Distribution Dashboard", "Personalized Elective Recommendation Engine", "Virtual SIS Helpdesk Chatbot",
-    "KAFKA Complaint Trend Analytics", "Hostel Maintenance Priority Assignment", "Hostel Occupancy Prediction Simulator",
-    "Smart Grievance Escalation Workflow", "Mobile-Friendly Complaint Tracking", "Multilingual Portal Accessibility Layer",
-    "Hostel Utility Consumption Analytics", "Smart Campus Bus Route Optimizer", "Real-Time Transport Tracking Simulator",
-    "Campus Emergency Broadcast System", "Exam Timetable Clash Detection Tool", "Smart Lab Resource Booking Platform",
-    "Peer Mentoring Matchmaking Engine", "Digital Academic Certificate Verification", "Student Feedback Sentiment Analysis",
+    "Predictive Attendance Risk Analyzer", "Smart Academic Alert Notification", "Automated Transcript Request Workflow",
+    "Unified Campus Portal SSO", "Intelligent Exam Seating Allocation", "Attendance Anomaly Detection System",
+    "Faculty Load Distribution Dashboard", "Personalized Elective Recommendation", "Virtual SIS Helpdesk Chatbot",
+    "KAFKA Complaint Trend Analytics", "Hostel Maintenance Priority System", "Hostel Occupancy Prediction Simulator",
+    "Smart Grievance Escalation Engine", "Mobile Complaint Tracking Interface", "Multilingual Portal Accessibility Layer",
+    "Hostel Utility Consumption Platform", "Smart Campus Bus Route Optimizer", "Real-Time Transport Tracking Simulator",
+    "Campus Emergency Broadcast System", "Exam Timetable Clash Detection", "Smart Lab Resource Booking Platform",
+    "Peer Mentoring Matchmaking Engine", "Digital Academic Certificate Verification", "Student Feedback Sentiment Tool",
     "Automated Leave Approval Engine", "Smart Canteen Crowd Prediction", "Lab Utilization Optimization System",
-    "Unified University Events Calendar", "Student Skill Gap Identification Engine", "LMS Engagement Analytics Dashboard",
-    "Scholarship Eligibility Filtering Engine", "Intelligent Notification Priority Controller", "Centralized Campus Grievance Console",
+    "Unified University Events Calendar", "Student Skill Gap Identification", "LMS Engagement Analytics Dashboard",
+    "Scholarship Eligibility Filtering", "Intelligent Notification Controller", "Centralized Campus Grievance Console",
     "Document Digitization & OCR Tool", "Dynamic University FAQ Generator", "Campus Occupancy Visualization Heatmap",
-    "Night Transport Safety Monitoring", "Academic Performance Forecasting Tool", "Alumni Mentorship Matching Platform",
-    "Interactive Portal Guidance Assistant", "Hostel Food Quality Analytics Platform", "Smart Hostel Energy Optimization",
-    "Campus Data Privacy Risk Scanner", "Degree Progress Audit Automation Tool", "System Downtime Notification Simulator",
-    "Third-Party Tool Integration Gateway", "Student Certification Tracking Platform", "Counseling Appointment Queue Manager",
+    "Night Transport Safety Monitoring", "Academic Performance Forecasting", "Alumni Mentorship Matching Platform",
+    "Interactive Portal Guidance Assistant", "Hostel Food Quality Analytics", "Smart Hostel Energy Optimization",
+    "Campus Data Privacy Risk Scanner", "Degree Progress Audit Automation", "System Downtime Notification Simulator",
+    "Third-Party Tool Integration Gateway", "Student Certification Tracking", "Counseling Appointment Queue Manager",
     "Accessibility Enhancement Toolkit", "University KPI Analytics Dashboard"
   ];
 
-  // POPULATE PROBLEMS & SYNC OCCUPANCY
-  const renderProblems = () => {
-    const list = document.getElementById('problemList');
-    list.innerHTML = '';
-    problems.forEach((title, index) => {
-        const id = index + 1;
-        const count = allProblemStats[id] || 0;
-        const card = document.createElement('div');
-        card.className = `problem-card ${count >= 2 ? 'full' : ''}`;
-        card.innerHTML = `
-            <div class="occupancy-badge" style="color: ${count >= 2 ? '#ff0033' : '#00e676'}">
-                ${count}/2 Teams
-            </div>
-            <strong style="color: var(--st-blue)">#${id}</strong>
-            <p style="margin: 10px 0 0 0; font-size: 0.85rem;">${title}</p>
-        `;
-        list.appendChild(card);
-    });
-  };
+  const missionLog = [
+    {t: "JAN 30 5:00 PM", e: "HACKATHON START"},
+    {t: "6:00PM - 6:30PM", e: "Problem Distribution"},
+    {t: "8:15PM - 9:00PM", e: "Round 1 Submission Deadline"},
+    {t: "11:00PM - 3:00AM", e: "Phase 1 Development"},
+    {t: "JAN 31 10:00 AM", e: "Phase 2 Development"},
+    {t: "3:30PM - 4:00PM", e: "Final Submission Deadline"},
+    {t: "5:00 PM", e: "Winners Announcement"}
+  ];
 
-  // SYNC PROBLEM OCCUPANCY FROM DB
-  onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snapshot) => {
-      allProblemStats = {};
-      snapshot.forEach(doc => {
-          const topic = doc.data().submissions?.projectTopic;
-          if(topic) allProblemStats[topic] = (allProblemStats[topic] || 0) + 1;
-      });
-      renderProblems();
-  });
+  // INIT UI
+  const logDiv = document.getElementById('logContent');
+  missionLog.forEach(l => logDiv.innerHTML += `<div><span style="color:var(--st-blue)">${l.t}</span> — ${l.e}</div>`);
 
-  // AUTH & LOGIN
+  // AUTH
   document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
 
   onAuthStateChanged(auth, async (user) => {
@@ -342,9 +301,10 @@
           const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
           let myTeam = null;
           snap.forEach(doc => {
-              const members = doc.data().members || [];
-              const found = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
-              if(found && doc.data().verified) { myTeam = doc.data(); currentTeamId = doc.id; }
+              const data = doc.data();
+              const members = data.members || [];
+              const isMember = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
+              if(isMember && data.verified) { myTeam = data; currentTeamId = doc.id; }
           });
 
           if(myTeam) {
@@ -354,61 +314,73 @@
               document.getElementById('userName').textContent = user.displayName;
               document.getElementById('teamNameDisplay').textContent = myTeam.team_name.toUpperCase();
               if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
-              loadDashboard(myTeam);
+              syncStats();
+              loadDash(myTeam.submissions || {});
           } else {
-              alert("Access Denied: Team not verified.");
-              await signOut(auth);
+              alert("Access Denied: Unverified Identity."); signOut(auth);
           }
       }
   });
 
-  function loadDashboard(team) {
-      const subs = team.submissions || {};
-      if(subs.projectTopic) {
-          document.getElementById('projectTopic').value = subs.projectTopic;
-          document.getElementById('projectTitle').value = subs.projectTitle;
-          document.getElementById('projectTopic').disabled = true;
-          document.getElementById('projectTitle').disabled = true;
-          document.getElementById('freezeBtn').textContent = "LOCKED";
-          document.getElementById('freezeBtn').disabled = true;
-      }
-      if(subs.round1Link) { document.getElementById('round1Link').value = subs.round1Link; disableBtn('btnRound1', "SENT"); }
-      if(subs.finalGithub) { 
-          document.getElementById('finalGithub').value = subs.finalGithub; 
-          document.getElementById('finalPPT').value = subs.finalPPT;
-          disableBtn('btnFinalRound', "SUBMITTED"); 
-      }
+  function syncStats() {
+      onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snapshot) => {
+          stats = {};
+          snapshot.forEach(doc => {
+              const topic = doc.data().submissions?.projectTopic;
+              if(topic) stats[topic] = (stats[topic] || 0) + 1;
+          });
+          renderProbs();
+      });
   }
 
-  function disableBtn(id, text) {
-      const btn = document.getElementById(id);
-      if(btn) { btn.textContent = text; btn.disabled = true; btn.style.borderColor="#00e676"; btn.style.color="#00e676"; }
+  function renderProbs() {
+      const list = document.getElementById('problemList');
+      list.innerHTML = "";
+      problems.forEach((p, i) => {
+          const id = i + 1;
+          const count = stats[id] || 0;
+          const card = document.createElement('div');
+          card.className = `prob-card ${count >= 2 ? 'locked' : ''}`;
+          card.innerHTML = `<span style="font-size:0.6rem; color:var(--st-orange);">${count}/2 CLAIMED</span><br><b>#${id}</b> ${p}`;
+          list.appendChild(card);
+      });
   }
 
-  // PROJECT FREEZE LOGIC WITH 2-TEAM LIMIT
+  function loadDash(s) {
+      let progress = 0;
+      if(s.projectTopic) {
+          document.getElementById('projectTopic').value = s.projectTopic;
+          document.getElementById('projectTitle').value = s.projectTitle;
+          ['projectTopic','projectTitle','freezeBtn'].forEach(id => document.getElementById(id).disabled = true);
+          progress += 33;
+      }
+      if(s.round1Link) { document.getElementById('round1Link').value = s.round1Link; disableBtn('btnRound1'); progress += 33; }
+      if(s.finalGithub) { 
+          document.getElementById('finalGithub').value = s.finalGithub; 
+          document.getElementById('finalPPT').value = s.finalPPT; 
+          disableBtn('btnFinalRound'); progress = 100;
+      }
+      document.getElementById('progressFill').style.width = progress + "%";
+      document.getElementById('progressPercent').textContent = progress + "%";
+  }
+
   document.getElementById('freezeBtn').onclick = async () => {
       const id = parseInt(document.getElementById('projectTopic').value);
       const title = document.getElementById('projectTitle').value;
+      if(!id || !title || id < 1 || id > 50) return alert("Invalid Data.");
+      if((stats[id] || 0) >= 2) return alert("Problem already claimed by 2 teams.");
       
-      if(!id || id < 1 || id > 50 || !title) return alert("Select a valid ID (1-50) and Title.");
-      
-      const count = allProblemStats[id] || 0;
-      if(count >= 2) return alert("ERROR: Problem Statement at maximum capacity (2 teams already registered). Please select another.");
-
-      if(confirm(`Lock Project #${id}: ${problems[id-1]}?`)) {
-          await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), {
-              "submissions.projectTopic": id,
-              "submissions.projectTitle": title
-          });
-          location.reload();
-      }
+      await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), {
+          "submissions.projectTopic": id, "submissions.projectTitle": title
+      });
+      location.reload();
   };
 
   window.submitRound1 = async () => {
       const link = document.getElementById('round1Link').value;
       if(link) {
           await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), { "submissions.round1Link": link });
-          disableBtn('btnRound1', "SENT");
+          location.reload();
       }
   };
 
@@ -416,38 +388,40 @@
       const git = document.getElementById('finalGithub').value;
       const ppt = document.getElementById('finalPPT').value;
       if(git && ppt) {
-          await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), { 
-              "submissions.finalGithub": git, "submissions.finalPPT": ppt 
-          });
-          disableBtn('btnFinalRound', "SUBMITTED");
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), { "submissions.finalGithub": git, "submissions.finalPPT": ppt });
+          location.reload();
+      }
+  };
+
+  window.callMentor = async () => {
+      const loc = prompt("Where are you sitting? (e.g. Block 8, Lab 2)");
+      if(loc) {
+          await addDoc(collection(db, "mentor_requests"), { team: currentTeamId, location: loc, time: serverTimestamp() });
+          alert("MENTOR SIGNAL BROADCASTED.");
       }
   };
 
   window.switchTab = (id) => {
-      document.querySelectorAll('.show-section').forEach(el => { el.className = 'hidden-section'; });
+      document.querySelectorAll('.show-section').forEach(e => e.className = 'hidden-section');
       document.getElementById(id).className = 'show-section';
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
   };
 
-  window.logout = () => signOut(auth).then(() => location.reload());
+  function disableBtn(id) { const b = document.getElementById(id); b.disabled = true; b.textContent = "DONE"; b.style.color = "var(--st-green)"; }
 
-  // TIMER
   setInterval(() => {
     const now = new Date().getTime();
     let dist, label;
-    if (now < DATE_START) { dist = DATE_START - now; label = "HACKATHON COMMENCES IN"; }
-    else if (now < DATE_END) { dist = DATE_END - now; label = "HACKATHON ENDS IN"; document.getElementById('timer').style.color = "#00e676"; }
-    else { document.getElementById("timer").innerHTML = "OFFLINE"; return; }
-
-    const d = Math.floor(dist / 86400000);
-    const h = Math.floor((dist % 86400000) / 3600000);
+    if (now < DATE_START) { dist = DATE_START - now; label = "COMMENCES IN"; }
+    else if (now < DATE_END) { dist = DATE_END - now; label = "TIME REMAINING"; document.getElementById('timer').style.color = "var(--st-green)"; }
+    else { document.getElementById('timer').textContent = "OFFLINE"; return; }
+    const h = Math.floor(dist / 3600000);
     const m = Math.floor((dist % 3600000) / 60000);
     const s = Math.floor((dist % 60000) / 1000);
-    document.getElementById("timer").innerHTML = `${d}d ${h}h ${m}m ${s}s`;
-    document.getElementById("timerLabel").innerHTML = label;
+    document.getElementById('timer').textContent = `${h}h ${m}m ${s}s`;
+    document.getElementById('timerLabel').textContent = label;
   }, 1000);
-
 </script>
 </body>
 </html>
