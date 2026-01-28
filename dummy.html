@@ -32,14 +32,12 @@
     background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
   }
 
-  /* PERSISTENT SCANLINE OVERLAY */
   body::before {
     content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
     background-size: 100% 4px; z-index: 1000; pointer-events: none;
   }
 
-  /* SYSTEM BROADCAST */
   .broadcast-strip {
     background: var(--st-red); color: white; padding: 10px; font-size: 0.75rem;
     text-align: center; font-weight: bold; letter-spacing: 2px; position: sticky; top: 0; z-index: 1100;
@@ -47,14 +45,12 @@
   }
   @keyframes pulse-red { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
 
-  /* AUTH SCREEN */
   .login-screen {
     position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #000; transition: 0.8s;
+    align-items: center; justify-content: center; background: #000; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
+  .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
 
-  /* NAVIGATION */
   .header-nav {
     background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--glass-border); padding: 15px 5%;
@@ -72,7 +68,6 @@
   }
   .tab-trigger.active { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
-  /* VIEW MANAGEMENT */
   .view-frame { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; }
   .view-frame.active { display: block; animation: viewIn 0.4s ease forwards; }
   @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -83,7 +78,6 @@
   }
   .glass-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--st-red); }
 
-  /* MATRIX GRID */
   .matrix-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 20px; max-height: 550px; overflow-y: auto; padding-right: 10px;
@@ -95,7 +89,6 @@
   .matrix-item.full { border-color: var(--st-red); opacity: 0.4; pointer-events: none; }
   .occupancy-tag { position: absolute; top: 12px; right: 12px; font-weight: 800; font-size: 0.7rem; }
 
-  /* UI ELEMENTS */
   input { background: #000; border: 1px solid #333; color: var(--st-green); padding: 15px; width: 100%; margin-bottom: 15px; border-radius: 4px; }
   .btn-submit {
     background: var(--st-red); color: #fff; border: none; padding: 16px 32px; font-weight: 800;
@@ -111,13 +104,18 @@
   }
 </style>
 </head>
-<body>
+<body onclick="initAudio()">
 
-<div class="broadcast-strip">BROADCAST: HACKATHON MISSION IN PROGRESS | ALL SYSTEMS ACTIVE</div>
+<audio id="stAudio" loop>
+    <source src="https://www.soundboard.com/handler/Downloadaudio.ashx?id=433621" type="audio/mpeg">
+</audio>
+
+<div class="broadcast-strip">BROADCAST: MISSION IN PROGRESS | ALL SYSTEMS ACTIVE</div>
 
 <div class="login-screen" id="loginScreen">
   <div class="glitch-logo" style="font-family: var(--font-title); font-size: 5rem; text-align: center;">EDU HACK<br>SUPREME</div>
   <button class="btn-submit" id="loginBtn" style="width:auto; min-width:320px; background:#fff; color:#000;">AUTHENTICATE IDENTITY</button>
+  <p style="color: var(--st-red); font-size: 0.6rem; margin-top: 20px; letter-spacing: 2px;">CLICK ANYWHERE TO INITIALIZE AUDIO</p>
 </div>
 
 <header class="header-nav" id="mainHeader">
@@ -144,7 +142,7 @@
 
     <div id="dash" class="view-frame active">
         <div style="text-align:center; margin-bottom:45px;">
-            <div style="font-size:0.8rem; letter-spacing:5px; color:var(--st-red); margin-bottom:10px;">REMAINING TIME</div>
+            <div id="timerLabel" style="font-size:0.8rem; letter-spacing:5px; color:var(--st-red); margin-bottom:10px;">REMAINING TIME</div>
             <div id="timer" style="font-family: var(--font-title); font-size: 5.5rem; text-shadow: 0 0 30px var(--st-red);">00h 00m 00s</div>
         </div>
 
@@ -211,6 +209,7 @@
 
   let teamId = null;
   let stats = {};
+  let audioInitialized = false;
 
   const problems = [
     {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing historical patterns to flag students at risk and simulate automated intervention alerts."},
@@ -222,9 +221,9 @@
     {id:7, t:"Smart Bus Route Optimization Tool", d:"Transport analytics system optimizing campus bus routes using demand patterns."},
     {id:8, t:"Student Feedback Sentiment Analytics", d:"NLP-based dashboard converting raw feedback into academic/facility insights."},
     {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system simulating water and power usage with anomaly detection."},
-    {id:10, t:"Degree Progress Audit Automation", d:"System that tracks course completion, credit requirements, and graduation readiness automatically."},
+    {id:10, t:"Degree Progress Audit Automation Tool", d:"System that tracks course completion, credit requirements, and graduation readiness automatically."},
     {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
-    {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support support support needs."},
+    {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support needs."},
     {id:13, t:"Campus Occupancy Heatmap", d:"Visualization tool simulating real-time classroom, library, and hostel occupancy trends."},
     {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates using academic/socioeconomic criteria."},
     {id:15, t:"University KPI Analytics Dashboard", d:"Executive dashboard combining academic, hostel, and grievance indicators into actionable metrics."}
@@ -238,14 +237,21 @@
     "JAN 31 3:00AM: Refreshment", "7:00AM - 9:00AM: Breakfast",
     "9:00AM - 10:00AM: Review", "10:00AM - 1:00PM: Phase 2 Work",
     "1:00PM - 2:00PM: Lunch Break", "2:00PM - 3:00PM: Final Touches",
-    "3:30PM - 4:00PM: Final Submission", "5:00PM: Winners Announcement"
+    "3:30PM - 4:00PM: Final Submission", "4:00PM - 5:00PM: Judging & Closing",
+    "5:00PM: Winners & Prizes", "JAN 31 5:00 PM: HACKATHON END"
   ];
 
-  // LOG BUILDER
+  window.initAudio = () => {
+    if (!audioInitialized) {
+        const audio = document.getElementById('stAudio');
+        audio.play().catch(e => console.log("Audio failed to load: ", e));
+        audioInitialized = true;
+    }
+  };
+
   const logContainer = document.getElementById('logItems');
   logData.forEach(l => logContainer.innerHTML += `<div><span style="color:var(--st-blue)">></span> ${l}</div>`);
 
-  // TAB ENGINE
   document.querySelectorAll('.tab-trigger').forEach(btn => {
       btn.addEventListener('click', () => {
           document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
@@ -259,6 +265,9 @@
   
   onAuthStateChanged(auth, async (user) => {
       if(user) {
+          const audio = document.getElementById('stAudio');
+          audio.pause(); // Stop theme after login
+          
           const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
           let myTeam = null;
           snap.forEach(d => {
@@ -349,15 +358,33 @@
 
   function disableBtn(id) { document.getElementById(id).disabled = true; document.getElementById(id).textContent = "SUBMITTED"; }
 
+  // CORRECTED TIMER LOGIC
   setInterval(() => {
+    const start = new Date("Jan 30, 2026 17:00:00").getTime();
     const end = new Date("Jan 31, 2026 17:00:00").getTime();
     const now = new Date().getTime();
-    const dist = end - now;
-    if (dist < 0) { document.getElementById('timer').textContent = "EXPIRED"; return; }
-    const h = Math.floor(dist / 3600000);
-    const m = Math.floor((dist % 3600000) / 60000);
-    const s = Math.floor((dist % 60000) / 1000);
+    
+    let targetTime, label;
+    
+    if (now < start) {
+        targetTime = start;
+        label = "MISSION BEGINS IN";
+    } else if (now >= start && now < end) {
+        targetTime = end;
+        label = "MISSION ENDS IN";
+    } else {
+        document.getElementById('timer').textContent = "MISSION COMPLETE";
+        document.getElementById('timerLabel').textContent = "SYSTEM OFFLINE";
+        return;
+    }
+
+    const dist = targetTime - now;
+    const h = Math.floor(dist / (1000 * 60 * 60));
+    const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((dist % (1000 * 60)) / 1000);
+    
     document.getElementById('timer').textContent = `${h}h ${m}m ${s}s`;
+    document.getElementById('timerLabel').textContent = label;
   }, 1000);
 </script>
 </body>
