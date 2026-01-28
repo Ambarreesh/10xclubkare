@@ -32,150 +32,157 @@
     background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
   }
 
+  /* PERSISTENT SCANLINE OVERLAY */
   body::before {
     content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
     background-size: 100% 4px; z-index: 1000; pointer-events: none;
   }
 
-  /* AUTH OVERLAY */
+  /* SYSTEM BROADCAST */
+  .broadcast-strip {
+    background: var(--st-red); color: white; padding: 10px; font-size: 0.75rem;
+    text-align: center; font-weight: bold; letter-spacing: 2px; position: sticky; top: 0; z-index: 1100;
+    animation: pulse-red 2.5s infinite;
+  }
+  @keyframes pulse-red { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+  /* AUTH SCREEN */
   .login-screen {
     position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #000; transition: 0.8s ease;
+    align-items: center; justify-content: center; background: #000; transition: 0.8s;
   }
-  .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
+  .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
 
-  /* PERSISTENT ELEMENTS */
-  .broadcast-header {
-    background: var(--st-red); color: #fff; padding: 10px; font-size: 0.75rem;
-    text-align: center; font-weight: bold; letter-spacing: 2px; position: sticky; top: 0; z-index: 1100;
-  }
-
-  .main-nav {
+  /* NAVIGATION */
+  .header-nav {
     background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--glass-border); padding: 15px 5%;
     display: flex; justify-content: space-between; align-items: center; position: sticky; top: 38px; z-index: 1000;
   }
 
-  /* TAB SYSTEM - FIXED LOGIC */
-  .tab-container {
-    max-width: 1000px; margin: 30px auto; display: flex; gap: 10px; padding: 5px;
+  .nav-tabs {
+    max-width: 900px; margin: 30px auto; display: flex; gap: 8px; padding: 6px;
     background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);
   }
-  .tab-btn {
+  .tab-trigger {
     flex: 1; padding: 14px; border: none; background: transparent; color: var(--text-secondary);
     font-family: var(--font-main); font-weight: bold; cursor: pointer; border-radius: 8px;
     text-transform: uppercase; font-size: 0.8rem; transition: 0.3s;
   }
-  .tab-btn.active { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+  .tab-trigger.active { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
-  /* CONTENT WRAPPERS */
-  .view-pane { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; }
-  .view-pane.active { display: block; animation: fadeIn 0.5s ease forwards; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* VIEW MANAGEMENT */
+  .view-frame { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; }
+  .view-frame.active { display: block; animation: viewIn 0.4s ease forwards; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
   .glass-card {
     background: var(--glass-surface); border: 1px solid var(--glass-border);
     padding: 30px; margin-bottom: 25px; position: relative; border-radius: 4px;
   }
-  .glass-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--st-red); }
+  .glass-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--st-red); }
 
-  /* PROBLEM GRID */
-  .problem-grid {
+  /* MATRIX GRID */
+  .matrix-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px; max-height: 500px; overflow-y: auto; padding-right: 10px;
+    gap: 20px; max-height: 550px; overflow-y: auto; padding-right: 10px;
   }
-  .problem-item {
+  .matrix-item {
     background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
     padding: 20px; position: relative; transition: 0.3s;
   }
-  .problem-item.full { border-color: var(--st-red); opacity: 0.4; }
-  .count-tag { position: absolute; top: 12px; right: 12px; font-weight: bold; font-size: 0.7rem; }
+  .matrix-item.full { border-color: var(--st-red); opacity: 0.4; pointer-events: none; }
+  .occupancy-tag { position: absolute; top: 12px; right: 12px; font-weight: 800; font-size: 0.7rem; }
 
-  /* INPUTS & BTNS */
-  input { background: #000; border: 1px solid #333; color: var(--st-green); padding: 14px; width: 100%; margin-bottom: 15px; }
-  .btn-action {
-    background: var(--st-red); color: #fff; border: none; padding: 15px 30px; font-weight: 800;
-    cursor: pointer; width: 100%; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  /* UI ELEMENTS */
+  input { background: #000; border: 1px solid #333; color: var(--st-green); padding: 15px; width: 100%; margin-bottom: 15px; border-radius: 4px; }
+  .btn-submit {
+    background: var(--st-red); color: #fff; border: none; padding: 16px 32px; font-weight: 800;
+    cursor: pointer; width: 100%; font-family: var(--font-main);
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   }
-  .btn-action:disabled { background: #222; color: #555; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
+  .btn-submit:disabled { background: #222; color: #555; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
 
   .mentor-btn {
     position: fixed; bottom: 30px; right: 30px; background: var(--st-orange);
-    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    z-index: 1200; border: none; cursor: pointer; box-shadow: 0 0 20px rgba(255, 171, 0, 0.4);
+    width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    z-index: 1200; border: none; cursor: pointer; box-shadow: 0 0 25px rgba(255, 171, 0, 0.4);
   }
 </style>
 </head>
 <body>
 
-<div class="broadcast-header">BROADCAST: HACKATHON STAGE II IS LIVE | ALL SYSTEMS GREEN</div>
+<div class="broadcast-strip">BROADCAST: HACKATHON MISSION IN PROGRESS | ALL SYSTEMS ACTIVE</div>
 
 <div class="login-screen" id="loginScreen">
   <div class="glitch-logo" style="font-family: var(--font-title); font-size: 5rem; text-align: center;">EDU HACK<br>SUPREME</div>
-  <button class="btn-action" id="loginBtn" style="width:auto; min-width:300px; background:#fff; color:#000;">INITIALIZE AUTH</button>
+  <button class="btn-submit" id="loginBtn" style="width:auto; min-width:320px; background:#fff; color:#000;">AUTHENTICATE IDENTITY</button>
 </div>
 
-<header class="main-nav" id="mainHeader">
+<header class="header-nav" id="mainHeader">
     <div>
-        <h1 style="margin:0; font-size:1.5rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
-        <span style="font-size:0.7rem; color:var(--text-secondary);">COMMAND CONSOLE v2.6</span>
+        <h1 style="margin:0; font-size:1.6rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">COMMAND CENTER v2.6</span>
     </div>
     <div style="display:flex; align-items:center; gap:20px;">
         <div style="text-align:right;">
-            <div id="userName" style="font-weight:bold; font-size:0.9rem;">RECRUIT</div>
-            <div id="teamName" style="font-size:0.7rem; color:var(--st-green); font-weight:bold;">TEAM: ...</div>
+            <div id="userName" style="font-weight:bold; font-size:0.95rem;">...</div>
+            <div id="teamName" style="font-size:0.75rem; color:var(--st-green); font-weight:bold;">TEAM: ...</div>
         </div>
-        <div id="userAvatar" style="width:42px; height:42px; border-radius:50%; background:#333; background-size:cover; border:1px solid #fff;"></div>
-        <button onclick="logout()" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:5px 10px; cursor:pointer; font-size:0.75rem;">LOGOUT</button>
+        <div id="userAvatar" style="width:45px; height:45px; border-radius:50%; background:#222; background-size:cover; border:2px solid #fff;"></div>
+        <button onclick="logout()" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:6px 14px; cursor:pointer; font-size:0.75rem; border-radius:4px;">LOGOUT</button>
     </div>
 </header>
 
-<div class="app-shell" id="appShell">
-    <nav class="tab-container">
-        <button class="tab-btn active" data-view="dash">Dashboard</button>
-        <button class="tab-btn" data-view="matrix">Matrix</button>
-        <button class="tab-btn" data-view="log">Mission Log</button>
+<div class="app-shell">
+    <nav class="nav-tabs" id="tabBar">
+        <button class="tab-trigger active" data-target="dash">Dashboard</button>
+        <button class="tab-trigger" data-target="matrix">Problem Matrix</button>
+        <button class="tab-trigger" data-target="log">Mission Log</button>
     </nav>
 
-    <div id="dash" class="view-pane active">
-        <div style="text-align:center; margin-bottom:40px;">
-            <div id="timer" style="font-family: var(--font-title); font-size: 5rem; text-shadow: 0 0 25px var(--st-red);">00h 00m 00s</div>
+    <div id="dash" class="view-frame active">
+        <div style="text-align:center; margin-bottom:45px;">
+            <div style="font-size:0.8rem; letter-spacing:5px; color:var(--st-red); margin-bottom:10px;">REMAINING TIME</div>
+            <div id="timer" style="font-family: var(--font-title); font-size: 5.5rem; text-shadow: 0 0 30px var(--st-red);">00h 00m 00s</div>
         </div>
+
         <div class="glass-card">
-            <h3 style="color:var(--st-green); margin-top:0;">PROJECT CLAIM (CAPACITY 7)</h3>
+            <h3 style="color:var(--st-green); margin-top:0;">01. PROJECT CLAIM (MAX 7 TEAMS)</h3>
             <div style="display:grid; grid-template-columns: 1fr 2fr auto; gap:15px;">
                 <input type="number" id="topicId" placeholder="ID (1-15)">
-                <input type="text" id="projTitle" placeholder="Project Title...">
-                <button class="btn-action" id="lockBtn">SECURE ID</button>
+                <input type="text" id="projTitle" placeholder="Project Name...">
+                <button class="btn-submit" id="lockBtn">SECURE ID</button>
             </div>
         </div>
+
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
             <div class="glass-card">
-                <h3 style="color:var(--st-orange);">ROUND 1: PLANNING</h3>
-                <input type="text" id="r1Link" placeholder="PPT Link">
-                <button class="btn-action" id="r1Btn" onclick="submitR1()">SUBMIT R1</button>
+                <h3 style="color:var(--st-orange);">STAGE 1: PLANNING</h3>
+                <input type="text" id="r1Link" placeholder="Blueprint PPT URL">
+                <button class="btn-submit" id="r1Btn" onclick="submitR1()">SUBMIT STAGE 1</button>
             </div>
             <div class="glass-card">
-                <h3 style="color:var(--st-blue);">FINAL: DEPLOYMENT</h3>
-                <input type="text" id="gitLink" placeholder="GitHub Repo">
-                <input type="text" id="finalPPT" placeholder="Final PPT">
-                <button class="btn-action" id="finalBtn" onclick="submitFinal()">DEPLOY FINAL</button>
+                <h3 style="color:var(--st-blue);">STAGE 2: DEPLOYMENT</h3>
+                <input type="text" id="gitLink" placeholder="GitHub Repository">
+                <input type="text" id="finalPPT" placeholder="Final PPT URL">
+                <button class="btn-submit" id="finalBtn" onclick="submitFinal()">DEPLOY FINAL</button>
             </div>
         </div>
     </div>
 
-    <div id="matrix" class="view-pane">
+    <div id="matrix" class="view-frame">
         <div class="glass-card">
-            <h2 style="color:var(--st-blue); margin:0 0 20px 0;">PROBLEM STATEMENTS</h2>
-            <div class="problem-grid" id="problemList"></div>
+            <h2 style="color:var(--st-blue); margin:0 0 25px 0;">GLOBAL PROBLEM MATRIX</h2>
+            <div class="matrix-grid" id="problemList"></div>
         </div>
     </div>
 
-    <div id="log" class="view-pane">
+    <div id="log" class="view-frame">
         <div class="glass-card">
-            <h2 style="color:var(--st-red); margin:0 0 20px 0;">MISSION TIMELINE</h2>
-            <div id="logItems" style="line-height:2.2; font-size:0.95rem;"></div>
+            <h2 style="color:var(--st-red); margin:0 0 25px 0;">EVENT TIMELINE</h2>
+            <div id="logItems" style="line-height:2.4; font-size:0.95rem;"></div>
         </div>
     </div>
 </div>
@@ -206,26 +213,26 @@
   let stats = {};
 
   const problems = [
-    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing patterns to flag students at risk and simulate automated intervention alerts."},
+    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing historical patterns to flag students at risk and simulate automated intervention alerts."},
     {id:2, t:"Smart Academic Notification Engine", d:"Rule-based alert system for academic deadlines, fee reminders, and exam updates."},
-    {id:3, t:"Intelligent Exam Seating Engine", d:"Automated seating optimizer maximizing hall utilization and minimizing malpractice probability."},
-    {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing hostel complaints by severity and SLA."},
-    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform pushing simulated alerts to multiple user roles in real time."},
-    {id:6, t:"Unified Campus Resource Booking", d:"Booking system for labs and halls with clash detection and approval workflows."},
-    {id:7, t:"Smart Bus Route Optimization Tool", d:"Transport analytics system optimizing routes using student demand patterns."},
-    {id:8, t:"Student Feedback Sentiment Tool", d:"NLP-based dashboard converting raw feedback into academic and facility insights."},
-    {id:9, t:"Hostel Utility Consumption Platform", d:"Monitoring system simulating water and power usage with anomaly detection."},
-    {id:10, t:"Degree Progress Audit Automation", d:"System tracking course completion and credit requirements automatically."},
+    {id:3, t:"Intelligent Exam Seating Engine", d:"Automated seating optimizer maximizing hall utilization and minimizing malpractice."},
+    {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing complaints based on severity and SLA."},
+    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform capable of pushing simulated alerts to multiple user roles in real time."},
+    {id:6, t:"Unified Campus Resource Booking", d:"Booking system for labs and classrooms with clash detection and workflows."},
+    {id:7, t:"Smart Bus Route Optimization Tool", d:"Transport analytics system optimizing campus bus routes using demand patterns."},
+    {id:8, t:"Student Feedback Sentiment Analytics", d:"NLP-based dashboard converting raw feedback into academic/facility insights."},
+    {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system simulating water and power usage with anomaly detection."},
+    {id:10, t:"Degree Progress Audit Automation", d:"System that tracks course completion, credit requirements, and graduation readiness automatically."},
     {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
-    {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support needs."},
-    {id:13, t:"Campus Occupancy Heatmap", d:"Visualization tool simulating real-time classroom, library, and hostel trends."},
+    {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support support support needs."},
+    {id:13, t:"Campus Occupancy Heatmap", d:"Visualization tool simulating real-time classroom, library, and hostel occupancy trends."},
     {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates using academic/socioeconomic criteria."},
-    {id:15, t:"University KPI Analytics Dashboard", d:"Executive dashboard combining academic, hostel, and grievance indicators."}
+    {id:15, t:"University KPI Analytics Dashboard", d:"Executive dashboard combining academic, hostel, and grievance indicators into actionable metrics."}
   ];
 
   const logData = [
     "JAN 30 5:00 PM: HACKATHON START", "5:00PM - 6:00PM: Event Launch",
-    "6:00PM - 6:30PM: Problem Distribution", "6:30PM - 7:00PM: Project Planning",
+    "6:00PM - 6:30PM: Problem Statement Distribution", "6:30PM - 7:00PM: Project Planning",
     "7:00PM - 8:15PM: Dinner Break", "8:15PM - 9:00PM: Round 1 Submission",
     "10:00PM: Refreshment", "11:00PM - 3:00AM: Phase 1 Work",
     "JAN 31 3:00AM: Refreshment", "7:00AM - 9:00AM: Breakfast",
@@ -234,16 +241,17 @@
     "3:30PM - 4:00PM: Final Submission", "5:00PM: Winners Announcement"
   ];
 
+  // LOG BUILDER
   const logContainer = document.getElementById('logItems');
   logData.forEach(l => logContainer.innerHTML += `<div><span style="color:var(--st-blue)">></span> ${l}</div>`);
 
-  // FIX TAB SWITCHING
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  // TAB ENGINE
+  document.querySelectorAll('.tab-trigger').forEach(btn => {
       btn.addEventListener('click', () => {
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+          document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.view-frame').forEach(v => v.classList.remove('active'));
           btn.classList.add('active');
-          document.getElementById(btn.dataset.view).classList.add('active');
+          document.getElementById(btn.dataset.target).classList.add('active');
       });
   });
 
@@ -255,8 +263,8 @@
           let myTeam = null;
           snap.forEach(d => {
               const members = d.data().members || [];
-              const exists = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
-              if(exists && d.data().verified) { myTeam = d.data(); teamId = d.id; }
+              const isMe = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
+              if(isMe && d.data().verified) { myTeam = d.data(); teamId = d.id; }
           });
 
           if(myTeam) {
@@ -264,15 +272,15 @@
               document.getElementById('userName').textContent = user.displayName;
               document.getElementById('teamName').textContent = "TEAM: " + myTeam.team_name.toUpperCase();
               if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
-              loadSubs(myTeam.submissions || {});
-              syncStats();
+              loadDashboard(myTeam.submissions || {});
+              syncRealtimeStats();
           } else {
-              alert("Access Denied."); signOut(auth);
+              alert("Unauthorized Access."); signOut(auth);
           }
       }
   });
 
-  function syncStats() {
+  function syncRealtimeStats() {
       onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snap) => {
           stats = {};
           snap.forEach(d => {
@@ -289,15 +297,15 @@
       problems.forEach(p => {
           const count = stats[p.id] || 0;
           const card = document.createElement('div');
-          card.className = `problem-item ${count >= 7 ? 'full' : ''}`;
-          card.innerHTML = `<span class="count-tag" style="color:${count >= 7 ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
+          card.className = `matrix-item ${count >= 7 ? 'full' : ''}`;
+          card.innerHTML = `<span class="occupancy-tag" style="color:${count >= 7 ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
                             <strong style="color:var(--st-blue)">#${p.id} ${p.t}</strong><br>
                             <p style="font-size:0.75rem; color:#888; margin-top:10px; line-height:1.4;">${p.d}</p>`;
           grid.appendChild(card);
       });
   }
 
-  function loadSubs(s) {
+  function loadDashboard(s) {
       if(s.projectTopic) {
           document.getElementById('topicId').value = s.projectTopic;
           document.getElementById('projTitle').value = s.projectTitle;
@@ -316,7 +324,7 @@
       const id = parseInt(document.getElementById('topicId').value);
       const title = document.getElementById('projTitle').value;
       if(!id || !title || id < 1 || id > 15) return alert("Select ID 1-15.");
-      if((stats[id] || 0) >= 7) return alert("Topic at 7-team capacity.");
+      if((stats[id] || 0) >= 7) return alert("Problem is at full capacity (7 teams reached).");
       await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.projectTopic": id, "submissions.projectTitle": title });
       location.reload();
   };
@@ -335,8 +343,8 @@
   window.logout = () => signOut(auth).then(() => location.reload());
 
   window.callMentor = async () => {
-      const loc = prompt("Team Location?");
-      if(loc) { await addDoc(collection(db, "mentor_requests"), { teamId, loc, time: serverTimestamp() }); alert("Signal sent."); }
+      const loc = prompt("Where is your team seated?");
+      if(loc) { await addDoc(collection(db, "mentor_requests"), { teamId, loc, time: serverTimestamp() }); alert("Mentor signaled."); }
   };
 
   function disableBtn(id) { document.getElementById(id).disabled = true; document.getElementById(id).textContent = "SUBMITTED"; }
