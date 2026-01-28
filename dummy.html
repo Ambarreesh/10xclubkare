@@ -32,204 +32,155 @@
     background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
   }
 
-  /* PERSISTENT SCANLINE */
   body::before {
     content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
     background-size: 100% 4px; z-index: 1000; pointer-events: none;
   }
 
-  /* BROADCAST HEADER */
-  .broadcast-strip {
-    background: var(--st-red); color: #fff; padding: 8px; font-size: 0.7rem;
-    text-align: center; font-weight: bold; letter-spacing: 2px;
-    position: sticky; top: 0; z-index: 1100; box-shadow: 0 4px 15px rgba(255, 0, 51, 0.4);
-    animation: pulse-red 2.5s infinite;
-  }
-  @keyframes pulse-red { 0% { opacity: 0.95; } 50% { opacity: 1; } 100% { opacity: 0.95; } }
-
   /* AUTH OVERLAY */
   .login-screen {
     position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #000; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: center; justify-content: center; background: #000; transition: 0.8s ease;
   }
-  .login-screen.hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+  .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
 
-  /* NAVIGATION BAR */
+  /* PERSISTENT ELEMENTS */
+  .broadcast-header {
+    background: var(--st-red); color: #fff; padding: 10px; font-size: 0.75rem;
+    text-align: center; font-weight: bold; letter-spacing: 2px; position: sticky; top: 0; z-index: 1100;
+  }
+
   .main-nav {
-    background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px);
+    background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--glass-border); padding: 15px 5%;
-    display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 34px; z-index: 900;
+    display: flex; justify-content: space-between; align-items: center; position: sticky; top: 38px; z-index: 1000;
   }
 
-  .user-ctrl { display: flex; align-items: center; gap: 15px; }
-  .avatar-ring { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--st-red); background-size: cover; }
-  
-  /* TAB CONTROLS */
-  .tab-row {
-    display: flex; justify-content: center; gap: 8px; background: rgba(255,255,255,0.02);
-    padding: 6px; border-radius: 10px; margin: 30px auto; max-width: 1000px; border: 1px solid var(--glass-border);
+  /* TAB SYSTEM - FIXED LOGIC */
+  .tab-container {
+    max-width: 1000px; margin: 30px auto; display: flex; gap: 10px; padding: 5px;
+    background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);
   }
-  .tab-item {
-    flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-secondary);
-    font-family: var(--font-main); font-weight: bold; cursor: pointer; transition: 0.3s;
-    text-transform: uppercase; font-size: 0.75rem; border-radius: 6px;
+  .tab-btn {
+    flex: 1; padding: 14px; border: none; background: transparent; color: var(--text-secondary);
+    font-family: var(--font-main); font-weight: bold; cursor: pointer; border-radius: 8px;
+    text-transform: uppercase; font-size: 0.8rem; transition: 0.3s;
   }
-  .tab-item.active { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+  .tab-btn.active { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
-  /* CONTENT AREAS */
-  .view-container { max-width: 1150px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; opacity: 0; }
-  .view-container.active { display: block; opacity: 1; transition: 0.6s ease; }
+  /* CONTENT WRAPPERS */
+  .view-pane { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; }
+  .view-pane.active { display: block; animation: fadeIn 0.5s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .glass-box {
+  .glass-card {
     background: var(--glass-surface); border: 1px solid var(--glass-border);
     padding: 30px; margin-bottom: 25px; position: relative; border-radius: 4px;
-    overflow: hidden;
   }
-  .glass-box::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--st-red); }
+  .glass-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--st-red); }
 
   /* PROBLEM GRID */
-  .prob-grid {
+  .problem-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px; max-height: 550px; overflow-y: auto; padding-right: 10px;
+    gap: 20px; max-height: 500px; overflow-y: auto; padding-right: 10px;
   }
-  .prob-card {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+  .problem-item {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
     padding: 20px; position: relative; transition: 0.3s;
   }
-  .prob-card.full { border-color: var(--st-red); opacity: 0.4; }
-  .prob-card:hover:not(.full) { border-color: var(--st-blue); background: rgba(0, 204, 255, 0.05); }
-  .status-tag { position: absolute; top: 12px; right: 12px; font-size: 0.65rem; font-weight: 800; }
+  .problem-item.full { border-color: var(--st-red); opacity: 0.4; }
+  .count-tag { position: absolute; top: 12px; right: 12px; font-weight: bold; font-size: 0.7rem; }
 
-  /* INPUTS & ACTIONS */
-  input {
-    background: #000; border: 1px solid #333; color: var(--st-green);
-    padding: 14px; font-family: var(--font-main); width: 100%; margin-bottom: 15px;
+  /* INPUTS & BTNS */
+  input { background: #000; border: 1px solid #333; color: var(--st-green); padding: 14px; width: 100%; margin-bottom: 15px; }
+  .btn-action {
+    background: var(--st-red); color: #fff; border: none; padding: 15px 30px; font-weight: 800;
+    cursor: pointer; width: 100%; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   }
-  .btn-primary {
-    background: var(--st-red); color: #fff; border: none; padding: 15px 30px;
-    font-weight: 900; cursor: pointer; font-family: var(--font-main);
-    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
-    transition: 0.3s; width: 100%;
-  }
-  .btn-primary:hover { background: #ff3355; box-shadow: 0 0 20px rgba(255, 0, 51, 0.4); }
-  .btn-primary:disabled { background: #1a1a1a; color: #444; cursor: not-allowed; clip-path: none; border: 1px solid #222; }
-
-  /* PROGRESS TRACKER */
-  .prog-track { height: 6px; background: #1a1a1a; border-radius: 3px; margin: 15px 0; overflow: hidden; }
-  .prog-bar { height: 100%; width: 0%; background: var(--st-green); box-shadow: 0 0 10px var(--st-green); transition: 1.2s ease; }
+  .btn-action:disabled { background: #222; color: #555; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
 
   .mentor-btn {
-    position: fixed; bottom: 35px; right: 35px; background: var(--st-orange);
-    width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; z-index: 1200; border: none; cursor: pointer;
-    box-shadow: 0 0 25px rgba(255, 171, 0, 0.4); animation: pulse-float 2s infinite;
+    position: fixed; bottom: 30px; right: 30px; background: var(--st-orange);
+    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    z-index: 1200; border: none; cursor: pointer; box-shadow: 0 0 20px rgba(255, 171, 0, 0.4);
   }
-  @keyframes pulse-float { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 </style>
 </head>
 <body>
 
-<div class="broadcast-strip" id="broadcast">MISSION STATUS: CONSOLE ONLINE | HACKATHON STAGE II ACTIVE</div>
+<div class="broadcast-header">BROADCAST: HACKATHON STAGE II IS LIVE | ALL SYSTEMS GREEN</div>
 
 <div class="login-screen" id="loginScreen">
   <div class="glitch-logo" style="font-family: var(--font-title); font-size: 5rem; text-align: center;">EDU HACK<br>SUPREME</div>
-  <button class="btn-primary" id="loginBtn" style="width:auto; min-width:320px; background:#fff; color:#000;">VERIFY AGENT IDENTITY</button>
+  <button class="btn-action" id="loginBtn" style="width:auto; min-width:300px; background:#fff; color:#000;">INITIALIZE AUTH</button>
 </div>
 
 <header class="main-nav" id="mainHeader">
     <div>
-        <h1 style="margin:0; font-size:1.6rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
-        <span style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase;">Command Center v2.6</span>
+        <h1 style="margin:0; font-size:1.5rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
+        <span style="font-size:0.7rem; color:var(--text-secondary);">COMMAND CONSOLE v2.6</span>
     </div>
-    
-    <div class="user-ctrl">
+    <div style="display:flex; align-items:center; gap:20px;">
         <div style="text-align:right;">
             <div id="userName" style="font-weight:bold; font-size:0.9rem;">RECRUIT</div>
-            <div id="teamName" style="font-size:0.7rem; color:var(--st-green); font-weight:900;">TEAM: PENDING</div>
+            <div id="teamName" style="font-size:0.7rem; color:var(--st-green); font-weight:bold;">TEAM: ...</div>
         </div>
-        <div id="userAvatar" class="avatar-ring"></div>
-        <button onclick="logout()" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:6px 12px; cursor:pointer; font-family:var(--font-main); font-size:0.7rem; border-radius:4px;">LOGOUT</button>
+        <div id="userAvatar" style="width:42px; height:42px; border-radius:50%; background:#333; background-size:cover; border:1px solid #fff;"></div>
+        <button onclick="logout()" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:5px 10px; cursor:pointer; font-size:0.75rem;">LOGOUT</button>
     </div>
 </header>
 
-<div class="view-container" id="appContent">
-    
-    <nav class="tab-row">
-        <button class="tab-item active" onclick="switchView('dash')">Command</button>
-        <button class="tab-item" onclick="switchView('matrix')">Problems</button>
-        <button class="tab-item" onclick="switchView('hub')">Dev Hub</button>
-        <button class="tab-item" onclick="switchView('log')">Mission Log</button>
+<div class="app-shell" id="appShell">
+    <nav class="tab-container">
+        <button class="tab-btn active" data-view="dash">Dashboard</button>
+        <button class="tab-btn" data-view="matrix">Matrix</button>
+        <button class="tab-btn" data-view="log">Mission Log</button>
     </nav>
 
-    <div id="dash-view" class="view-pane">
-        <div style="text-align:center; margin-bottom:45px;">
-            <div style="font-size:0.8rem; letter-spacing:5px; color:var(--st-red); margin-bottom:12px;">TIME TO DEPLOYMENT</div>
-            <div id="timer" style="font-family: var(--font-title); font-size: 5.5rem; text-shadow: 0 0 30px var(--st-red);">00h 00m 00s</div>
-            
-            <div style="max-width: 650px; margin: 25px auto 0 auto;">
-                <div style="display:flex; justify-content:space-between; font-size: 0.75rem; color: var(--st-green); font-weight:bold;">
-                    <span>MISSION COMPLETION</span>
-                    <span id="progText">0%</span>
-                </div>
-                <div class="prog-track"><div class="prog-bar" id="progBar"></div></div>
-            </div>
+    <div id="dash" class="view-pane active">
+        <div style="text-align:center; margin-bottom:40px;">
+            <div id="timer" style="font-family: var(--font-title); font-size: 5rem; text-shadow: 0 0 25px var(--st-red);">00h 00m 00s</div>
         </div>
-
-        <div class="glass-box">
-            <h3 style="color:var(--st-green); margin-top:0;">01. PROBLEM CLAIM (CAPACITY: 7 TEAMS)</h3>
+        <div class="glass-card">
+            <h3 style="color:var(--st-green); margin-top:0;">PROJECT CLAIM (CAPACITY 7)</h3>
             <div style="display:grid; grid-template-columns: 1fr 2fr auto; gap:15px;">
                 <input type="number" id="topicId" placeholder="ID (1-15)">
-                <input type="text" id="projTitle" placeholder="Project Codename...">
-                <button class="btn-primary" id="lockBtn">SECURE CLAIM</button>
+                <input type="text" id="projTitle" placeholder="Project Title...">
+                <button class="btn-action" id="lockBtn">SECURE ID</button>
             </div>
         </div>
-
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
-            <div class="glass-box">
-                <h3 style="color:var(--st-orange);">STAGE 1: PLANNING</h3>
-                <input type="text" id="r1Link" placeholder="Blueprint/PPT URL">
-                <button class="btn-primary" id="r1Btn" onclick="sendR1()">TRANSMIT R1</button>
+            <div class="glass-card">
+                <h3 style="color:var(--st-orange);">ROUND 1: PLANNING</h3>
+                <input type="text" id="r1Link" placeholder="PPT Link">
+                <button class="btn-action" id="r1Btn" onclick="submitR1()">SUBMIT R1</button>
             </div>
-            <div class="glass-box">
-                <h3 style="color:var(--st-blue);">STAGE 2: FINAL DEPLOY</h3>
-                <input type="text" id="gitLink" placeholder="GitHub Repository">
-                <input type="text" id="finalPPT" placeholder="Final Deck Link">
-                <button class="btn-primary" id="finalBtn" onclick="sendFinal()">INITIALIZE FINAL</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="matrix-view" class="view-pane hidden">
-        <div class="glass-box">
-            <h2 style="color:var(--st-blue); margin-top:0;">PROBLEM MATRIX</h2>
-            <div class="prob-grid" id="probList"></div>
-        </div>
-    </div>
-
-    <div id="hub-view" class="view-pane hidden">
-        <div class="glass-box">
-            <h2 style="color:var(--st-orange); margin-top:0;">DEVELOPER HUB</h2>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-                <a href="https://angular.io/" target="_blank" style="background:rgba(255,255,255,0.05); padding:15px; color:var(--st-blue); text-decoration:none; text-align:center; border:1px solid #333;">Angular Documentation</a>
-                <a href="https://firebase.google.com/docs" target="_blank" style="background:rgba(255,255,255,0.05); padding:15px; color:var(--st-blue); text-decoration:none; text-align:center; border:1px solid #333;">Firebase Backend</a>
-                <a href="https://github.com/" target="_blank" style="background:rgba(255,255,255,0.05); padding:15px; color:var(--st-blue); text-decoration:none; text-align:center; border:1px solid #333;">GitHub</a>
-                <a href="https://fonts.google.com/icons" target="_blank" style="background:rgba(255,255,255,0.05); padding:15px; color:var(--st-blue); text-decoration:none; text-align:center; border:1px solid #333;">Material Icons</a>
+            <div class="glass-card">
+                <h3 style="color:var(--st-blue);">FINAL: DEPLOYMENT</h3>
+                <input type="text" id="gitLink" placeholder="GitHub Repo">
+                <input type="text" id="finalPPT" placeholder="Final PPT">
+                <button class="btn-action" id="finalBtn" onclick="submitFinal()">DEPLOY FINAL</button>
             </div>
         </div>
     </div>
 
-    <div id="log-view" class="view-pane hidden">
-        <div class="glass-box">
-            <h2 style="color:var(--st-red); margin-top:0;">MISSION LOG</h2>
-            <div id="missionLog" style="line-height:2.4; font-size:0.95rem;"></div>
+    <div id="matrix" class="view-pane">
+        <div class="glass-card">
+            <h2 style="color:var(--st-blue); margin:0 0 20px 0;">PROBLEM STATEMENTS</h2>
+            <div class="problem-grid" id="problemList"></div>
         </div>
     </div>
 
+    <div id="log" class="view-pane">
+        <div class="glass-card">
+            <h2 style="color:var(--st-red); margin:0 0 20px 0;">MISSION TIMELINE</h2>
+            <div id="logItems" style="line-height:2.2; font-size:0.95rem;"></div>
+        </div>
+    </div>
 </div>
 
-<button class="mentor-btn" onclick="requestMentor()"><span class="material-icons">support_agent</span></button>
+<button class="mentor-btn" onclick="callMentor()"><span class="material-icons">support_agent</span></button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -252,41 +203,48 @@
   const EVENT_ID = "edu-hack-2025";
 
   let teamId = null;
-  let topicStats = {};
+  let stats = {};
 
   const problems = [
-    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing historical patterns to flag students at risk and simulate alerts."},
+    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing patterns to flag students at risk and simulate automated intervention alerts."},
     {id:2, t:"Smart Academic Notification Engine", d:"Rule-based alert system for academic deadlines, fee reminders, and exam updates."},
-    {id:3, t:"Intelligent Exam Seating Allocation", d:"Automated seating optimizer maximizing hall utilization and minimizing malpractice risk."},
-    {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing complaints based on severity."},
-    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform for real-time simulated emergency alert distribution."},
-    {id:6, t:"Unified Campus Resource Booking", d:"System for labs, classrooms, and halls with clash detection."},
+    {id:3, t:"Intelligent Exam Seating Engine", d:"Automated seating optimizer maximizing hall utilization and minimizing malpractice probability."},
+    {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing hostel complaints by severity and SLA."},
+    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform pushing simulated alerts to multiple user roles in real time."},
+    {id:6, t:"Unified Campus Resource Booking", d:"Booking system for labs and halls with clash detection and approval workflows."},
     {id:7, t:"Smart Bus Route Optimization Tool", d:"Transport analytics system optimizing routes using student demand patterns."},
-    {id:8, t:"Student Feedback Sentiment Tool", d:"NLP-based dashboard converting raw feedback into actionable insights."},
-    {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system for usage trends with anomaly detection."},
-    {id:10, t:"Degree Progress Audit Automation", d:"System tracking course completion and graduation readiness automatically."},
-    {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution speed."},
-    {id:12, t:"Academic Performance Forecast", d:"Prediction model identifying semester outcomes and support needs."},
-    {id:13, t:"Campus Occupancy Heatmap", d:"Visualizer simulating real-time classroom and hostel trends."},
-    {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates by academic/socio criteria."},
+    {id:8, t:"Student Feedback Sentiment Tool", d:"NLP-based dashboard converting raw feedback into academic and facility insights."},
+    {id:9, t:"Hostel Utility Consumption Platform", d:"Monitoring system simulating water and power usage with anomaly detection."},
+    {id:10, t:"Degree Progress Audit Automation", d:"System tracking course completion and credit requirements automatically."},
+    {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
+    {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support needs."},
+    {id:13, t:"Campus Occupancy Heatmap", d:"Visualization tool simulating real-time classroom, library, and hostel trends."},
+    {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates using academic/socioeconomic criteria."},
     {id:15, t:"University KPI Analytics Dashboard", d:"Executive dashboard combining academic, hostel, and grievance indicators."}
   ];
 
-  const missionLog = [
-    "JAN 30 5:00 PM: HACKATHON START", "5:00PM - 6:00PM: Event Launch", 
-    "6:00PM - 6:30PM: Problem Statement Distribution", "6:30PM - 7:00PM: Project Planning",
+  const logData = [
+    "JAN 30 5:00 PM: HACKATHON START", "5:00PM - 6:00PM: Event Launch",
+    "6:00PM - 6:30PM: Problem Distribution", "6:30PM - 7:00PM: Project Planning",
     "7:00PM - 8:15PM: Dinner Break", "8:15PM - 9:00PM: Round 1 Submission",
-    "10:00PM: Refreshment", "11:00PM - 3:00AM: Phase 1 Work", 
-    "JAN 31 3:00AM: Refreshment", "7:00AM - 9:00AM: Breakfast", "9:00AM - 10:00AM: Review",
-    "10:00AM - 1:00PM: Phase 2 Work", "1:00PM - 2:00PM: Lunch Break",
-    "2:00PM - 3:00PM: Final Touches", "3:30PM - 4:00PM: Final Submission", 
-    "5:00PM: Winners Announcement & End"
+    "10:00PM: Refreshment", "11:00PM - 3:00AM: Phase 1 Work",
+    "JAN 31 3:00AM: Refreshment", "7:00AM - 9:00AM: Breakfast",
+    "9:00AM - 10:00AM: Review", "10:00AM - 1:00PM: Phase 2 Work",
+    "1:00PM - 2:00PM: Lunch Break", "2:00PM - 3:00PM: Final Touches",
+    "3:30PM - 4:00PM: Final Submission", "5:00PM: Winners Announcement"
   ];
 
-  const logBox = document.getElementById('missionLog');
-  missionLog.forEach(l => {
-      const color = l.includes("SUBMISSION") || l.includes("START") ? "var(--st-orange)" : "var(--st-blue)";
-      logBox.innerHTML += `<div><span style="color:${color}; margin-right:12px;">></span> ${l}</div>`;
+  const logContainer = document.getElementById('logItems');
+  logData.forEach(l => logContainer.innerHTML += `<div><span style="color:var(--st-blue)">></span> ${l}</div>`);
+
+  // FIX TAB SWITCHING
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.view).classList.add('active');
+      });
   });
 
   document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
@@ -297,99 +255,88 @@
           let myTeam = null;
           snap.forEach(d => {
               const members = d.data().members || [];
-              const isMe = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
-              if(isMe && d.data().verified) { myTeam = d.data(); teamId = d.id; }
+              const exists = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
+              if(exists && d.data().verified) { myTeam = d.data(); teamId = d.id; }
           });
 
           if(myTeam) {
               document.getElementById('loginScreen').classList.add('hidden');
-              document.getElementById('appContent').classList.add('active');
               document.getElementById('userName').textContent = user.displayName;
               document.getElementById('teamName').textContent = "TEAM: " + myTeam.team_name.toUpperCase();
               if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
-              syncTopicStats();
-              loadProgress(myTeam.submissions || {});
+              loadSubs(myTeam.submissions || {});
+              syncStats();
           } else {
-              alert("Access Denied: Unverified Profile."); signOut(auth);
+              alert("Access Denied."); signOut(auth);
           }
       }
   });
 
-  function syncTopicStats() {
+  function syncStats() {
       onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snap) => {
-          topicStats = {};
+          stats = {};
           snap.forEach(d => {
-              const tid = d.data().submissions?.projectTopic;
-              if(tid) topicStats[tid] = (topicStats[tid] || 0) + 1;
+              const topic = d.data().submissions?.projectTopic;
+              if(topic) stats[topic] = (stats[topic] || 0) + 1;
           });
           renderMatrix();
       });
   }
 
   function renderMatrix() {
-      const list = document.getElementById('probList');
-      list.innerHTML = "";
+      const grid = document.getElementById('problemList');
+      grid.innerHTML = "";
       problems.forEach(p => {
-          const count = topicStats[p.id] || 0;
+          const count = stats[p.id] || 0;
           const card = document.createElement('div');
-          card.className = `prob-card ${count >= 7 ? 'full' : ''}`;
-          card.innerHTML = `<span class="status-tag" style="color:${count >= 7 ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
+          card.className = `problem-item ${count >= 7 ? 'full' : ''}`;
+          card.innerHTML = `<span class="count-tag" style="color:${count >= 7 ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
                             <strong style="color:var(--st-blue)">#${p.id} ${p.t}</strong><br>
                             <p style="font-size:0.75rem; color:#888; margin-top:10px; line-height:1.4;">${p.d}</p>`;
-          list.appendChild(card);
+          grid.appendChild(card);
       });
   }
 
-  function loadProgress(s) {
-      let p = 0;
+  function loadSubs(s) {
       if(s.projectTopic) {
           document.getElementById('topicId').value = s.projectTopic;
           document.getElementById('projTitle').value = s.projectTitle;
           ['topicId','projTitle','lockBtn'].forEach(id => document.getElementById(id).disabled = true);
-          document.getElementById('lockBtn').textContent = "LOCKED"; p += 33;
+          document.getElementById('lockBtn').textContent = "LOCKED";
       }
-      if(s.round1Link) { document.getElementById('r1Link').value = s.round1Link; disableBtn('r1Btn'); p += 33; }
+      if(s.round1Link) { document.getElementById('r1Link').value = s.round1Link; disableBtn('r1Btn'); }
       if(s.finalGithub) { 
           document.getElementById('gitLink').value = s.finalGithub; 
           document.getElementById('finalPPT').value = s.finalPPT; 
-          disableBtn('finalBtn'); p = 100;
+          disableBtn('finalBtn'); 
       }
-      document.getElementById('progBar').style.width = p + "%";
-      document.getElementById('progText').textContent = p + "%";
   }
 
   document.getElementById('lockBtn').onclick = async () => {
       const id = parseInt(document.getElementById('topicId').value);
       const title = document.getElementById('projTitle').value;
       if(!id || !title || id < 1 || id > 15) return alert("Select ID 1-15.");
-      if((topicStats[id] || 0) >= 7) return alert("Problem is at full capacity (7 teams reached).");
+      if((stats[id] || 0) >= 7) return alert("Topic at 7-team capacity.");
       await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.projectTopic": id, "submissions.projectTitle": title });
       location.reload();
   };
 
-  window.sendR1 = async () => {
+  window.submitR1 = async () => {
       const link = document.getElementById('r1Link').value;
       if(link) { await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.round1Link": link }); location.reload(); }
   };
 
-  window.sendFinal = async () => {
+  window.submitFinal = async () => {
       const git = document.getElementById('gitLink').value;
       const ppt = document.getElementById('finalPPT').value;
       if(git && ppt) { await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.finalGithub": git, "submissions.finalPPT": ppt }); location.reload(); }
   };
 
-  window.switchView = (id) => {
-      document.querySelectorAll('.view-pane').forEach(v => v.classList.add('hidden'));
-      document.getElementById(id + '-view').classList.remove('hidden');
-      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
-  };
-
   window.logout = () => signOut(auth).then(() => location.reload());
 
-  window.requestMentor = async () => {
-      const loc = prompt("Team Location (System No)?");
-      if(loc) { await addDoc(collection(db, "mentor_requests"), { team: teamId, loc, time: serverTimestamp() }); alert("Mentor signaled."); }
+  window.callMentor = async () => {
+      const loc = prompt("Team Location?");
+      if(loc) { await addDoc(collection(db, "mentor_requests"), { teamId, loc, time: serverTimestamp() }); alert("Signal sent."); }
   };
 
   function disableBtn(id) { document.getElementById(id).disabled = true; document.getElementById(id).textContent = "SUBMITTED"; }
@@ -398,7 +345,7 @@
     const end = new Date("Jan 31, 2026 17:00:00").getTime();
     const now = new Date().getTime();
     const dist = end - now;
-    if (dist < 0) { document.getElementById('timer').textContent = "MISSION END"; return; }
+    if (dist < 0) { document.getElementById('timer').textContent = "EXPIRED"; return; }
     const h = Math.floor(dist / 3600000);
     const m = Math.floor((dist % 3600000) / 60000);
     const s = Math.floor((dist % 60000) / 1000);
