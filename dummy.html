@@ -17,7 +17,7 @@
     --st-blue: #00ccff;
     --st-orange: #ffab00;
     --bg-dark: #050505;
-    --glass-surface: rgba(20, 20, 20, 0.9);
+    --glass-surface: rgba(15, 15, 15, 0.95);
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-primary: #e0e0e0;
     --text-secondary: #86868b;
@@ -26,216 +26,175 @@
   }
 
   * { box-sizing: border-box; outline: none; }
-
   body {
     margin: 0; font-family: var(--font-main); background-color: var(--bg-dark);
-    color: var(--text-primary); min-height: 100vh;
+    color: var(--text-primary); min-height: 100vh; overflow-x: hidden;
     background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
   }
 
-  /* SCANLINE EFFECT */
+  /* GLOBAL OVERLAYS */
   body::before {
     content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-    background-size: 100% 4px; z-index: 100; pointer-events: none;
+    background-size: 100% 4px; z-index: 1000; pointer-events: none;
   }
 
-  /* WORLD-CLASS BROADCAST BAR */
-  .broadcast-bar {
-    background: var(--st-red); color: white; padding: 10px; font-size: 0.8rem;
-    text-align: center; font-weight: bold; letter-spacing: 2px;
-    animation: pulse-red 2s infinite; position: sticky; top: 0; z-index: 1000;
-  }
-  @keyframes pulse-red { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
-
-  .app-container {
-    max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 10;
-    display: none; opacity: 0; transition: 1s ease; padding-bottom: 120px;
-  }
-  .app-container.visible { display: block; opacity: 1; }
-
+  /* AUTH SCREEN */
   .login-screen {
     position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #000; transition: 0.8s;
+    align-items: center; justify-content: center; background: #000; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .login-screen.hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 
-  .glitch-logo {
-    font-family: var(--font-title); font-size: 5rem; color: #fff;
-    text-shadow: 4px 4px 0px var(--st-red); margin-bottom: 20px;
-    animation: glitch 2.5s infinite alternate-reverse; line-height: 1;
+  /* HEADER & NAVIGATION */
+  .main-header {
+    position: sticky; top: 0; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border); z-index: 900; padding: 15px 5%;
+    display: flex; justify-content: space-between; align-items: center;
   }
-
-  header { border-bottom: 1px solid var(--glass-border); margin-bottom: 30px; padding-bottom: 20px; }
-
-  .tabs { display: flex; gap: 2px; margin-bottom: 30px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px; }
+  
+  .nav-tabs {
+    display: flex; justify-content: center; gap: 5px; background: rgba(255,255,255,0.03);
+    padding: 5px; border-radius: 8px; margin: 20px auto; max-width: 900px;
+  }
   .tab-btn {
-    flex: 1; background: transparent; border: none; color: var(--text-secondary);
-    font-family: var(--font-main); font-size: 0.8rem; font-weight: 700;
-    padding: 16px; cursor: pointer; transition: 0.3s; text-transform: uppercase;
+    flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-secondary);
+    font-family: var(--font-main); font-weight: bold; cursor: pointer; transition: 0.3s;
+    text-transform: uppercase; font-size: 0.8rem; border-radius: 6px;
   }
-  .tab-btn.active { color: #000; background: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+  .tab-btn.active { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+
+  /* CONTAINER & CARDS */
+  .app-content { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; opacity: 0; }
+  .app-content.visible { display: block; opacity: 1; transition: 1s; }
 
   .glass-card {
-    background: var(--glass-surface); backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border); padding: 30px; margin-bottom: 24px;
-    position: relative;
+    background: var(--glass-surface); border: 1px solid var(--glass-border);
+    padding: 30px; margin-bottom: 25px; position: relative; border-radius: 4px;
   }
-  .glass-card::before { content:''; position: absolute; top:0; left:0; width: 4px; height: 100%; background: var(--st-red); }
+  .glass-card::after { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--st-red); }
 
-  /* PROGRESS BAR */
-  .progress-container { height: 10px; background: #222; border-radius: 5px; margin: 20px 0; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--st-green); width: 0%; transition: 1s ease; box-shadow: 0 0 10px var(--st-green); }
-
-  input {
-    background: #111; border: 1px solid #333; color: var(--st-green);
-    padding: 12px 18px; font-family: var(--font-main); width: 100%; margin-bottom: 10px;
-  }
-
+  /* BUTTONS & INPUTS */
   .btn {
-    background: var(--st-red); color: #fff; border: none; padding: 12px 24px;
-    font-weight: 700; cursor: pointer; width: 100%; font-family: var(--font-main);
+    background: var(--st-red); color: #fff; border: none; padding: 14px 28px;
+    font-weight: bold; cursor: pointer; font-family: var(--font-main);
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: 0.3s;
   }
   .btn:hover { background: #ff3355; box-shadow: 0 0 15px rgba(255, 0, 51, 0.4); }
-  .btn:disabled { background: #333; color: #888; cursor: not-allowed; }
+  .btn:disabled { background: #222; color: #555; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
 
+  input {
+    background: #0a0a0a; border: 1px solid #333; color: var(--st-green);
+    padding: 14px; font-family: var(--font-main); width: 100%; margin-bottom: 15px;
+  }
+
+  /* PROBLEM GRID */
   .problem-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px; max-height: 500px; overflow-y: auto; padding-right: 10px;
+    gap: 15px; max-height: 550px; overflow-y: auto; padding-right: 10px;
   }
-  .prob-card {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px;
-    position: relative; transition: 0.3s; cursor: pointer;
+  .prob-item {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+    padding: 15px; position: relative; transition: 0.3s;
   }
-  .prob-card.locked { opacity: 0.4; border-color: var(--st-red); }
-  .prob-card:hover:not(.locked) { border-color: var(--st-blue); background: rgba(0, 204, 255, 0.05); }
+  .prob-item.full { border-color: var(--st-red); opacity: 0.4; }
+  .occupancy { position: absolute; top: 10px; right: 10px; font-size: 0.65rem; color: var(--st-orange); }
 
+  /* MENTOR FLOATER */
   .mentor-btn {
     position: fixed; bottom: 30px; right: 30px; background: var(--st-orange);
-    width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 20px rgba(255, 171, 0, 0.4); cursor: pointer; z-index: 999; border: none;
+    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; z-index: 1100; border: none; cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 171, 0, 0.3); animation: pulse 2s infinite;
   }
 
-  .timer-display { font-family: var(--font-title); font-size: 5rem; color: #fff; text-shadow: 0 0 20px rgba(255,0,51,0.6); margin: 20px 0; }
-
-  .resource-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-  .res-link { background: rgba(255,255,255,0.05); padding: 10px; text-decoration: none; color: var(--st-blue); font-size: 0.7rem; border: 1px solid #333; text-align: center; }
-  .res-link:hover { background: var(--st-blue); color: #000; }
-
-  @media(max-width: 768px){ .glitch-logo { font-size: 3rem; } .timer-display { font-size: 3rem; } .resource-grid { grid-template-columns: 1fr; } }
+  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
 
-<div class="broadcast-bar" id="broadcast">SYSTEM MESSAGE: HACKATHON COMMENCING SOON. PREPARE YOUR TEAMS.</div>
-
-<button class="mentor-btn" onclick="callMentor()">
-    <span class="material-icons">support_agent</span>
-</button>
-
 <div class="login-screen" id="loginScreen">
-  <div class="glitch-logo">EDU HACK<br>SUPREME</div>
-  <button class="btn" style="width:auto; min-width:280px; background:#fff; color:#000;" id="loginBtn">AUTHENTICATE ACCESS</button>
+  <div class="glitch-logo" style="font-family: var(--font-title); font-size: 5rem; text-align: center;">EDU HACK<br>SUPREME</div>
+  <button class="btn" id="loginBtn" style="width:auto; min-width:300px; background:#fff; color:#000;">AUTHENTICATE IDENTITY</button>
 </div>
 
-<div class="app-container" id="appContainer">
-  
-  <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-      <div>
-        <h1 style="margin:0; font-size:1.8rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
-        <span style="font-size:0.75rem; color:var(--text-secondary);">10X CLUB | KARE CAMPUS</span>
-      </div>
-      <div class="user-badge">
-        <div class="user-avatar" id="userAvatar"></div>
-        <div>
-          <div id="userName" style="font-weight:700;">USER_ALPHA</div>
-          <div style="font-size:0.7rem; color:var(--st-green);">TEAM: <span id="teamNameDisplay">...</span></div>
+<header class="main-header" id="mainHeader">
+    <div>
+        <h1 style="margin:0; font-size:1.5rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> SUPREME</span></h1>
+        <span style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase;">Console Access v2.0</span>
+    </div>
+    
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div style="text-align:right;">
+            <div id="userName" style="font-weight:bold; font-size:0.9rem;">...</div>
+            <div id="teamName" style="font-size:0.7rem; color:var(--st-green); font-weight:bold;">TEAM: ...</div>
         </div>
-      </div>
+        <div id="userAvatar" style="width:40px; height:40px; border-radius:50%; background:#333; background-size:cover; border:1px solid #fff;"></div>
+        <button onclick="logout()" title="Terminate Session" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:5px 10px; cursor:pointer; font-family:var(--font-main); font-size:0.7rem;">LOGOUT</button>
     </div>
-  </header>
+</header>
 
-  <nav class="tabs">
-    <button class="tab-btn active" onclick="switchTab('hackathon')">Mission Dashboard</button>
-    <button class="tab-btn" onclick="switchTab('problems')">Problem Matrix</button>
-    <button class="tab-btn" onclick="switchTab('resources')">Resources</button>
-    <button class="tab-btn" onclick="switchTab('timeline')">Mission Log</button>
-  </nav>
+<div class="app-content" id="appContent">
+    
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('dash')">Dashboard</button>
+        <button class="tab-btn" onclick="switchTab('probs')">Problem Matrix</button>
+        <button class="tab-btn" onclick="switchTab('log')">Mission Log</button>
+    </nav>
 
-  <div id="hackathon" class="show-section">
-    <div style="text-align:center; margin-bottom:30px;">
-      <div id="timerLabel" style="font-size:0.8rem; letter-spacing:4px; color:var(--st-red);">REMAINING TIME</div>
-      <div class="timer-display" id="timer">00:00:00:00</div>
-      
-      <div style="max-width: 600px; margin: 0 auto;">
-          <div style="display:flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 5px;">
-              <span>MISSION PROGRESS</span>
-              <span id="progressPercent">0%</span>
-          </div>
-          <div class="progress-container"><div class="progress-fill" id="progressFill"></div></div>
-      </div>
-    </div>
+    <div id="dash-section" class="tab-content">
+        <div style="text-align:center; margin-bottom:40px;">
+            <div id="timerLabel" style="font-size:0.8rem; letter-spacing:5px; color:var(--st-red);">REMAINING TIME</div>
+            <div id="timer" style="font-family: var(--font-title); font-size: 5rem; text-shadow: 0 0 20px var(--st-red);">00h 00m 00s</div>
+        </div>
 
-    <div class="glass-card">
-      <h3 style="color:var(--st-green); margin-top:0;">1. PROTOCOL ACTIVATION</h3>
-      <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px;">
-          <input type="number" id="projectTopic" placeholder="Problem ID (1-50)">
-          <input type="text" id="projectTitle" placeholder="Your Unique Project Title...">
-          <button class="btn" id="freezeBtn">LOCK DATA</button>
-      </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div class="glass-card">
-            <h3 style="color:var(--st-orange);">ROUND 1: PLANNING</h3>
-            <input type="text" id="round1Link" placeholder="Slide Deck Link (Google Drive)">
-            <button class="btn" id="btnRound1" onclick="submitRound1()">SUBMIT PLANNING</button>
+            <h3 style="color:var(--st-green); margin-top:0;">01. PROJECT CLAIM</h3>
+            <div style="display:grid; grid-template-columns: 1fr 2fr auto; gap:15px;">
+                <input type="number" id="topicId" placeholder="Problem ID (1-50)">
+                <input type="text" id="projTitle" placeholder="Project Title...">
+                <button class="btn" id="lockBtn">LOCK SELECTION</button>
+            </div>
         </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
+            <div class="glass-card">
+                <h3 style="color:var(--st-orange);">ROUND 1: PLANNING</h3>
+                <input type="text" id="r1Link" placeholder="Planning PPT Link">
+                <button class="btn" id="r1Btn" onclick="submitR1()">SUBMIT ROUND 1</button>
+            </div>
+            <div class="glass-card">
+                <h3 style="color:var(--st-blue);">FINAL: DEPLOYMENT</h3>
+                <input type="text" id="gitLink" placeholder="GitHub Repository URL">
+                <input type="text" id="finalPPT" placeholder="Final PPT Link">
+                <button class="btn" id="finalBtn" onclick="submitFinal()">SUBMIT PROJECT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="probs-section" class="tab-content hidden">
         <div class="glass-card">
-            <h3 style="color:var(--st-blue);">FINAL: DEPLOYMENT</h3>
-            <input type="text" id="finalGithub" placeholder="GitHub Repository">
-            <input type="text" id="finalPPT" placeholder="Final Presentation Link">
-            <button class="btn" id="btnFinalRound" onclick="submitFinalRound()">FINALIZE MISSION</button>
+            <h2 style="color:var(--st-blue); margin-top:0;">AVAILABLE PROBLEM STATEMENTS</h2>
+            <div class="problem-grid" id="problemList"></div>
         </div>
     </div>
-  </div>
 
-  <div id="problems" class="hidden-section">
-    <div class="glass-card">
-        <h2 style="color:var(--st-blue); margin-top:0;">PROBLEM MATRIX</h2>
-        <div class="problem-grid" id="problemList"></div>
+    <div id="log-section" class="tab-content hidden">
+        <div class="glass-card">
+            <h2 style="color:var(--st-red); margin-top:0;">MISSION LOG (IST)</h2>
+            <div id="logItems" style="line-height:2; font-size:0.9rem;">
+                </div>
+        </div>
     </div>
-  </div>
-
-  <div id="resources" class="hidden-section">
-      <div class="glass-card">
-          <h2 style="color:var(--st-orange);">DEVELOPER TOOLKIT</h2>
-          <div class="resource-grid">
-              <a href="#" class="res-link">Angular Official Docs</a>
-              <a href="#" class="res-link">Firebase Console</a>
-              <a href="#" class="res-link">Tailwind Cheat Sheet</a>
-              <a href="#" class="res-link">Material Icons List</a>
-              <a href="#" class="res-link">Devpost Best Practices</a>
-              <a href="#" class="res-link">Github Desktop Tool</a>
-          </div>
-      </div>
-  </div>
-
-  <div id="timeline" class="hidden-section">
-      <div class="glass-card">
-          <h2 style="color:var(--st-red);">MISSION LOG</h2>
-          <div id="logContent" style="font-size: 0.85rem; line-height: 2;">
-              </div>
-      </div>
-  </div>
-
 </div>
+
+<button class="mentor-btn" onclick="callMentor()"><span class="material-icons">support_agent</span></button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, query, getDocs, doc, updateDoc, serverTimestamp, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, query, getDocs, doc, updateDoc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -252,81 +211,79 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
   const EVENT_ID = "edu-hack-2025";
-  const DATE_START = new Date("Jan 30, 2026 17:00:00").getTime(); 
-  const DATE_END = new Date("Jan 31, 2026 17:00:00").getTime(); 
 
   let currentTeamId = null;
-  let currentUser = null;
   let stats = {};
 
   const problems = [
     "Predictive Attendance Risk Analyzer", "Smart Academic Alert Notification", "Automated Transcript Request Workflow",
-    "Unified Campus Portal SSO", "Intelligent Exam Seating Allocation", "Attendance Anomaly Detection System",
+    "Unified Campus Portal SSO Prototype", "Intelligent Exam Seating Allocation", "Attendance Anomaly Detection System",
     "Faculty Load Distribution Dashboard", "Personalized Elective Recommendation", "Virtual SIS Helpdesk Chatbot",
     "KAFKA Complaint Trend Analytics", "Hostel Maintenance Priority System", "Hostel Occupancy Prediction Simulator",
-    "Smart Grievance Escalation Engine", "Mobile Complaint Tracking Interface", "Multilingual Portal Accessibility Layer",
-    "Hostel Utility Consumption Platform", "Smart Campus Bus Route Optimizer", "Real-Time Transport Tracking Simulator",
+    "Smart Grievance Escalation Workflow", "Mobile-Friendly Complaint Tracking", "Multilingual Portal Accessibility Layer",
+    "Hostel Utility Consumption Analytics", "Smart Campus Bus Route Optimizer", "Real-Time Transport Tracking Simulator",
     "Campus Emergency Broadcast System", "Exam Timetable Clash Detection", "Smart Lab Resource Booking Platform",
     "Peer Mentoring Matchmaking Engine", "Digital Academic Certificate Verification", "Student Feedback Sentiment Tool",
     "Automated Leave Approval Engine", "Smart Canteen Crowd Prediction", "Lab Utilization Optimization System",
     "Unified University Events Calendar", "Student Skill Gap Identification", "LMS Engagement Analytics Dashboard",
-    "Scholarship Eligibility Filtering", "Intelligent Notification Controller", "Centralized Campus Grievance Console",
+    "Scholarship Eligibility Filtering Engine", "Intelligent Notification Controller", "Centralized Campus Grievance Console",
     "Document Digitization & OCR Tool", "Dynamic University FAQ Generator", "Campus Occupancy Visualization Heatmap",
-    "Night Transport Safety Monitoring", "Academic Performance Forecasting", "Alumni Mentorship Matching Platform",
-    "Interactive Portal Guidance Assistant", "Hostel Food Quality Analytics", "Smart Hostel Energy Optimization",
-    "Campus Data Privacy Risk Scanner", "Degree Progress Audit Automation", "System Downtime Notification Simulator",
-    "Third-Party Tool Integration Gateway", "Student Certification Tracking", "Counseling Appointment Queue Manager",
+    "Night Transport Safety Monitoring System", "Academic Performance Forecasting Tool", "Alumni Mentorship Matching Platform",
+    "Interactive Portal Guidance Assistant", "Hostel Food Quality Analytics Platform", "Smart Hostel Energy Optimization",
+    "Campus Data Privacy Risk Scanner", "Degree Progress Audit Automation Tool", "System Downtime Notification Simulator",
+    "Third-Party Tool Integration Gateway", "Student Certification Tracking Platform", "Counseling Appointment Queue Manager",
     "Accessibility Enhancement Toolkit", "University KPI Analytics Dashboard"
   ];
 
-  const missionLog = [
-    {t: "JAN 30 5:00 PM", e: "HACKATHON START"},
-    {t: "6:00PM - 6:30PM", e: "Problem Distribution"},
-    {t: "8:15PM - 9:00PM", e: "Round 1 Submission Deadline"},
-    {t: "11:00PM - 3:00AM", e: "Phase 1 Development"},
-    {t: "JAN 31 10:00 AM", e: "Phase 2 Development"},
-    {t: "3:30PM - 4:00PM", e: "Final Submission Deadline"},
-    {t: "5:00 PM", e: "Winners Announcement"}
+  const logData = [
+    "JAN 05-23: Angular Bootcamp Phase [Completed] [cite: 1, 15]",
+    "JAN 30 17:00: HACKATHON START [cite: 15]",
+    "17:00 - 18:00: Event Launch [cite: 15]",
+    "18:00 - 18:30: Problem Distribution [cite: 15]",
+    "18:30 - 19:00: Project Planning [cite: 15]",
+    "20:15 - 21:00: ROUND 1 SUBMISSION [cite: 15]",
+    "23:00 - 03:00: Phase 1 Work [cite: 15]",
+    "JAN 31 10:00 - 13:00: Phase 2 Work [cite: 15]",
+    "15:30 - 16:00: FINAL SUBMISSION [cite: 15]",
+    "17:00: Winner Announcement [cite: 15]"
   ];
 
-  // INIT UI
-  const logDiv = document.getElementById('logContent');
-  missionLog.forEach(l => logDiv.innerHTML += `<div><span style="color:var(--st-blue)">${l.t}</span> — ${l.e}</div>`);
+  // UI INIT
+  const logContainer = document.getElementById('logItems');
+  logData.forEach(l => logContainer.innerHTML += `<div><span style="color:var(--st-blue)">></span> ${l}</div>`);
 
-  // AUTH
+  // AUTH LOGIC
   document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
-
+  
   onAuthStateChanged(auth, async (user) => {
       if(user) {
           const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
           let myTeam = null;
-          snap.forEach(doc => {
-              const data = doc.data();
-              const members = data.members || [];
-              const isMember = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
-              if(isMember && data.verified) { myTeam = data; currentTeamId = doc.id; }
+          snap.forEach(d => {
+              const members = d.data().members || [];
+              const exists = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
+              if(exists && d.data().verified) { myTeam = d.data(); currentTeamId = d.id; }
           });
 
           if(myTeam) {
-              currentUser = user;
               document.getElementById('loginScreen').classList.add('hidden');
-              document.getElementById('appContainer').classList.add('visible');
+              document.getElementById('appContent').classList.add('visible');
               document.getElementById('userName').textContent = user.displayName;
-              document.getElementById('teamNameDisplay').textContent = myTeam.team_name.toUpperCase();
+              document.getElementById('teamName').textContent = "TEAM: " + myTeam.team_name.toUpperCase();
               if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
+              loadSubs(myTeam.submissions || {});
               syncStats();
-              loadDash(myTeam.submissions || {});
           } else {
-              alert("Access Denied: Unverified Identity."); signOut(auth);
+              alert("Access Denied: Team not verified."); signOut(auth);
           }
       }
   });
 
   function syncStats() {
-      onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snapshot) => {
+      onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snap) => {
           stats = {};
-          snapshot.forEach(doc => {
-              const topic = doc.data().submissions?.projectTopic;
+          snap.forEach(d => {
+              const topic = d.data().submissions?.projectTopic;
               if(topic) stats[topic] = (stats[topic] || 0) + 1;
           });
           renderProbs();
@@ -334,41 +291,38 @@
   }
 
   function renderProbs() {
-      const list = document.getElementById('problemList');
-      list.innerHTML = "";
+      const grid = document.getElementById('problemList');
+      grid.innerHTML = "";
       problems.forEach((p, i) => {
           const id = i + 1;
           const count = stats[id] || 0;
           const card = document.createElement('div');
-          card.className = `prob-card ${count >= 2 ? 'locked' : ''}`;
-          card.innerHTML = `<span style="font-size:0.6rem; color:var(--st-orange);">${count}/2 CLAIMED</span><br><b>#${id}</b> ${p}`;
-          list.appendChild(card);
+          card.className = `prob-item ${count >= 2 ? 'full' : ''}`;
+          card.innerHTML = `<span class="occupancy">${count}/2</span><b>#${id}</b><br><small>${p}</small>`;
+          grid.appendChild(card);
       });
   }
 
-  function loadDash(s) {
-      let progress = 0;
+  function loadSubs(s) {
       if(s.projectTopic) {
-          document.getElementById('projectTopic').value = s.projectTopic;
-          document.getElementById('projectTitle').value = s.projectTitle;
-          ['projectTopic','projectTitle','freezeBtn'].forEach(id => document.getElementById(id).disabled = true);
-          progress += 33;
+          document.getElementById('topicId').value = s.projectTopic;
+          document.getElementById('projTitle').value = s.projectTitle;
+          ['topicId','projTitle','lockBtn'].forEach(id => document.getElementById(id).disabled = true);
+          document.getElementById('lockBtn').textContent = "LOCKED";
       }
-      if(s.round1Link) { document.getElementById('round1Link').value = s.round1Link; disableBtn('btnRound1'); progress += 33; }
+      if(s.round1Link) { document.getElementById('r1Link').value = s.round1Link; disableBtn('r1Btn'); }
       if(s.finalGithub) { 
-          document.getElementById('finalGithub').value = s.finalGithub; 
+          document.getElementById('gitLink').value = s.finalGithub; 
           document.getElementById('finalPPT').value = s.finalPPT; 
-          disableBtn('btnFinalRound'); progress = 100;
+          disableBtn('finalBtn'); 
       }
-      document.getElementById('progressFill').style.width = progress + "%";
-      document.getElementById('progressPercent').textContent = progress + "%";
   }
 
-  document.getElementById('freezeBtn').onclick = async () => {
-      const id = parseInt(document.getElementById('projectTopic').value);
-      const title = document.getElementById('projectTitle').value;
-      if(!id || !title || id < 1 || id > 50) return alert("Invalid Data.");
-      if((stats[id] || 0) >= 2) return alert("Problem already claimed by 2 teams.");
+  document.getElementById('lockBtn').onclick = async () => {
+      const id = parseInt(document.getElementById('topicId').value);
+      const title = document.getElementById('projTitle').value;
+      if(!id || !title || id < 1 || id > 50) return alert("Enter valid ID (1-50)");
+      if((stats[id] || 0) >= 2) return alert("This problem is already claimed by 2 teams.");
       
       await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), {
           "submissions.projectTopic": id, "submissions.projectTitle": title
@@ -376,16 +330,16 @@
       location.reload();
   };
 
-  window.submitRound1 = async () => {
-      const link = document.getElementById('round1Link').value;
+  window.submitR1 = async () => {
+      const link = document.getElementById('r1Link').value;
       if(link) {
           await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), { "submissions.round1Link": link });
           location.reload();
       }
   };
 
-  window.submitFinalRound = async () => {
-      const git = document.getElementById('finalGithub').value;
+  window.submitFinal = async () => {
+      const git = document.getElementById('gitLink').value;
       const ppt = document.getElementById('finalPPT').value;
       if(git && ppt) {
           await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), { "submissions.finalGithub": git, "submissions.finalPPT": ppt });
@@ -393,34 +347,35 @@
       }
   };
 
-  window.callMentor = async () => {
-      const loc = prompt("Where are you sitting? (e.g. Block 8, Lab 2)");
-      if(loc) {
-          await addDoc(collection(db, "mentor_requests"), { team: currentTeamId, location: loc, time: serverTimestamp() });
-          alert("MENTOR SIGNAL BROADCASTED.");
-      }
-  };
-
   window.switchTab = (id) => {
-      document.querySelectorAll('.show-section').forEach(e => e.className = 'hidden-section');
-      document.getElementById(id).className = 'show-section';
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById(id + '-section').classList.remove('hidden');
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
   };
 
-  function disableBtn(id) { const b = document.getElementById(id); b.disabled = true; b.textContent = "DONE"; b.style.color = "var(--st-green)"; }
+  window.logout = () => { if(confirm("Terminate Session?")) signOut(auth).then(() => location.reload()); };
 
+  window.callMentor = async () => {
+      const loc = prompt("Where are you sitting? (e.g. Lab 8, System 12)");
+      if(loc) {
+          await addDoc(collection(db, "mentor_requests"), { team: currentTeamId, loc, time: serverTimestamp() });
+          alert("Help Request Broadcasted.");
+      }
+  };
+
+  function disableBtn(id) { document.getElementById(id).disabled = true; document.getElementById(id).textContent = "SUBMITTED"; }
+
+  // TIMER LOGIC
   setInterval(() => {
+    const end = new Date("Jan 31, 2026 17:00:00").getTime();
     const now = new Date().getTime();
-    let dist, label;
-    if (now < DATE_START) { dist = DATE_START - now; label = "COMMENCES IN"; }
-    else if (now < DATE_END) { dist = DATE_END - now; label = "TIME REMAINING"; document.getElementById('timer').style.color = "var(--st-green)"; }
-    else { document.getElementById('timer').textContent = "OFFLINE"; return; }
+    const dist = end - now;
+    if (dist < 0) { document.getElementById('timer').textContent = "EXPIRED"; return; }
     const h = Math.floor(dist / 3600000);
     const m = Math.floor((dist % 3600000) / 60000);
     const s = Math.floor((dist % 60000) / 1000);
     document.getElementById('timer').textContent = `${h}h ${m}m ${s}s`;
-    document.getElementById('timerLabel').textContent = label;
   }, 1000);
 </script>
 </body>
