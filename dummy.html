@@ -41,20 +41,21 @@
   /* AUTH SCREEN */
   .login-screen {
     position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #000; transition: 0.8s;
+    align-items: center; justify-content: center; background: #000; transition: 0.8s ease;
   }
   .login-screen.hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 
-  /* NAVIGATION */
+  /* PERSISTENT HEADER */
   .main-header {
     position: sticky; top: 0; background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--glass-border); z-index: 900; padding: 15px 5%;
     display: flex; justify-content: space-between; align-items: center;
   }
-  
+
+  /* NAVIGATION */
   .nav-tabs {
     display: flex; justify-content: center; gap: 5px; background: rgba(255,255,255,0.03);
-    padding: 5px; border-radius: 8px; margin: 25px auto; max-width: 900px;
+    padding: 5px; border-radius: 8px; margin: 25px auto; max-width: 950px;
   }
   .tab-btn {
     flex: 1; padding: 14px; border: none; background: transparent; color: var(--text-secondary);
@@ -63,7 +64,7 @@
   }
   .tab-btn.active { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
 
-  /* CONTENT SECTIONS */
+  /* CONTENT CARDS */
   .app-content { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; opacity: 0; }
   .app-content.visible { display: block; opacity: 1; transition: 1s; }
 
@@ -82,8 +83,7 @@
     background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
     padding: 20px; position: relative; transition: 0.3s; border-radius: 4px;
   }
-  .prob-item.full { border-color: var(--st-red); opacity: 0.4; pointer-events: none; }
-  .prob-item.claimed { border-color: var(--st-blue); background: rgba(0, 204, 255, 0.05); }
+  .prob-item.full { border-color: var(--st-red); opacity: 0.4; }
   .occupancy { position: absolute; top: 12px; right: 12px; font-size: 0.7rem; font-weight: bold; }
 
   /* INPUTS & BUTTONS */
@@ -149,10 +149,10 @@
         </div>
 
         <div class="glass-card">
-            <h3 style="color:var(--st-green); margin-top:0;">01. PROJECT CLAIM (MAX 7 TEAMS/ID)</h3>
+            <h3 style="color:var(--st-green); margin-top:0;">01. PROJECT SELECTION (MAX 7 TEAMS/PROB)</h3>
             <div style="display:grid; grid-template-columns: 1fr 2fr auto; gap:15px;">
-                <input type="number" id="topicId" placeholder="Statement ID (1-15)">
-                <input type="text" id="projTitle" placeholder="Your Project Title...">
+                <input type="number" id="topicId" placeholder="Problem ID (1-15)">
+                <input type="text" id="projTitle" placeholder="Project Title...">
                 <button class="btn" id="lockBtn">LOCK SELECTION</button>
             </div>
         </div>
@@ -160,7 +160,7 @@
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
             <div class="glass-card">
                 <h3 style="color:var(--st-orange);">ROUND 1: PLANNING</h3>
-                <input type="text" id="r1Link" placeholder="Slide Deck Link">
+                <input type="text" id="r1Link" placeholder="Planning PPT Link">
                 <button class="btn" id="r1Btn" onclick="submitR1()">SUBMIT ROUND 1</button>
             </div>
             <div class="glass-card">
@@ -174,15 +174,16 @@
 
     <div id="probs-section" class="tab-content hidden">
         <div class="glass-card">
-            <h2 style="color:var(--st-blue); margin-top:0;">UPDATED PROBLEM STATEMENTS</h2>
+            <h2 style="color:var(--st-blue); margin-top:0;">PROBLEM STATEMENTS</h2>
             <div class="problem-grid" id="problemList"></div>
         </div>
     </div>
 
     <div id="log-section" class="tab-content hidden">
         <div class="glass-card">
-            <h2 style="color:var(--st-red); margin-top:0;">EVENT TIMELINE (IST)</h2>
-            <div id="logItems" style="line-height:2.4; font-size:0.95rem;"></div>
+            <h2 style="color:var(--st-red); margin-top:0;">MISSION LOG: JAN 30-31</h2>
+            <div id="logItems" style="line-height:2.2; font-size:0.95rem;">
+                </div>
         </div>
     </div>
 </div>
@@ -213,37 +214,51 @@
   let stats = {};
 
   const problems = [
-    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing historical attendance and academic patterns to flag students at risk and simulate automated intervention alerts."},
-    {id:2, t:"Smart Academic Notification Engine", d:"Design a rule-based alert system that prioritizes and delivers academic deadlines, fee reminders, and examination updates."},
-    {id:3, t:"Intelligent Exam Seating Allocation Engine", d:"Create an automated seating optimizer that minimizes malpractice probability and maximizes hall utilization efficiency."},
-    {id:4, t:"Hostel Maintenance Priority Automation", d:"Develop a KAFKA-inspired workflow engine that auto-prioritizes hostel complaints based on severity, frequency, and response SLA."},
-    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Build a centralized emergency alert platform capable of pushing simulated alerts to multiple user roles in real time."},
-    {id:6, t:"Unified Campus Resource Booking", d:"Design a booking system for labs, classrooms, and event halls with clash detection and approval workflows."},
-    {id:7, t:"Smart Bus Route Optimization Tool", d:"Create a transport analytics system that optimizes campus bus routes using student demand patterns and time constraints."},
-    {id:8, t:"Student Feedback Sentiment Analytics", d:"Build an NLP-based dashboard that converts raw feedback into actionable academic and facility improvement insights."},
-    {id:9, t:"Hostel Utility Consumption Analytics", d:"Develop a monitoring system that simulates water and power usage trends with anomaly detection and conservation alerts."},
-    {id:10, t:"Degree Progress Audit Automation Tool", d:"Create a system that tracks course completion, credit requirements, and graduation readiness automatically."},
-    {id:11, t:"Centralized Grievance Monitoring Console", d:"Design an admin dashboard that visualizes complaint categories, bottlenecks, and resolution performance metrics."},
-    {id:12, t:"Academic Performance Forecasting Engine", d:"Build a prediction model that estimates semester outcomes and identifies students needing academic support."},
-    {id:13, t:"Campus Occupancy Heatmap Visualizer", d:"Develop a visualization tool that simulates real-time classroom, library, and hostel occupancy trends."},
-    {id:14, t:"Scholarship Eligibility Filtering Engine", d:"Create a rules-based system that automatically shortlists candidates using academic and socioeconomic criteria."},
-    {id:15, t:"University KPI Analytics Dashboard", d:"Build an executive dashboard combining academic, hostel, transport, and grievance indicators into actionable metrics."}
+    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing historical attendance and academic patterns to flag students at risk and simulate alerts."},
+    {id:2, t:"Smart Academic Notification Engine", d:"Rule-based alert system for academic deadlines, fee reminders, and exam updates."},
+    {id:3, t:"Intelligent Exam Seating Engine", d:"Automated seating optimizer maximizing hall utilization and minimizing malpractice risk."},
+    {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing complaints based on severity and SLA."},
+    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform for real-time simulated emergency alert distribution."},
+    {id:6, t:"Unified Campus Resource Booking", d:"System for labs, classrooms, and halls with clash detection and approval workflows."},
+    {id:7, t:"Smart Bus Route Optimization Tool", d:"Transport analytics system optimizing routes using student demand patterns."},
+    {id:8, t:"Student Feedback Sentiment Tool", d:"NLP-based dashboard converting raw feedback into actionable insights."},
+    {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system for usage trends with anomaly detection and conservation alerts."},
+    {id:10, t:"Degree Progress Audit Automation", d:"System tracking course completion and graduation readiness automatically."},
+    {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
+    {id:12, t:"Academic Performance Forecast", d:"Prediction model identifying semester outcomes and students needing support."},
+    {id:13, t:"Campus Occupancy Heatmap", d:"Visualizer simulating real-time classroom, library, and hostel trends."},
+    {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system automatically shortlisting candidates by academic/socio criteria."},
+    {id:15, t:"University KPI Analytics Dashboard", d:"Executive dashboard combining academic, hostel, transport, and grievance metrics."}
   ];
 
   const logData = [
-    "JAN 30 17:00: HACKATHON START",
-    "17:00 - 18:00: Event Launch",
-    "18:00 - 18:30: Problem Distribution",
-    "18:30 - 19:00: Project Planning",
-    "20:15 - 21:00: ROUND 1 SUBMISSION",
-    "23:00 - 03:00: Phase 1 Development",
-    "JAN 31 10:00 - 13:00: Phase 2 Development",
-    "15:30 - 16:00: FINAL SUBMISSION",
-    "17:00: Judging & Winner Announcement"
+    "JAN 30 5:00 PM: HACKATHON START",
+    "5:00PM - 6:00PM: Event Launch",
+    "6:00PM - 6:30PM: Problem Statement Distribution",
+    "6:30PM - 7:00PM: Project Planning",
+    "7:00PM - 8:15PM: Dinner Break",
+    "8:15PM - 9:00PM: Round 1 Submission",
+    "10:00PM: Refreshment",
+    "11:00PM - 3:00AM: Phase 1 Work",
+    "JAN 31 3:00AM: Refreshment",
+    "7:00AM - 9:00AM: Breakfast / Get Ready",
+    "9:00AM - 10:00AM: Review",
+    "10:00AM - 1:00PM: Phase 2 Work",
+    "1:00PM - 2:00PM: Lunch Break",
+    "2:00PM - 3:00PM: Final Touches",
+    "3:00PM: Refreshment",
+    "3:30PM - 4:00PM: Final Submission",
+    "4:00PM - 5:00PM: Judging & Closing Ceremony",
+    "5:00PM: Winners Announcement & Prizes",
+    "JAN 31 5:00 PM: HACKATHON END"
   ];
 
+  // POPULATE LOG
   const logContainer = document.getElementById('logItems');
-  logData.forEach(l => logContainer.innerHTML += `<div><span style="color:var(--st-blue); margin-right:10px;">></span> ${l}</div>`);
+  logData.forEach(l => {
+      const color = l.includes("SUBMISSION") || l.includes("START") ? "var(--st-orange)" : "var(--st-blue)";
+      logContainer.innerHTML += `<div><span style="color:${color}; margin-right:10px;">></span> ${l}</div>`;
+  });
 
   document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
   
@@ -266,7 +281,7 @@
               loadSubs(myTeam.submissions || {});
               syncStats();
           } else {
-              alert("Access Denied: Team not verified."); signOut(auth);
+              alert("Access Denied: Verified Identity Required."); signOut(auth);
           }
       }
   });
@@ -315,7 +330,7 @@
       const id = parseInt(document.getElementById('topicId').value);
       const title = document.getElementById('projTitle').value;
       if(!id || !title || id < 1 || id > 15) return alert("Select ID 1-15 and enter a title.");
-      if((stats[id] || 0) >= 7) return alert("Maximum 7 teams reached for this problem.");
+      if((stats[id] || 0) >= 7) return alert("Statement is at full capacity (7 teams reached).");
       
       await updateDoc(doc(db, "events", EVENT_ID, "registrations", currentTeamId), {
           "submissions.projectTopic": id, "submissions.projectTitle": title
@@ -347,8 +362,8 @@
   window.logout = () => signOut(auth).then(() => location.reload());
 
   window.callMentor = async () => {
-      const loc = prompt("Current Location (Block/System No)?");
-      if(loc) { await addDoc(collection(db, "mentor_requests"), { team: currentTeamId, loc, time: serverTimestamp() }); alert("Mentor requested."); }
+      const loc = prompt("Where is your team seated?");
+      if(loc) { await addDoc(collection(db, "mentor_requests"), { team: currentTeamId, loc, time: serverTimestamp() }); alert("Mentor signaled."); }
   };
 
   function disableBtn(id) { document.getElementById(id).disabled = true; document.getElementById(id).textContent = "SUBMITTED"; }
