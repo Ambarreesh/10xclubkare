@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EDU HACK '26 |Console</title>
+<title>EDU HACK '26 | Console</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,16 +86,20 @@
     background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
     padding: 20px; position: relative; transition: 0.3s;
   }
-  .matrix-item.full { border-color: var(--st-red); opacity: 0.4; pointer-events: none; }
+  .matrix-item.full { border-color: var(--st-red); opacity: 0.4; }
   .occupancy-tag { position: absolute; top: 12px; right: 12px; font-weight: 800; font-size: 0.7rem; }
 
   input { background: #000; border: 1px solid #333; color: var(--st-green); padding: 15px; width: 100%; margin-bottom: 15px; border-radius: 4px; }
+  input:disabled { opacity: 0.6; cursor: not-allowed; }
+  
   .btn-submit {
     background: var(--st-red); color: #fff; border: none; padding: 16px 32px; font-weight: 800;
     cursor: pointer; width: 100%; font-family: var(--font-main);
     clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    transition: 0.2s;
   }
-  .btn-submit:disabled { background: #222; color: #555; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { background: #222 !important; color: #555 !important; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
 
   .mentor-btn {
     position: fixed; bottom: 30px; right: 30px; background: var(--st-orange);
@@ -218,21 +222,15 @@
     {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing complaints based on severity and SLA."},
     {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform capable of pushing simulated alerts to multiple user roles in real time."},
     {id:6, t:"Unified Campus Resource Booking", d:"Booking system for labs and classrooms with clash detection and workflows."},
-    {id:7, t:"Smart Campus Vendor Management and Ordering Platform ", d:"Build a centralized web
-application for campus shops and food stalls that manages digital menus, live order queues,
-inventory tracking, pre-ordering, sales analytics, and admin monitoring dashboards."},
+    {id:7, t:"Smart Campus Vendor Management", d:"Build a centralized web application for campus shops that manages digital menus, live order queues, and inventory."},
     {id:8, t:"Student Feedback Sentiment Analytics", d:"NLP-based dashboard converting raw feedback into academic/facility insights."},
     {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system simulating water and power usage with anomaly detection."},
-    {id:10, t:"Degree Progress Audit Automation Tool", d:"System that tracks course completion, credit requirements, and graduation readiness automatically."},
+    {id:10, t:"Degree Progress Audit Automation Tool", d:"System that tracks course completion and graduation readiness automatically."},
     {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
     {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support needs."},
-    {id:13, t:"Smart Classroom Scheduling and Availability System", d:"Develop a scheduling platform that
-manages classroom allocations, detects timetable clashes, supports temporary bookings, and
-provides live availability views."},
+    {id:13, t:"Smart Classroom Scheduling System", d:"Scheduling platform managing classroom allocations and detecting timetable clashes."},
     {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates using academic/socioeconomic criteria."},
-    {id:15, t:"Campus Digital Workflow Automation Platform ", d:"Create an end-to-end workflow system that
-digitizes approvals such as leave requests, permissions, certificates, and hostel passes with
-role-based access and audit tracking."}
+    {id:15, t:"Campus Digital Workflow Automation", d:"Digitize approvals such as leave requests and permissions with role-based access."}
   ];
 
   const logData = [
@@ -250,7 +248,7 @@ role-based access and audit tracking."}
   window.initAudio = () => {
     if (!audioInitialized) {
         const audio = document.getElementById('stAudio');
-        audio.play().catch(e => console.log("Audio failed to load: ", e));
+        audio.play().catch(e => console.log("Audio blocked by browser"));
         audioInitialized = true;
     }
   };
@@ -267,30 +265,36 @@ role-based access and audit tracking."}
       });
   });
 
-  document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
+  document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider).catch(e => alert("Login Failed: " + e.message));
   
   onAuthStateChanged(auth, async (user) => {
       if(user) {
           const audio = document.getElementById('stAudio');
-          audio.pause(); // Stop theme after login
+          audio.pause(); 
           
-          const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
-          let myTeam = null;
-          snap.forEach(d => {
-              const members = d.data().members || [];
-              const isMe = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
-              if(isMe && d.data().verified) { myTeam = d.data(); teamId = d.id; }
-          });
+          try {
+              const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
+              let myTeam = null;
+              snap.forEach(d => {
+                  const members = d.data().members || [];
+                  const isMe = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
+                  if(isMe && d.data().verified) { myTeam = d.data(); teamId = d.id; }
+              });
 
-          if(myTeam) {
-              document.getElementById('loginScreen').classList.add('hidden');
-              document.getElementById('userName').textContent = user.displayName;
-              document.getElementById('teamName').textContent = "TEAM: " + myTeam.team_name.toUpperCase();
-              if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
-              loadDashboard(myTeam.submissions || {});
-              syncRealtimeStats();
-          } else {
-              alert("Unauthorized Access."); signOut(auth);
+              if(myTeam) {
+                  document.getElementById('loginScreen').classList.add('hidden');
+                  document.getElementById('userName').textContent = user.displayName;
+                  document.getElementById('teamName').textContent = "TEAM: " + myTeam.team_name.toUpperCase();
+                  if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
+                  loadDashboard(myTeam.submissions || {});
+                  syncRealtimeStats();
+              } else {
+                  alert("Access Denied: Email not registered or verified for this event.");
+                  signOut(auth);
+              }
+          } catch (e) {
+              console.error(e);
+              alert("Error fetching team data.");
           }
       }
   });
@@ -311,9 +315,10 @@ role-based access and audit tracking."}
       grid.innerHTML = "";
       problems.forEach(p => {
           const count = stats[p.id] || 0;
+          const isFull = count >= 7;
           const card = document.createElement('div');
-          card.className = `matrix-item ${count >= 7 ? 'full' : ''}`;
-          card.innerHTML = `<span class="occupancy-tag" style="color:${count >= 7 ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
+          card.className = `matrix-item ${isFull ? 'full' : ''}`;
+          card.innerHTML = `<span class="occupancy-tag" style="color:${isFull ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
                             <strong style="color:var(--st-blue)">#${p.id} ${p.t}</strong><br>
                             <p style="font-size:0.75rem; color:#888; margin-top:10px; line-height:1.4;">${p.d}</p>`;
           grid.appendChild(card);
@@ -327,7 +332,10 @@ role-based access and audit tracking."}
           ['topicId','projTitle','lockBtn'].forEach(id => document.getElementById(id).disabled = true);
           document.getElementById('lockBtn').textContent = "LOCKED";
       }
-      if(s.round1Link) { document.getElementById('r1Link').value = s.round1Link; disableBtn('r1Btn'); }
+      if(s.round1Link) { 
+          document.getElementById('r1Link').value = s.round1Link; 
+          disableBtn('r1Btn'); 
+      }
       if(s.finalGithub) { 
           document.getElementById('gitLink').value = s.finalGithub; 
           document.getElementById('finalPPT').value = s.finalPPT; 
@@ -337,34 +345,90 @@ role-based access and audit tracking."}
 
   document.getElementById('lockBtn').onclick = async () => {
       const id = parseInt(document.getElementById('topicId').value);
-      const title = document.getElementById('projTitle').value;
-      if(!id || !title || id < 1 || id > 15) return alert("Select ID 1-15.");
-      if((stats[id] || 0) >= 7) return alert("Problem is at full capacity (7 teams reached).");
-      await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.projectTopic": id, "submissions.projectTitle": title });
-      location.reload();
+      const title = document.getElementById('projTitle').value.trim();
+      const btn = document.getElementById('lockBtn');
+
+      if(!id || !title || id < 1 || id > 15) return alert("Select valid ID (1-15) and Title.");
+      if((stats[id] || 0) >= 7) return alert("Problem is at full capacity.");
+      
+      try {
+          btn.disabled = true;
+          btn.textContent = "PROCESSING...";
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { 
+              "submissions.projectTopic": id, 
+              "submissions.projectTitle": title 
+          });
+          location.reload();
+      } catch (e) {
+          alert("Lock failed. Try again.");
+          btn.disabled = false;
+          btn.textContent = "SECURE ID";
+      }
   };
 
   window.submitR1 = async () => {
-      const link = document.getElementById('r1Link').value;
-      if(link) { await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.round1Link": link }); location.reload(); }
+      const link = document.getElementById('r1Link').value.trim();
+      const btn = document.getElementById('r1Btn');
+      if(!link) return alert("Enter link.");
+      
+      try {
+          btn.disabled = true;
+          btn.textContent = "UPLOADING...";
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.round1Link": link });
+          location.reload();
+      } catch (e) {
+          alert("Submission failed.");
+          btn.disabled = false;
+          btn.textContent = "SUBMIT STAGE 1";
+      }
   };
 
   window.submitFinal = async () => {
-      const git = document.getElementById('gitLink').value;
-      const ppt = document.getElementById('finalPPT').value;
-      if(git && ppt) { await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.finalGithub": git, "submissions.finalPPT": ppt }); location.reload(); }
+      const git = document.getElementById('gitLink').value.trim();
+      const ppt = document.getElementById('finalPPT').value.trim();
+      const btn = document.getElementById('finalBtn');
+      if(!git || !ppt) return alert("Enter both links.");
+      
+      try {
+          btn.disabled = true;
+          btn.textContent = "DEPLOYING...";
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { 
+              "submissions.finalGithub": git, 
+              "submissions.finalPPT": ppt 
+          });
+          location.reload();
+      } catch (e) {
+          alert("Final deployment failed.");
+          btn.disabled = false;
+          btn.textContent = "DEPLOY FINAL";
+      }
   };
 
   window.logout = () => signOut(auth).then(() => location.reload());
 
   window.callMentor = async () => {
-      const loc = prompt("Where is your team seated?");
-      if(loc) { await addDoc(collection(db, "mentor_requests"), { teamId, loc, time: serverTimestamp() }); alert("Mentor signaled."); }
+      const loc = prompt("Where is your team seated? (e.g. Table 4)");
+      if(loc && loc.trim() !== "") { 
+          try {
+              await addDoc(collection(db, "events", EVENT_ID, "mentor_requests"), { 
+                  teamId, 
+                  location: loc, 
+                  time: serverTimestamp(),
+                  status: "pending"
+              }); 
+              alert("Mentor signaled. Stay at your station."); 
+          } catch (e) {
+              alert("Signal failed.");
+          }
+      }
   };
 
-  function disableBtn(id) { document.getElementById(id).disabled = true; document.getElementById(id).textContent = "SUBMITTED"; }
+  function disableBtn(id) { 
+      const btn = document.getElementById(id);
+      btn.disabled = true; 
+      btn.textContent = "SUBMITTED"; 
+  }
 
-  // CORRECTED TIMER LOGIC
   setInterval(() => {
     const start = new Date("Jan 30, 2026 17:00:00").getTime();
     const end = new Date("Jan 31, 2026 17:00:00").getTime();
