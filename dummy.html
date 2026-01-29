@@ -193,7 +193,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, query, getDocs, doc, updateDoc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -227,7 +227,7 @@
     {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system simulating water and power usage with anomaly detection."},
     {id:10, t:"Degree Progress Audit Automation Tool", d:"System that tracks course completion and graduation readiness automatically."},
     {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
-    {id:12, t:"Academic Performance Forecast", d:"Prediction model estimating semester outcomes and identifying support needs."},
+    {id:12, t:"Academic Performance Forecasting Tool", d:"Develop a predictive engine that forecasts student GPAs based on historical data and identifies early intervention needs."},
     {id:13, t:"Smart Classroom Scheduling System", d:"Scheduling platform managing classroom allocations and detecting timetable clashes."},
     {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates using academic/socioeconomic criteria."},
     {id:15, t:"Campus Digital Workflow Automation", d:"Digitize approvals such as leave requests and permissions with role-based access."}
@@ -246,9 +246,10 @@
   ];
 
   window.initAudio = () => {
-    if (!audioInitialized) {
+    // Only play if login screen is active
+    if (!audioInitialized && !document.getElementById('loginScreen').classList.contains('hidden')) {
         const audio = document.getElementById('stAudio');
-        audio.play().catch(e => console.log("Audio blocked by browser"));
+        audio.play().catch(e => console.log("Audio blocked"));
         audioInitialized = true;
     }
   };
@@ -265,12 +266,14 @@
       });
   });
 
-  document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider).catch(e => alert("Login Failed: " + e.message));
+  document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
   
   onAuthStateChanged(auth, async (user) => {
       if(user) {
+          // STOP AND RESET AUDIO IMMEDIATELY ON HOME
           const audio = document.getElementById('stAudio');
-          audio.pause(); 
+          audio.pause();
+          audio.currentTime = 0; 
           
           try {
               const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
@@ -289,12 +292,11 @@
                   loadDashboard(myTeam.submissions || {});
                   syncRealtimeStats();
               } else {
-                  alert("Access Denied: Email not registered or verified for this event.");
+                  alert("Access Denied: Email not registered.");
                   signOut(auth);
               }
           } catch (e) {
               console.error(e);
-              alert("Error fetching team data.");
           }
       }
   });
@@ -346,52 +348,36 @@
   document.getElementById('lockBtn').onclick = async () => {
       const id = parseInt(document.getElementById('topicId').value);
       const title = document.getElementById('projTitle').value.trim();
-      const btn = document.getElementById('lockBtn');
-
-      if(!id || !title || id < 1 || id > 15) return alert("Select valid ID (1-15) and Title.");
-      if((stats[id] || 0) >= 7) return alert("Problem is at full capacity.");
+      if(!id || !title || id < 1 || id > 15) return alert("Select valid ID and Title.");
+      if((stats[id] || 0) >= 7) return alert("Problem is at capacity.");
       
       try {
-          btn.disabled = true;
-          btn.textContent = "PROCESSING...";
           await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { 
               "submissions.projectTopic": id, 
               "submissions.projectTitle": title 
           });
           location.reload();
       } catch (e) {
-          alert("Lock failed. Try again.");
-          btn.disabled = false;
-          btn.textContent = "SECURE ID";
+          alert("Lock failed.");
       }
   };
 
   window.submitR1 = async () => {
       const link = document.getElementById('r1Link').value.trim();
-      const btn = document.getElementById('r1Btn');
       if(!link) return alert("Enter link.");
-      
       try {
-          btn.disabled = true;
-          btn.textContent = "UPLOADING...";
           await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.round1Link": link });
           location.reload();
       } catch (e) {
           alert("Submission failed.");
-          btn.disabled = false;
-          btn.textContent = "SUBMIT STAGE 1";
       }
   };
 
   window.submitFinal = async () => {
       const git = document.getElementById('gitLink').value.trim();
       const ppt = document.getElementById('finalPPT').value.trim();
-      const btn = document.getElementById('finalBtn');
       if(!git || !ppt) return alert("Enter both links.");
-      
       try {
-          btn.disabled = true;
-          btn.textContent = "DEPLOYING...";
           await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { 
               "submissions.finalGithub": git, 
               "submissions.finalPPT": ppt 
@@ -399,15 +385,13 @@
           location.reload();
       } catch (e) {
           alert("Final deployment failed.");
-          btn.disabled = false;
-          btn.textContent = "DEPLOY FINAL";
       }
   };
 
   window.logout = () => signOut(auth).then(() => location.reload());
 
   window.callMentor = async () => {
-      const loc = prompt("Where is your team seated? (e.g. Table 4)");
+      const loc = prompt("Where is your team seated?");
       if(loc && loc.trim() !== "") { 
           try {
               await addDoc(collection(db, "events", EVENT_ID, "mentor_requests"), { 
@@ -416,7 +400,7 @@
                   time: serverTimestamp(),
                   status: "pending"
               }); 
-              alert("Mentor signaled. Stay at your station."); 
+              alert("Mentor signaled."); 
           } catch (e) {
               alert("Signal failed.");
           }
