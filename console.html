@@ -1,15 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EDU HACK '26 | Console</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EDU HACK '26 | Console</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Rubik+Glitch&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+  :root {
+    --st-red: #ff0033;
+    --st-green: #00e676;
+    --st-blue: #00ccff;
+    --st-orange: #ffab00;
+    --bg-dark: #050505;
+    --glass-surface: rgba(12, 12, 12, 0.98);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #e0e0e0;
+    --text-secondary: #86868b;
+    --font-main: 'JetBrains Mono', monospace;
+    --font-title: 'Rubik Glitch', cursive;
+  }
+
+  * { box-sizing: border-box; outline: none; }
+  body {
+    margin: 0; font-family: var(--font-main); background-color: var(--bg-dark);
+    color: var(--text-primary); min-height: 100vh; overflow-x: hidden;
+    background: radial-gradient(circle at 50% -20%, #1a0505 0%, #000 80%);
+  }
+
+  body::before {
+    content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px; z-index: 1000; pointer-events: none;
+  }
+
+  .broadcast-strip {
+    background: var(--st-red); color: white; padding: 10px; font-size: 0.75rem;
+    text-align: center; font-weight: bold; letter-spacing: 2px; position: sticky; top: 0; z-index: 1100;
+    animation: pulse-red 2.5s infinite;
+  }
+  @keyframes pulse-red { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+  .login-screen {
+    position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; background: #000; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
+
+  .header-nav {
+    background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border); padding: 15px 5%;
+    display: flex; justify-content: space-between; align-items: center; position: sticky; top: 38px; z-index: 1000;
+  }
+
+  .nav-tabs {
+    max-width: 900px; margin: 30px auto; display: flex; gap: 8px; padding: 6px;
+    background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);
+  }
+  .tab-trigger {
+    flex: 1; padding: 14px; border: none; background: transparent; color: var(--text-secondary);
+    font-family: var(--font-main); font-weight: bold; cursor: pointer; border-radius: 8px;
+    text-transform: uppercase; font-size: 0.8rem; transition: 0.3s;
+  }
+  .tab-trigger.active { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+  .view-frame { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px 20px; display: none; }
+  .view-frame.active { display: block; animation: viewIn 0.4s ease forwards; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .glass-card {
+    background: var(--glass-surface); border: 1px solid var(--glass-border);
+    padding: 30px; margin-bottom: 25px; position: relative; border-radius: 4px;
+  }
+  .glass-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--st-red); }
+
+  .matrix-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px; max-height: 550px; overflow-y: auto; padding-right: 10px;
+  }
+  .matrix-item {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+    padding: 20px; position: relative; transition: 0.3s;
+  }
+  .matrix-item.full { border-color: var(--st-red); opacity: 0.4; }
+  .occupancy-tag { position: absolute; top: 12px; right: 12px; font-weight: 800; font-size: 0.7rem; }
+
+  input { background: #000; border: 1px solid #333; color: var(--st-green); padding: 15px; width: 100%; margin-bottom: 15px; border-radius: 4px; }
+  input:disabled { opacity: 0.6; cursor: not-allowed; }
+  
+  .btn-submit {
+    background: var(--st-red); color: #fff; border: none; padding: 16px 32px; font-weight: 800;
+    cursor: pointer; width: 100%; font-family: var(--font-main);
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    transition: 0.2s;
+  }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { background: #222 !important; color: #555 !important; cursor: not-allowed; clip-path: none; border: 1px solid #333; }
+
+  .mentor-btn {
+    position: fixed; bottom: 30px; right: 30px; background: var(--st-orange);
+    width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    z-index: 1200; border: none; cursor: pointer; box-shadow: 0 0 25px rgba(255, 171, 0, 0.4);
+  }
+</style>
 </head>
-<body>
-  <CENTER>
-  <H1>10X CLUB KARE</H1>
-  <H1>EDU HACK '26 CONSOLE V2</H1>
-  <H2>AVAILABLE AT 30 JAN 2026</H2>
-  </CENTER>
+<body onclick="initAudio()">
+
+<audio id="stAudio" loop>
+    <source src="img/strangerthings_theme.mp3" type="audio/mpeg">
+</audio>
+
+<div class="broadcast-strip">BROADCAST: MISSION IN PROGRESS | ALL SYSTEMS ACTIVE</div>
+
+<div class="login-screen" id="loginScreen">
+  <div class="glitch-logo" style="font-family: var(--font-title); font-size: 5rem; text-align: center;">EDU HACK<br>CONSOLE</div>
+  <button class="btn-submit" id="loginBtn" style="width:auto; min-width:320px; background:#fff; color:#000;">AUTHENTICATE IDENTITY</button>
+  <p style="color: var(--st-red); font-size: 0.6rem; margin-top: 20px; letter-spacing: 2px;">CLICK ANYWHERE TO INITIALIZE AUDIO</p>
+</div>
+
+<header class="header-nav" id="mainHeader">
+    <div>
+        <h1 style="margin:0; font-size:1.6rem; letter-spacing:-1px;">EDUHACK<span style="color:var(--st-red)"> PLAYGROUND V2</span></h1>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">10X CLUB KARE</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div style="text-align:right;">
+            <div id="userName" style="font-weight:bold; font-size:0.95rem;">...</div>
+            <div id="teamName" style="font-size:0.75rem; color:var(--st-green); font-weight:bold;">TEAM: ...</div>
+        </div>
+        <div id="userAvatar" style="width:45px; height:45px; border-radius:50%; background:#222; background-size:cover; border:2px solid #fff;"></div>
+        <button onclick="logout()" style="background:transparent; border:1px solid var(--st-red); color:var(--st-red); padding:6px 14px; cursor:pointer; font-size:0.75rem; border-radius:4px;">LOGOUT</button>
+    </div>
+</header>
+
+<div class="app-shell">
+    <nav class="nav-tabs" id="tabBar">
+        <button class="tab-trigger active" data-target="dash">Dashboard</button>
+        <button class="tab-trigger" data-target="matrix">Problem Matrix</button>
+        <button class="tab-trigger" data-target="log">Mission Log</button>
+    </nav>
+
+    <div id="dash" class="view-frame active">
+        <div style="text-align:center; margin-bottom:45px;">
+            <div id="timerLabel" style="font-size:0.8rem; letter-spacing:5px; color:var(--st-red); margin-bottom:10px;">REMAINING TIME</div>
+            <div id="timer" style="font-family: var(--font-title); font-size: 5.5rem; text-shadow: 0 0 30px var(--st-red);">00h 00m 00s</div>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="color:var(--st-green); margin-top:0;">01. PROJECT CLAIM </h3>
+            <div style="display:grid; grid-template-columns: 1fr 2fr auto; gap:15px;">
+                <input type="number" id="topicId" placeholder="ID (1-15)">
+                <input type="text" id="projTitle" placeholder="Project Name...">
+                <button class="btn-submit" id="lockBtn">SECURE ID</button>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
+            <div class="glass-card">
+                <h3 style="color:var(--st-orange);">STAGE 1: PLANNING</h3>
+                <input type="text" id="r1Link" placeholder="Blueprint PPT URL">
+                <button class="btn-submit" id="r1Btn" onclick="submitR1()">SUBMIT STAGE 1</button>
+            </div>
+            <div class="glass-card">
+                <h3 style="color:var(--st-blue);">STAGE 2: DEPLOYMENT</h3>
+                <input type="text" id="gitLink" placeholder="GitHub Repository">
+                <input type="text" id="finalPPT" placeholder="Final PPT URL">
+                <button class="btn-submit" id="finalBtn" onclick="submitFinal()">DEPLOY FINAL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="matrix" class="view-frame">
+        <div class="glass-card">
+            <h2 style="color:var(--st-blue); margin:0 0 25px 0;">GLOBAL PROBLEM MATRIX</h2>
+            <div class="matrix-grid" id="problemList"></div>
+        </div>
+    </div>
+
+    <div id="log" class="view-frame">
+        <div class="glass-card">
+            <h2 style="color:var(--st-red); margin:0 0 25px 0;">EVENT TIMELINE</h2>
+            <div id="logItems" style="line-height:2.4; font-size:0.95rem;"></div>
+        </div>
+    </div>
+</div>
+
+<button class="mentor-btn" onclick="callMentor()"><span class="material-icons">support_agent</span></button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzEwEDcTDs2Y-NUAGZkhQJsFRg6MZxoYE",
+    authDomain: "eduhack-432fd.firebaseapp.com",
+    projectId: "eduhack-432fd",
+    storageBucket: "eduhack-432fd.firebasestorage.app",
+    messagingSenderId: "160252785408",
+    appId: "1:160252785408:web:6a22e465982e3e510979e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+  const EVENT_ID = "edu-hack-2025";
+
+  let teamId = null;
+  let stats = {};
+  let audioInitialized = false;
+
+  const problems = [
+    {id:1, t:"Predictive Attendance Risk Analyzer", d:"Build a system analyzing historical patterns to flag students at risk and simulate automated intervention alerts."},
+    {id:2, t:"Smart Academic Notification Engine", d:"Rule-based alert system for academic deadlines, fee reminders, and exam updates."},
+    {id:3, t:"Intelligent Exam Seating Engine", d:"Automated seating optimizer maximizing hall utilization and minimizing malpractice."},
+    {id:4, t:"Hostel Maintenance Priority System", d:"KAFKA-inspired workflow engine auto-prioritizing complaints based on severity and SLA."},
+    {id:5, t:"Campus Emergency Broadcast Simulator", d:"Centralized platform capable of pushing simulated alerts to multiple user roles in real time."},
+    {id:6, t:"Unified Campus Resource Booking", d:"Booking system for labs and classrooms with clash detection and workflows."},
+    {id:7, t:"Smart Campus Vendor Management", d:"Build a centralized web application for campus shops that manages digital menus, live order queues, and inventory."},
+    {id:8, t:"Student Feedback Sentiment Analytics", d:"NLP-based dashboard converting raw feedback into academic/facility insights."},
+    {id:9, t:"Hostel Utility Consumption Analytics", d:"Monitoring system simulating water and power usage with anomaly detection."},
+    {id:10, t:"Degree Progress Audit Automation Tool", d:"System that tracks course completion and graduation readiness automatically."},
+    {id:11, t:"Centralized Grievance Console", d:"Admin dashboard visualizing complaint categories and resolution performance."},
+    {id:12, t:"Academic Performance Forecasting Tool", d:"Develop a predictive engine that forecasts student GPAs based on historical data and identifies early intervention needs."},
+    {id:13, t:"Smart Classroom Scheduling System", d:"Scheduling platform managing classroom allocations and detecting timetable clashes."},
+    {id:14, t:"Scholarship Eligibility Filter", d:"Rules-based system shortlisting candidates using academic/socioeconomic criteria."},
+    {id:15, t:"Alumni Mentorship Matching Platform", d:"An Alumni Mentorship Matching Platform connects students with suitable alumni mentors based on skills, interests, and career goals to provide guidance, networking, and career support."}
+  ];
+
+  const logData = [
+    "JAN 30 5:00 PM: HACKATHON START", "5:00PM - 5:30PM: Event Launch",
+    "6:00PM - 6:30PM: Problem Statement Distribution", "6:30PM - 8:00PM: Dinner Break",
+    "8:00PM - 10:00PM: Round 1", 
+    "10:00PM: Refreshment", "11:00PM - 3:00AM: Phase 1 Work",
+    "JAN 31 5:00AM: Refreshment", "7:00AM - 9:00AM: Breakfast",
+    "9:00AM - 10:00AM: Review", "10:00AM - 12:00PM: Phase 2 Work",
+    "12:00PM - 1:00PM: Lunch Break", "1:00PM - 4:00PM: Final Round",
+    "4:00PM - 5:00PM: Judging & Closing",
+    "5:00PM: Winners & Prizes", "JAN 31 5:00 PM: HACKATHON END"
+  ];
+
+  window.initAudio = () => {
+    // Only play if login screen is active
+    if (!audioInitialized && !document.getElementById('loginScreen').classList.contains('hidden')) {
+        const audio = document.getElementById('stAudio');
+        audio.play().catch(e => console.log("Audio blocked"));
+        audioInitialized = true;
+    }
+  };
+
+  const logContainer = document.getElementById('logItems');
+  logData.forEach(l => logContainer.innerHTML += `<div><span style="color:var(--st-blue)">></span> ${l}</div>`);
+
+  document.querySelectorAll('.tab-trigger').forEach(btn => {
+      btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.view-frame').forEach(v => v.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.target).classList.add('active');
+      });
+  });
+
+  document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
+  
+  onAuthStateChanged(auth, async (user) => {
+      if(user) {
+          // STOP AND RESET AUDIO IMMEDIATELY ON HOME
+          const audio = document.getElementById('stAudio');
+          audio.pause();
+          audio.currentTime = 0; 
+          
+          try {
+              const snap = await getDocs(collection(db, "events", EVENT_ID, "registrations"));
+              let myTeam = null;
+              snap.forEach(d => {
+                  const members = d.data().members || [];
+                  const isMe = members.some(m => (typeof m === 'string' ? m : m.email).toLowerCase() === user.email.toLowerCase());
+                  if(isMe && d.data().verified) { myTeam = d.data(); teamId = d.id; }
+              });
+
+              if(myTeam) {
+                  document.getElementById('loginScreen').classList.add('hidden');
+                  document.getElementById('userName').textContent = user.displayName;
+                  document.getElementById('teamName').textContent = "TEAM: " + myTeam.team_name.toUpperCase();
+                  if(user.photoURL) document.getElementById('userAvatar').style.backgroundImage = `url(${user.photoURL})`;
+                  loadDashboard(myTeam.submissions || {});
+                  syncRealtimeStats();
+              } else {
+                  alert("Access Denied: Email not registered.");
+                  signOut(auth);
+              }
+          } catch (e) {
+              console.error(e);
+          }
+      }
+  });
+
+  function syncRealtimeStats() {
+      onSnapshot(collection(db, "events", EVENT_ID, "registrations"), (snap) => {
+          stats = {};
+          snap.forEach(d => {
+              const topic = d.data().submissions?.projectTopic;
+              if(topic) stats[topic] = (stats[topic] || 0) + 1;
+          });
+          renderMatrix();
+      });
+  }
+
+  function renderMatrix() {
+      const grid = document.getElementById('problemList');
+      grid.innerHTML = "";
+      problems.forEach(p => {
+          const count = stats[p.id] || 0;
+          const isFull = count >= 7;
+          const card = document.createElement('div');
+          card.className = `matrix-item ${isFull ? 'full' : ''}`;
+          card.innerHTML = `<span class="occupancy-tag" style="color:${isFull ? 'var(--st-red)' : 'var(--st-green)'}">${count}/7</span>
+                            <strong style="color:var(--st-blue)">#${p.id} ${p.t}</strong><br>
+                            <p style="font-size:0.75rem; color:#888; margin-top:10px; line-height:1.4;">${p.d}</p>`;
+          grid.appendChild(card);
+      });
+  }
+
+  function loadDashboard(s) {
+      if(s.projectTopic) {
+          document.getElementById('topicId').value = s.projectTopic;
+          document.getElementById('projTitle').value = s.projectTitle;
+          ['topicId','projTitle','lockBtn'].forEach(id => document.getElementById(id).disabled = true);
+          document.getElementById('lockBtn').textContent = "LOCKED";
+      }
+      if(s.round1Link) { 
+          document.getElementById('r1Link').value = s.round1Link; 
+          disableBtn('r1Btn'); 
+      }
+      if(s.finalGithub) { 
+          document.getElementById('gitLink').value = s.finalGithub; 
+          document.getElementById('finalPPT').value = s.finalPPT; 
+          disableBtn('finalBtn'); 
+      }
+  }
+
+  document.getElementById('lockBtn').onclick = async () => {
+      const id = parseInt(document.getElementById('topicId').value);
+      const title = document.getElementById('projTitle').value.trim();
+      if(!id || !title || id < 1 || id > 15) return alert("Select valid ID and Title.");
+      if((stats[id] || 0) >= 7) return alert("Problem is at capacity.");
+      
+      try {
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { 
+              "submissions.projectTopic": id, 
+              "submissions.projectTitle": title 
+          });
+          location.reload();
+      } catch (e) {
+          alert("Lock failed.");
+      }
+  };
+
+  window.submitR1 = async () => {
+      const link = document.getElementById('r1Link').value.trim();
+      if(!link) return alert("Enter link.");
+      try {
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { "submissions.round1Link": link });
+          location.reload();
+      } catch (e) {
+          alert("Submission failed.");
+      }
+  };
+
+  window.submitFinal = async () => {
+      const git = document.getElementById('gitLink').value.trim();
+      const ppt = document.getElementById('finalPPT').value.trim();
+      if(!git || !ppt) return alert("Enter both links.");
+      try {
+          await updateDoc(doc(db, "events", EVENT_ID, "registrations", teamId), { 
+              "submissions.finalGithub": git, 
+              "submissions.finalPPT": ppt 
+          });
+          location.reload();
+      } catch (e) {
+          alert("Final deployment failed.");
+      }
+  };
+
+  window.logout = () => signOut(auth).then(() => location.reload());
+
+  window.callMentor = async () => {
+      const loc = prompt("Where is your team seated?");
+      if(loc && loc.trim() !== "") { 
+          try {
+              await addDoc(collection(db, "events", EVENT_ID, "mentor_requests"), { 
+                  teamId, 
+                  location: loc, 
+                  time: serverTimestamp(),
+                  status: "pending"
+              }); 
+              alert("Mentor signaled."); 
+          } catch (e) {
+              alert("Signal failed.");
+          }
+      }
+  };
+
+  function disableBtn(id) { 
+      const btn = document.getElementById(id);
+      btn.disabled = true; 
+      btn.textContent = "SUBMITTED"; 
+  }
+
+  setInterval(() => {
+    const start = new Date("Jan 30, 2026 17:00:00").getTime();
+    const end = new Date("Jan 31, 2026 17:00:00").getTime();
+    const now = new Date().getTime();
+    
+    let targetTime, label;
+    
+    if (now < start) {
+        targetTime = start;
+        label = "MISSION BEGINS IN";
+    } else if (now >= start && now < end) {
+        targetTime = end;
+        label = "MISSION ENDS IN";
+    } else {
+        document.getElementById('timer').textContent = "MISSION COMPLETE";
+        document.getElementById('timerLabel').textContent = "SYSTEM OFFLINE";
+        return;
+    }
+
+    const dist = targetTime - now;
+    const h = Math.floor(dist / (1000 * 60 * 60));
+    const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((dist % (1000 * 60)) / 1000);
+    
+    document.getElementById('timer').textContent = `${h}h ${m}m ${s}s`;
+    document.getElementById('timerLabel').textContent = label;
+  }, 1000);
+</script>
 </body>
 </html>
