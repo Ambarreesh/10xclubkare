@@ -1,968 +1,1421 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- jsPDF & QRCode (for building the Event Pass PDF) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>10X Club KARE Student Chapter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>10X Club KARE</title>
   <link rel="icon" href="img/image 26.png" />
-  <link rel="stylesheet" href="style.css" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <style>
+    /* =========================================
+       CORE VARIABLES & RESET
+       ========================================= */
+    :root {
+      --bg-deep: #000000;
+      --bg-subtle: #0a0a0a;
+      --glass-surface: rgba(30, 30, 30, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-highlight: rgba(255, 255, 255, 0.15);
+      --primary-accent: #0A84FF; /* iOS Blue */
+      --secondary-accent: #BF5AF2; /* iOS Purple */
+      --text-main: #ffffff;
+      --text-muted: #86868b;
+      --radius-lg: 24px;
+      --radius-sm: 12px;
+      --blur-strength: 20px;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      line-height: 1.5;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.1) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* =========================================
+       COMPONENTS
+       ========================================= */
+    .glass-panel {
+      background: var(--glass-surface);
+      backdrop-filter: blur(var(--blur-strength));
+      -webkit-backdrop-filter: blur(var(--blur-strength));
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-ios {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-ios:hover:not([disabled]) {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.02);
+    }
+
+    .btn-ios.primary {
+      background: var(--primary-accent);
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 15px rgba(10, 132, 255, 0.4);
+    }
+    
+    .btn-ios.primary:hover {
+      box-shadow: 0 0 25px rgba(10, 132, 255, 0.6);
+    }
+
+    .btn-ios[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(1);
+    }
+
+    .section-title {
+      font-size: 3rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, #fff 0%, #888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    /* =========================================
+       NAVBAR
+       ========================================= */
     .navbar {
-  position: relative;
-  z-index: 1000; /* Ensure navbar is above banner */
-}
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1000px;
+      padding: 12px 24px;
+      border-radius: 100px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+    }
 
-#profileBox {
-  position: relative;
-  z-index: 1100;
-}
+    .nav-left { display: flex; align-items: center; gap: 30px; }
+    .logo { height: 35px; border-radius: 50%; }
+    
+    .nav-links { display: flex; gap: 25px; }
+    .nav-links li a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+    .nav-links li a:hover { opacity: 1; color: var(--primary-accent); }
 
-.profile-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: rgba(0, 0, 0, 0.85);
-  border-radius: 6px;
-  padding: 8px;
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1200; /* Menu above everything */
-}
+    .nav-right { position: relative; }
+    
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
 
-.profile-menu button {
-  background: transparent;
-  color: white;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-}
+    /* Profile Dropdown */
+    .profile-menu {
+      position: absolute;
+      top: 55px;
+      right: 0;
+      width: 220px;
+      padding: 15px;
+      border-radius: var(--radius-sm);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1200;
+    }
+    .profile-menu button {
+      background: transparent;
+      border: none;
+      color: white;
+      text-align: left;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .profile-menu button:hover { background: rgba(255,255,255,0.1); }
 
-.profile-menu button:hover {
-  color: #00ffcc;
-}
+    /* =========================================
+       HERO SECTION
+       ========================================= */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding-top: 80px;
+    }
 
+    .hero-content img {
+      height: 100px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 30px auto;
+    }
+
+    /* =========================================
+       EVENTS SECTION
+       ========================================= */
+    .events-section { padding: 80px 20px; }
+    
+    .events-container {
+      display: flex;
+      gap: 30px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 20px 5px 40px 5px;
+    }
+
+    .event-card {
+      min-width: 350px;
+      height: 450px;
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
+      scroll-snap-align: center;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      border: 1px solid var(--glass-border);
+    }
+
+    .event-card img {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+      z-index: 0;
+    }
+
+    .event-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; width: 100%; height: 70%;
+      background: linear-gradient(to top, #000 0%, transparent 100%);
+      z-index: 1;
+    }
+
+    .event-content {
+      position: relative;
+      z-index: 2;
+      padding: 24px;
+      transform: translateY(20px);
+      transition: var(--transition);
+    }
+
+    .event-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .event-card:hover img { transform: scale(1.1); }
+    .event-card:hover .event-content { transform: translateY(0); }
+
+    .event-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+    .event-meta { font-size: 0.9rem; color: #ccc; margin-bottom: 15px; }
+    
+    .event-actions { display: flex; gap: 10px; opacity: 0; transition: 0.3s; transform: translateY(10px); }
+    .event-card:hover .event-actions { opacity: 1; transform: translateY(0); }
+
+    /* =========================================
+       TEAM & FACULTY SECTION (UPDATED)
+       ========================================= */
+    .team-section { padding: 80px 20px; max-width: 1300px; margin: 0 auto; }
+    
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 30px;
+    }
+
+    /* Special rule for Faculty Center Alignment */
+    #faculty .team-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center; /* This centers the cards */
+    }
+
+    .profile-card {
+      background: rgba(20, 20, 20, 0.6);
+      border-radius: var(--radius-lg);
+      padding: 30px 20px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
+      position: relative;
+      /* Ensure flex items in faculty don't shrink too small */
+      min-width: 240px; 
+      max-width: 300px;
+      flex: 1;
+    }
+
+    .profile-card:hover {
+      background: rgba(40, 40, 40, 0.8);
+      transform: translateY(-5px);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* Wrapper for Image + Overlay */
+    .img-wrapper {
+      position: relative;
+      width: 250px; 
+      height: 250px;
+      margin: 0 auto 20px auto;
+      /* SQUARE with rounded corners */
+      border-radius: 24px; 
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.1);
+      transition: var(--transition);
+    }
+
+    .profile-card img {
+      width: 95%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.5s ease;
+    }
+
+    /* The Social Overlay */
+    .social-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: all 0.4s ease;
+      /* Inherit border radius so overlay is also rounded square */
+      border-radius: inherit; 
+    }
+
+    /* Hover Effects */
+    .profile-card:hover .img-wrapper { border-color: var(--primary-accent); }
+    .profile-card:hover img { transform: scale(1.1); }
+    .profile-card:hover .social-overlay { opacity: 1; transform: translateY(0); }
+
+    /* Social Icons Styles */
+    .social-icon {
+      color: white;
+      font-size: 1.5rem;
+      transition: 0.3s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%; /* Icons stay circular */
+      background: rgba(255,255,255,0.1);
+    }
+
+    .social-icon:hover { transform: scale(1.2); background: white; }
+    .social-icon.linkedin:hover { color: #0077b5; }
+    .social-icon.insta:hover { color: #E1306C; }
+
+    .profile-card p { font-weight: 700; font-size: 1.2rem; margin-top: 10px; }
+    .profile-card span { display: block; font-size: 0.85rem; color: var(--primary-accent); margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* =========================================
+       CONTACT FORM
+       ========================================= */
+    .contact-container {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 40px;
+      border-radius: var(--radius-lg);
+    }
+
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    
+    input, textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--glass-border);
+      padding: 14px;
+      border-radius: 12px;
+      color: white;
+      font-family: inherit;
+      transition: 0.3s;
+    }
+    
+    input:focus, textarea:focus {
+      border-color: var(--primary-accent);
+      background: rgba(0,0,0,0.5);
+    }
+
+    .hp-field { display: none !important; }
+
+    /* =========================================
+       MODALS
+       ========================================= */
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: var(--transition);
+    }
+    
+    .overlay.active { opacity: 1; pointer-events: auto; }
+
+    .modal-box {
+      width: 90%; max-width: 400px;
+      padding: 30px;
+      border-radius: 28px;
+      transform: scale(0.95);
+      transition: var(--transition);
+    }
+
+    .overlay.active .modal-box { transform: scale(1); }
+
+    .modal-close {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .auth-tabs { display: flex; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; }
+    .auth-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; color: #888; }
+    .auth-tab.active { background: rgba(255,255,255,0.1); color: white; font-weight: 600; }
+
+    .error-text { color: #ff453a; font-size: 0.85rem; margin-bottom: 15px; text-align: center; }
+    .popup-icons { display: flex; gap: 20px; justify-content: center; margin: 20px 0; }
+
+    /* =========================================
+       RESPONSIVE
+       ========================================= */
+    @media (max-width: 768px) {
+      .navbar { width: 95%; top: 10px; padding: 10px 15px; }
+      .nav-links, .hide-mobile { display: none; }
+      .hero h1 { font-size: 2.5rem; }
+      .events-container { padding-left: 20px; padding-right: 20px; }
+      .event-card { min-width: 85vw; height: 400px; }
+      /* Adjust square size for mobile if needed, but 180px usually fits fine */
+      .img-wrapper { width: 160px; height: 160px; } 
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Navigation Bar -->
-    <nav class="navbar glass">
-      <div class="nav-left">
-        <img src="img/image 26.png" alt="10X Club Logo" class="logo">
-        <ul>
-          <li><a href="#home">HOME</a></li>
-          <li><a href="#events">EVENTS</a></li>
-          <li class="nav-item hide-mobile"><a href="#team">OUR TEAM</a></li>
-          <li><a href="gallery.html">GALLERY</a></li>
-           <li class="nav-item hide-mobile"><a href="#contact">CONTACT</a></li>
+  <nav class="navbar glass-panel">
+    <div class="nav-left">
+      <img src="img/image 26.png" alt="10X Logo" class="logo">
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
 
-        </ul>
-      </div>
-
-      <!-- Right side: Sign In / Profile -->
-      <div class="nav-right" id="authRight">
-        <button class="btn-glass" id="openSignin">Sign In</button>
-
-        <!-- profile button + menu (hidden until logged in) -->
-        <div id="profileBox" style="position:relative; display:none;">
-          <div class="profile-avatar" id="avatarBtn">U</div>
-          <div class="profile-menu" id="profileMenu">
-          <div style="padding:8px 10px; font-size:.85rem; opacity:.7;" id="profileEmail">user@klu.ac.in</div>
-          <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin:6px 0;">
-          <button id="viewProfileBtn">View profile</button>
-          <a href="https://treasurer10xclub.vercel.app/eventpass.html" style="text-decoration: none;"><button >Event pass</button></a>
-          <button id="logoutBtn" class="btn-danger">Logout</button>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main Banner -->
-    <header class="main-banner glass" id="home">
-      <div class="banner-content">
-        <img src="img/image 27.png" alt="Coding Ninjas Logo">
-        <div class="banner-text">
-          <h1>10X CLUB KARE<br>STUDENT CHAPTER</h1>
-          <button class="btn-glass" id="connectBtn">Connect</button>
-        </div>
-      </div>
-    </header>
-  </div>
-
-  <!-- Vision Section -->
-  <section class="vision-section" id="vision">
-    <button class="btn-glass">OUR VISION</button>
-    <p class="vision-text">At 10X Club – KARE Chapter, our vision is to ignite a culture of exponential learning, innovation, and technical excellence among students...</p>
-    <p class="vision-text">We envision a campus where every aspiring coder, designer, and engineer feels empowered to dream bigger, build faster, and grow smarter — ten times over.</p>
-  </section>
-
-  <!-- Events Section -->
- <!-- Events Section -->
-<div class="container">
-  <section class="events-section glass" id="events">
-    <h2 class="section-title">EVENTS 2K25</h2>
-
-    <!-- Slider Wrapper -->
-    <div class="events-wrapper">
-      <div class="events-grid">
-        <!-- Event 1 -->
-        
-
-        <!-- Event 2 -->
-        <div class="event-card glass reveal">
-          <img src="img/edu.png" alt="Edu Hackathon">
-          <h3>EDU HACK<br><p>( Hackathon )</p><p>30 & 31 JAN 2026</p></h3>
-          <div class="event-buttons">
-            <a href="img/Edu Hack Pdf (1).pdf" class="btn-glass">Learn More</a>
-            <a href="eduhack.html" class="btn-glass register-btn" data-requires-auth="true" disabled>Closed</a>
-          </div>
-        </div>
-
-        <!-- Event 3 -->
-      
-
-        <!-- Event 4 -->
-        <div class="event-card glass reveal">
-          <img src="img/ui.png" alt="Another Event">
-          <h3>UI Wars<br><p>( Coding Event )</p><p>JAN 2026</p></h3>
-          <div class="event-buttons">
-            <button class="btn-glass">Learn More</button>
-            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
-          </div>
-        </div>
-        <div class="event-card glass reveal">
-          <img src="img/image 41.png" alt="Another Event">
-          <h3>GenAI X<br><p>( Hackathon )</p><p>FEB 2026</p></h3>
-          <div class="event-buttons">
-            <button class="btn-glass">Learn More</button>
-            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
-          </div>
-        </div>
-
-        <div class="event-card glass reveal">
-          <img src="img/sfi.png" alt="Another Event">
-          <h3>SOLVE FOR INDIA<br><p>EUPHORIA</p></h3>
-          <div class="event-buttons">
-            <button class="btn-glass">Learn More</button>
-            <button class="btn-glass register-btn" data-requires-auth="true" disabled>Not Open</button>
-          </div>
-        </div>
-
-         <div class="event-card glass reveal">
-          <img src="img/techtide.webp" alt="Another Event">
-          <h3>TechTide<br><p>VINTRA</p><p>31 OCT 2025</p></h3>
-          <div class="event-buttons">
-            <a href="https://drive.google.com/file/d/1gR_zgzTyxYZL7V7waoh-P__ILOxQTlm1/view?usp=share_link"><button class="btn-glass">Learn More</button></a>
-            <a href="vintra.kalasalingam.ac.in"><button class="btn-glass register-btn" data-requires-auth="true" disabled>Event Ended</button></a>
-          </div>
-        </div>
-
-        <div class="event-card glass reveal">
-          <img src="img/image 40.png" alt="API Maze Event">
-          <h3>API MAZE<br><p>( Coding Event )</p><p>2 AUG 2025</p></h3>
-          <div class="event-buttons">
-            <a href="img/API MAZE.pdf" class="btn-glass">Learn More</a>
-            <a href="apimaze.html" class="btn-glass register-btn" data-requires-auth="true" disabled>Event Ended</a>
-          </div>
+    <div class="nav-right" id="authRight">
+      <button class="btn-ios primary" id="openSignin">Sign In</button>
+      <div id="profileBox" style="display:none;">
+        <div class="profile-avatar" id="avatarBtn">U</div>
+        <div class="profile-menu glass-panel" id="profileMenu">
+          <div style="font-size:0.8rem; opacity:0.6; padding:0 5px;" id="profileEmail">user@klu.ac.in</div>
+          <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:8px 0;">
+          <button id="viewProfileBtn"><i class="fas fa-user"></i> View Profile</button>
+          <a href="https://treasurer10xclub.vercel.app/eventpass.html" style="text-decoration:none;">
+            <button style="width:100%"><i class="fas fa-ticket"></i> Event Pass</button>
+          </a>
+          <button id="logoutBtn" style="color:#ff453a;"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
       </div>
     </div>
+  </nav>
 
-    <!-- Nav Buttons -->
-    <button class="prev">&#10094;</button>
-    <button class="next">&#10095;</button>
+  <header class="hero" id="home">
+    <div class="hero-content">
+      <img src="img/image 27.png" alt="Coding Ninjas">
+      <h1 class="reveal">10X CLUB KARE<br>STUDENT CHAPTER</h1>
+      <p class="reveal">Igniting a culture of exponential learning and innovation.</p>
+      <div class="reveal">
+        <button class="btn-ios primary" id="connectBtn">Connect With Us</button>
+        <button class="btn-ios" onclick="document.getElementById('vision').scrollIntoView({behavior:'smooth'})">Our Vision</button>
+      </div>
+    </div>
+  </header>
+
+  <section id="vision" style="padding: 60px 20px; text-align: center; max-width: 800px; margin: 0 auto;">
+    <h2 class="section-title">OUR VISION</h2>
+    <p style="font-size: 1.1rem; color: #aaa; line-height: 1.8;">
+      At 10X Club – KARE Chapter, our vision is to ignite a culture of exponential learning, innovation, and technical excellence among students.
+      We envision a campus where every aspiring coder, designer, and engineer feels empowered to dream bigger, build faster, and grow smarter — ten times over.
+    </p>
   </section>
-</div>
-<style>
-/* === Events Section Styling === */
-.events-section {
-  position: relative;
-  text-align: center;
-  padding: 40px 20px;
-  overflow: hidden;
-}
 
-.events-wrapper {
-  width: 100%;
-  overflow: hidden;
-}
+  <section class="events-section" id="events">
+    <h2 class="section-title">EVENTS 2K25</h2>
+    
+    <div class="events-container">
 
-.events-grid {
-  display: flex;
-  transition: transform 0.5s ease-in-out;
-  width: 95%;
-}
+      
+     <div class="event-card glass-panel reveal">
+        <img src="img/sfi.png" alt="Solve For India">
+        <div class="event-content">
+          <h3 class="event-title">SOLVE FOR INDIA</h3>
+          <div class="event-meta">Euphoria</div>
+          <div class="event-actions">
+            <button class="btn-ios">Info</button>
+            <a href="http://euphoria.kalasalingam.ac.in"><button class="btn-ios primary register-btn" data-requires-auth="true" >Open</button></a>
+          </div>
+        </div>
+      </div>
 
-.event-card {
-  flex: 0 0 50%;   /* Desktop: 2 per row */
-  max-width: 50%;
-  box-sizing: border-box;
-  padding: 20px;
-}
+    
 
-/* Nav arrows */
-.prev, .next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.6);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 22px;
-  border-radius: 50%;
-  z-index: 10;
-}
-.prev { left: 10px; }
-.next { right: 10px; }
+      <div class="event-card glass-panel reveal">
+        <img src="img/image 41.png" alt="GenAI X">
+        <div class="event-content">
+          <h3 class="event-title">GenAI X</h3>
+          <div class="event-meta">Hackathon | Feb 2026</div>
+          <div class="event-actions">
+            <button class="btn-ios">Info</button>
+            <button class="btn-ios primary register-btn" data-requires-auth="true" disabled>Coming Soon</button>
+          </div>
+        </div>
+      </div>
 
-/* === Mobile Fix === */
-@media (max-width: 768px) {
-  .events-grid {
-    transform: none !important; /* disable slider */
-    flex-direction: column;     /* stack vertically */
-  }
+      
+       <div class="event-card glass-panel reveal">
+        <img src="img/edu.png" alt="Edu Hack">
+        <div class="event-content">
+          <h3 class="event-title">EDU HACK</h3>
+          <div class="event-meta">Hackathon | 30 & 31 Jan 2026</div>
+          <div class="event-actions">
+            <a href="img/Edu Hack Pdf (1).pdf" class="btn-ios">Info</a>
+            <a href="eduhack.html" class="btn-ios primary register-btn" data-requires-auth="true" disabled>Ended</a>
+          </div>
+        </div>
+      </div>
 
-  .event-card {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
 
-  .prev, .next {
-    display: none; /* hide arrows on mobile */
-  }
-}
-</style>
-<script>
-let currentIndex = 0;
-const grid = document.querySelector(".events-grid");
-const cards = document.querySelectorAll(".event-card");
-const perPage = 2; 
-const totalSlides = Math.ceil(cards.length / perPage);
+       <div class="event-card glass-panel reveal">
+        <img src="img/techtide.webp" alt="TechTide">
+        <div class="event-content">
+          <h3 class="event-title">TechTide</h3>
+          <div class="event-meta">VINTRA | 31 Oct 2025</div>
+          <div class="event-actions">
+            <a href="https://drive.google.com/file/d/1gR_zgzTyxYZL7V7waoh-P__ILOxQTlm1/view?usp=share_link" class="btn-ios">Info</a>
+            <a href="vintra.kalasalingam.ac.in" class="btn-ios primary register-btn" data-requires-auth="true" disabled>Ended</a>
+          </div>
+        </div>
+      </div>
 
-function updateSlide() {
-  // only slide if desktop
-  if (window.innerWidth > 768) {
-    const shiftPercent = (100 / totalSlides) * currentIndex;
-    grid.style.transform = `translateX(-${shiftPercent}%)`;
-  } else {
-    grid.style.transform = "none"; // reset for mobile
-  }
-}
+      <div class="event-card glass-panel reveal">
+        <img src="img/image 40.png" alt="API Maze">
+        <div class="event-content">
+          <h3 class="event-title">API MAZE</h3>
+          <div class="event-meta">Coding Event | 2 Aug 2025</div>
+          <div class="event-actions">
+            <a href="img/API MAZE.pdf" class="btn-ios">Info</a>
+            <a href="apimaze.html" class="btn-ios primary register-btn" data-requires-auth="true" disabled>Ended</a>
+          </div>
+        </div>
+      </div>
 
-document.querySelector(".next").addEventListener("click", () => {
-  if (currentIndex <= totalSlides + 4) {
-    currentIndex++;
-    updateSlide();
-  }
-});
+    </div>
+  </section>
 
-document.querySelector(".prev").addEventListener("click", () => {
-  if (currentIndex > 0) {
-    currentIndex--;
-    updateSlide();
-  }
-});
-
-window.addEventListener("resize", updateSlide); // re-check when resizing
-updateSlide();
-</script>
-
-  <!-- Faculty Coordinators Section -->
   <section class="team-section" id="faculty">
-    <h2 class="section-title" style="color: var(--primary-blue);">FACULTY COORDINATORS</h2>
-    <div class="profile-grid">
-      <div class="profile-card glass reveal">
-        <img src="img/sund.png" alt="Faculty Coordinator 1">
+    <h2 class="section-title">FACULTY</h2>
+    <div class="team-grid">
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/sund.png" alt="Faculty">
+          <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
         <p>Dr. R. SUNDARRAJAN</p>
       </div>
-      <div class="profile-card glass reveal">
-        <img src="img/siva.png" alt="Faculty Coordinator 2">
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/siva.png" alt="Faculty">
+           <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
         <p>Dr. V. SIVAKUMAR</p>
       </div>
-      <div class="profile-card glass reveal">
-        <img src="img/baran.png" alt="Faculty Coordinator 3">
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/baran.png" alt="Faculty">
+           <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
         <p>MR. BARANIDHARAN</p>
       </div>
     </div>
   </section>
 
-  <!-- Core Team Section -->
   <section class="team-section" id="team">
-    <h2 class="section-title" style="color: var(--primary-blue);">CORE TEAM</h2>
-    <div class="profile-grid">
-      <div class="profile-card glass reveal"><img src="img/image 31.png" alt=""><p>JEFRIN<span>CEO</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/image 32.png" alt=""><p>SHANMUGESHWAR<span>ECEO</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/am.png" alt=""><p>AMBARREESH<span>CTO</span></p></div>
+    <h2 class="section-title">CORE TEAM</h2>
+    <div class="team-grid">
+      
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/jeffy.png" alt="Jefrin">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/jefrin-antony-raj-a81b30343?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BbcSseKK9QN6IRoVE2sW8DA%3D%3D" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/ft_jeffy?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>JEFRIN<span>PRESIDENT</span></p>
+      </div>
 
-      <div class="profile-card glass reveal"><img src="img/sr.png" alt=""><p>SREE<span>CMO</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/ar.png" alt=""><p>ARCHANA<span>COO</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/ra.png" alt=""><p>RAGAVI<span>CAO</span></p></div>
-     
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/image 32.png" alt="Shanmugeshwar">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/shanmugeshwar-u-6b7164338?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BaTC%2BZD%2BWThq7dCwGSsHhwA%3D%3D" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/shanmu_403?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>SHANMUGESHWAR<span>VICE PRESIDENT</span></p>
+      </div>
 
-       <div class="profile-card glass reveal"><img src="img/vi.png" alt=""><p>VIKAS<span>CCO</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/chi.png" alt=""><p>CHITHAMBARESH<span>CONTENT CREATION TEAM LEAD</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/vam.png" alt=""><p>VAMSI<span>CONTENT CREATION TEAM</span></p></div>
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/ambu.png" alt="Ambarreesh">
+          <div class="social-overlay">
+            <a href="www.linkedin.com/in/ambarreesh" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/im_ambarreesh?igsh=MnVxdnltZDFseWkz&utm_source=qr" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>AMBARREESH<span>VICE PRESIDENT</span></p>
+      </div>
 
-      <div class="profile-card glass reveal"><img src="img/aja.png" alt=""><p>AJAY VAIRAM<span>FULL STACK TEAM LEAD</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/jef.png" alt=""><p>JEGATHEESAN<span>FULL STACK TEAM</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/fed.png" alt=""><p>FREDRICK<span>FULL STACK TEAM</span></p></div>
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/srrr.png" alt="Sree">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/sree-nanda" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/_sree._.nanda._?igsh=OGJidzQ0YnlsMGx2" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>SREE<span>SECRETARY</span></p>
+      </div>
 
-      <div class="profile-card glass reveal"><img src="img/gopi.png" alt=""><p>GOPI<span>EVENT MANAGEMENT TEAM LEAD</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/praa.png" alt=""><p>PRASSANA RAJ<span>EVENT MANAGEMENT TEAM</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/aldo.png" alt=""><p>ALDO JEFRIN<span>EVENT MANAGEMENT TEAM</span></p></div>
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/ra.png" alt="Ragavi">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/ragavimuthuvel" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>RAGAVI<span>TREASURER</span></p>
+      </div>
 
-      <div class="profile-card glass reveal"><img src="img/dhiya.png" alt=""><p>DHIYANESHWAR<span>EVENT MANAGEMENT TEAM</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/ud.png" alt=""><p>UDHAYA RAAJ<span>MEDIA TEAM LEAD</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/gau.png" alt=""><p>GAUSHIK<span>MEDIA TEAM</span></p></div>
-      <div class="profile-card glass reveal"><img src="img/santh.png" alt=""><p>SANTHOSH KUMAR<span>MEDIA TEAM</span></p></div>
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/arc.png" alt="Archana">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/archanakarthikesan?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3Bc8PIhwffQxSjkw%2FCLtDXOQ%3D%3D" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/archana_krishh_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>ARCHANA<span>OUTREACH LEAD</span></p>
+      </div>
+
+      
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/vi.png" alt="Vikas">
+          <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>VIKAS<span>CREATIVE LEAD</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/chi.png" alt="Chithambaresh">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/chithambaresh-s-9b8a44224?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/call_me_chithu.1?igsh=MWxqN2czZTM2OXBjdg==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>CHITHAMBARESH<span>Content Creation Team Lead</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/vam.png" alt="Vamsi">
+          <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>VAMSI<span>Content Creation Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/aja.png" alt="Ajay">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/ajayvairamt" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/ajay1311_/" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>AJAY VAIRAM<span>Full Stack Lead</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/jega.png" alt="Jegatheesan">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/jegatheesan-baskar-b933573a5?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BfIvFCkdVRoGToLriTcSn6g%3D%3D" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/jegabaskar_8055?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>JEGATHEESAN<span>Full Stack Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/fed.png" alt="Fredrick">
+          <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>FREDRICK<span>Full Stack Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/gopi.png" alt="Gopi">
+          <div class="social-overlay">
+            <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/_.gxpi.__?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>GOPI<span>Event Management Lead</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/praa.png" alt="Prassana">
+          <div class="social-overlay">
+            <a href="https://linkedin.com/in/prasanna2k5" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/d3lu._.prsnn_?igsh=MTB3MnI5OHg2ZTdoZA==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>PRASSANA RAJ<span>Event Management Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/doo.png" alt="Aldo">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/aldo-jeffrin-8a8145314?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/itzme_aj_20?igsh=aXNqYjRqNWpmcWM5" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>ALDO JEFRIN<span>Event Management Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/dhiya.png" alt="Dhiyaneshwar">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/dhiyaneshwar-d-r-57430027a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/dhiyanu_0_0?igsh=dDY0eXZhcmx2aXNm" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>DHIYANESHWAR<span>Event Management Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/utha.png" alt="Udhaya">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/udhaya-raaj-228b6b29b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/_udhayy_rxj_01?igsh=bnFtcmNrYzU0eGtz" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>UDHAYA RAAJ<span>Media Lead</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/gau.png" alt="Gaushik">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/gaushik-selvakumar-3a57a1344?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3Bdqzmzm6MThSdDL4z4kS6mA%3D%3D" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/gaushikselvakumar?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>GAUSHIK<span>Media Team</span></p>
+      </div>
+
+      <div class="profile-card glass-panel reveal">
+        <div class="img-wrapper">
+          <img src="img/santh.png" alt="Santhosh">
+          <div class="social-overlay">
+            <a href="https://www.linkedin.com/in/santhosh-kumar-28b341344?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/im.santh0shkumar?igsh=MmpxZWRyeHQ2c2Nu" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <p>SANTHOSH KUMAR<span>Media Team</span></p>
+      </div>
+
     </div>
   </section>
 
-  <!-- Contact Section -->
-  <section class="contact-section glass" id="contact">
-    <h2 class="section-title">CONTACT US</h2>
-
-    <style>.hp-field{ display:none !important; visibility:hidden !important; }</style>
-
-    <form class="contact-form" id="contactForm">
-      <input type="text"  name="name"    placeholder="Your Name" required>
-      <input type="email" name="email"   placeholder="Your Email" required>
-      <input type="text"  name="subject" placeholder="Subject" required>
-      <textarea name="message" placeholder="Message..." required></textarea>
+  <section class="contact-container glass-panel" id="contact">
+    <h2 class="section-title" style="font-size:2rem; margin-bottom:20px;">Contact Us</h2>
+    <form id="contactForm">
+      <div class="form-group"><input type="text" name="name" placeholder="Name" required></div>
+      <div class="form-group"><input type="email" name="email" placeholder="Email" required></div>
+      <div class="form-group"><input type="text" name="subject" placeholder="Subject" required></div>
+      <div class="form-group"><textarea name="message" placeholder="Your Message..." rows="5" required></textarea></div>
       <input type="text" class="hp-field" name="website" autocomplete="off" tabindex="-1">
-      <button type="submit" id="contactSubmit" class="btn-glass">
-        <span class="btn-text">Send</span>
-        <span class="btn-spinner"></span>
+      <button type="submit" id="contactSubmit" class="btn-ios primary" style="width:100%;">
+        <span class="btn-text">Send Message</span>
+        <span class="btn-spinner" style="display:none; margin-left:10px;"><i class="fas fa-spinner fa-spin"></i></span>
       </button>
     </form>
   </section>
 
-  <!-- Connect Popup -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <div class="popup-overlay" id="popupOverlay">
-    <div class="popup glass">
-      <h3>Connect With Us</h3>
+  <footer style="text-align:center; padding:40px; color:#666; font-size:0.9rem;">
+    &copy; 2025 10X Club KARE Student Chapter. All Rights Reserved.
+  </footer>
+
+  <div class="overlay" id="popupOverlay">
+    <div class="modal-box glass-panel" style="text-align:center;">
+      <h3 style="margin-bottom:20px;">Connect With Us</h3>
       <div class="popup-icons">
-        <a href="https://chat.whatsapp.com/EER0QyVve60AlIcXq8nxbl?mode=r_c" target="_blank" rel="noopener" title="WhatsApp">
-          <i class="fab fa-whatsapp fa-2x" style="color: #25D366;"></i>
-        </a>
-        <a href="https://www.instagram.com/10x_club_kare?igsh=MXRyaTg2bmplNTV4eg%3D%3D&utm_source=qr" target="_blank" rel="noopener" title="Instagram">
-          <i class="fab fa-instagram fa-2x" style="color: #E1306C;"></i>
-        </a>
-        <a href="https://www.linkedin.com/company/10x-club-infokare/" target="_blank" rel="noopener" title="LinkedIn">
-          <i class="fab fa-linkedin fa-2x" style="color: #0A66C2;"></i>
-        </a>
+        <a href="https://chat.whatsapp.com/EER0QyVve60AlIcXq8nxbl?mode=r_c" target="_blank"><i class="fab fa-whatsapp fa-2x" style="color: #25D366;"></i></a>
+        <a href="https://www.instagram.com/10x_club_kare?igsh=MXRyaTg2bmplNTV4eg%3D%3D&utm_source=qr" target="_blank"><i class="fab fa-instagram fa-2x" style="color: #E1306C;"></i></a>
+        <a href="https://www.linkedin.com/company/10x-club-infokare/" target="_blank"><i class="fab fa-linkedin fa-2x" style="color: #0A66C2;"></i></a>
       </div>
-      <button class="btn-glass" id="closePopup">Close</button>
+      <button class="btn-ios" id="closePopup">Close</button>
     </div>
   </div>
 
-  <!-- ===== Signin/Signup Modal ===== -->
   <div class="overlay" id="signinOverlay">
-    <div class="modal-box glass">
+    <div class="modal-box glass-panel">
       <button class="modal-close" id="signinClose">&times;</button>
-      <div class="modal-logo">
-        <img src="img/image 26.png" alt="10X Club">
+      <div style="text-align:center; margin-bottom:20px;">
+        <img src="img/image 26.png" style="height:50px;">
       </div>
 
-      <!-- Tabs -->
       <div class="auth-tabs">
-        <div class="auth-tab active" id="tabSignIn">Sign in</div>
-        <div class="auth-tab" id="tabSignUp">Sign up</div>
+        <div class="auth-tab active" id="tabSignIn">Sign In</div>
+        <div class="auth-tab" id="tabSignUp">Sign Up</div>
       </div>
 
       <div id="signinError" class="error-text" style="display:none;"></div>
 
-      <!-- Sign-in form -->
       <form id="signinForm">
-        <h3 style="margin-top:0;">Welcome back</h3>
         <div class="form-group">
-          <label>Email (only @klu.ac.in)</label>
-          <input type="email" id="signinEmail" required placeholder="you@klu.ac.in" />
+          <label>Email (@klu.ac.in)</label>
+          <input type="email" id="signinEmail" required placeholder="name@klu.ac.in">
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input type="password" id="signinPassword" required placeholder="••••••••" />
+          <input type="password" id="signinPassword" required placeholder="••••••••">
         </div>
-        <button type="submit" class="btn-glass" id="signinBtn" style="width:100%;">Sign in</button>
-        <div style="margin-top:12px; text-align:center;">
-          <button type="button" class="btn-glass" id="forgotBtn" style="width:100%; background:transparent;">Forgot password?</button>
-        </div>
-        <div class="auth-divider">OR</div>
-        <button type="button" class="btn-glass" id="googleBtn" style="width:100%;">Continue with Google</button>
+        <button type="submit" class="btn-ios primary" style="width:100%; margin-top:10px;">Sign In</button>
+        <button type="button" class="btn-ios" id="forgotBtn" style="width:100%; margin-top:10px; background:transparent; font-size:0.8rem;">Forgot Password?</button>
+        <div style="text-align:center; margin:15px 0; font-size:0.8rem; color:#666;">OR</div>
+        <button type="button" class="btn-ios" id="googleBtn" style="width:100%;">Continue with Google</button>
       </form>
 
-      <!-- Sign-up form -->
       <form id="signupForm" style="display:none;">
-        <h3 style="margin-top:0;">Create account</h3>
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="signupName" required placeholder="Your Name" />
-        </div>
-        <div class="form-group">
-          <label>Email (only @klu.ac.in)</label>
-          <input type="email" id="signupEmail" required placeholder="you@klu.ac.in" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signupPassword" required placeholder="8+ characters" />
-        </div>
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <input type="password" id="signupPassword2" required placeholder="Repeat password" />
-        </div>
-        <button type="submit" class="btn-glass" id="signupBtn" style="width:100%;">Create account</button>
-
-        <div class="auth-divider">OR</div>
-        <button type="button" class="btn-glass" id="googleBtn2" style="width:100%;">Continue with Google</button>
+        <div class="form-group"><input type="text" id="signupName" required placeholder="Full Name"></div>
+        <div class="form-group"><input type="email" id="signupEmail" required placeholder="Email (@klu.ac.in)"></div>
+        <div class="form-group"><input type="password" id="signupPassword" required placeholder="Password"></div>
+        <div class="form-group"><input type="password" id="signupPassword2" required placeholder="Confirm Password"></div>
+        <button type="submit" class="btn-ios primary" style="width:100%; margin-top:10px;">Create Account</button>
+        <div style="text-align:center; margin:15px 0; font-size:0.8rem; color:#666;">OR</div>
+        <button type="button" class="btn-ios" id="googleBtn2" style="width:100%;">Continue with Google</button>
       </form>
     </div>
   </div>
 
-  <!-- ===== Profile Modal ===== -->
   <div class="overlay" id="profileOverlay">
-    <div class="modal-box glass">
+    <div class="modal-box glass-panel">
       <button class="modal-close" id="profileClose">&times;</button>
-      <div class="modal-logo">
-        <img src="img/image 26.png" alt="10X Club">
-      </div>
-      <h3>Your Profile</h3>
-      <div id="profileInfo" style="font-size:.9rem; line-height:1.6;"></div>
-      <div style="margin-top:14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn-glass" id="profileCloseBtn">Close</button>
-      </div>
+      <h3>My Profile</h3>
+      <div id="profileInfo" style="margin:20px 0; color:#ccc; line-height:1.6;"></div>
+      <button class="btn-ios" id="profileCloseBtn" style="width:100%;">Close</button>
+      <button id="downloadPassBtn" style="display:none;"></button> 
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2025 10X Club KARE Student Chapter. All Rights Reserved.
-  </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-<!-- Firebase -->
-<script type="module">
-  /* Firebase Auth + Firestore */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getAuth, onAuthStateChanged, signInWithEmailAndPassword,
-    GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
-    signOut, createUserWithEmailAndPassword, updateProfile
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import {
-    getFirestore, collection, query, where, getDocs
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  // ---------- CONFIG ----------
-  const firebaseConfig = {
-  apiKey: "AIzaSyAg9CZRgpK2PbEDfbL9LkuzcyqDNmJpJAI",
-  authDomain: "cnclubkare.firebaseapp.com",
-  databaseURL: "https://cnclubkare-default-rtdb.firebaseio.com",
-  projectId: "cnclubkare",
-  storageBucket: "cnclubkare.firebasestorage.app",
-  messagingSenderId: "908066250584",
-  appId: "1:908066250584:web:19bb73367b2837240ccf2d",
-  measurementId: "G-5S27KP98QN"
-};
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  /* ==========================
-     EmailJS – contact form
-     ========================== */
-  const SERVICE_ID  = "service_5xj7qdk";
-  const TEMPLATE_ID = "template_y9ug5xe";
-  const PUBLIC_KEY  = "CxoOWur3_XqBcR52S";
-  emailjs.init({ publicKey: PUBLIC_KEY });
-
-  const contactForm  = document.getElementById('contactForm');
-  const submitBtn    = document.getElementById('contactSubmit');
-  const btnText      = submitBtn?.querySelector('.btn-text');
-  const btnSpinner   = submitBtn?.querySelector('.btn-spinner');
-
-  if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (contactForm.website && contactForm.website.value.trim() !== "") return;
-
-      const formData = new FormData(contactForm);
-      const params = {
-        name:    formData.get('name'),
-        email:   formData.get('email'),
-        subject: formData.get('subject'),
-        message: formData.get('message'),
-        time:    new Date().toLocaleString()
-      };
-
-      setLoading(true);
-      try {
-        await emailjs.send(SERVICE_ID, TEMPLATE_ID, params);
-        alert("✅ Message sent successfully!");
-        contactForm.reset();
-      } catch (err) {
-        console.error(err);
-        alert("❌ Failed to send message. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    });
-  }
-
-  function setLoading(state) {
-    if (!submitBtn) return;
-    if (state) {
-      submitBtn.disabled = true;
-      if (btnSpinner) btnSpinner.style.display = 'inline-block';
-      if (btnText) btnText.textContent = 'Sending...';
-    } else {
-      submitBtn.disabled = false;
-      if (btnSpinner) btnSpinner.style.display = 'none';
-      if (btnText) btnText.textContent = 'Send';
-    }
-  }
-
-  // Load animation
-  window.onload = () => document.body.classList.add('loaded');
-
-  // Popup (Connect)
-  const connectBtn   = document.getElementById('connectBtn');
-  const popupOverlay = document.getElementById('popupOverlay');
-  const closePopup   = document.getElementById('closePopup');
-  if (connectBtn && popupOverlay && closePopup) {
-    connectBtn.addEventListener('click', () => popupOverlay.style.display = 'flex');
-    closePopup.addEventListener('click', () => popupOverlay.style.display = 'none');
-    window.addEventListener('click', (e) => { if (e.target === popupOverlay) popupOverlay.style.display = 'none'; });
-  }
-
-  // Scroll reveal
-  const revealEls = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  revealEls.forEach(el => io.observe(el));
-
-  // ==== Auth UI refs ====
-  const openSignin     = document.getElementById('openSignin');
-  const signinOverlay  = document.getElementById('signinOverlay');
-  const signinClose    = document.getElementById('signinClose');
-
-  // tabs
-  const tabSignIn      = document.getElementById('tabSignIn');
-  const tabSignUp      = document.getElementById('tabSignUp');
-  const signinForm     = document.getElementById('signinForm');
-  const signupForm     = document.getElementById('signupForm');
-
-  const signinEmail    = document.getElementById('signinEmail');
-  const signinPassword = document.getElementById('signinPassword');
-  const signinBtn      = document.getElementById('signinBtn');
-
-  const signupName     = document.getElementById('signupName');
-  const signupEmail    = document.getElementById('signupEmail');
-  const signupPassword = document.getElementById('signupPassword');
-  const signupPassword2= document.getElementById('signupPassword2');
-  const signupBtn      = document.getElementById('signupBtn');
-
-  const googleBtn      = document.getElementById('googleBtn');
-  const googleBtn2     = document.getElementById('googleBtn2');
-  const forgotBtn      = document.getElementById('forgotBtn');
-  const signinError    = document.getElementById('signinError');
-
-  const authRight      = document.getElementById('authRight');
-  const profileBox     = document.getElementById('profileBox');
-  const avatarBtn      = document.getElementById('avatarBtn');
-  const profileMenu    = document.getElementById('profileMenu');
-  const profileEmail   = document.getElementById('profileEmail');
-  const logoutBtn      = document.getElementById('logoutBtn');
-
-  const viewProfileBtn   = document.getElementById('viewProfileBtn');
-  const downloadPassBtn  = document.getElementById('downloadPassBtn');
-
-  const profileOverlay = document.getElementById('profileOverlay');
-  const profileClose   = document.getElementById('profileClose');
-  const profileCloseBtn= document.getElementById('profileCloseBtn');
-  const profileInfo    = document.getElementById('profileInfo');
-
-  // -----------------
-  // Helpers to gate Register buttons
-  // -----------------
-   const REGISTER_SELECTOR = '.register-btn, [data-requires-auth="true"], a[href*="apimaze.html"]';
-
-  function gateRegisterButtons() {
-    const btns = document.querySelectorAll(REGISTER_SELECTOR);
-    btns.forEach(btn => {
-      if (btn.dataset.authBound === '1') return;
-      btn.dataset.authBound = '1';
-      btn.addEventListener('click', (e) => {
-        if (!auth.currentUser) {
-          e.preventDefault();
-          if (signinOverlay) {
-            signinOverlay.classList.add('active');
-            tabSignIn?.click();
-          } else {
-            alert("Please sign in to register for the event.");
-          }
+  <script type="module">
+    /* Firebase Auth + Firestore */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+      GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
+      signOut, createUserWithEmailAndPassword, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, query, where, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  
+    // ---------- CONFIG ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg9CZRgpK2PbEDfbL9LkuzcyqDNmJpJAI",
+      authDomain: "cnclubkare.firebaseapp.com",
+      databaseURL: "https://cnclubkare-default-rtdb.firebaseio.com",
+      projectId: "cnclubkare",
+      storageBucket: "cnclubkare.firebasestorage.app",
+      messagingSenderId: "908066250584",
+      appId: "1:908066250584:web:19bb73367b2837240ccf2d",
+      measurementId: "G-5S27KP98QN"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+  
+    /* ==========================
+       EmailJS – contact form
+       ========================== */
+    const SERVICE_ID  = "service_5xj7qdk";
+    const TEMPLATE_ID = "template_y9ug5xe";
+    const PUBLIC_KEY  = "CxoOWur3_XqBcR52S";
+    emailjs.init({ publicKey: PUBLIC_KEY });
+  
+    const contactForm  = document.getElementById('contactForm');
+    const submitBtn    = document.getElementById('contactSubmit');
+    const btnText      = submitBtn?.querySelector('.btn-text');
+    const btnSpinner   = submitBtn?.querySelector('.btn-spinner');
+  
+    if (contactForm) {
+      contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (contactForm.website && contactForm.website.value.trim() !== "") return;
+  
+        const formData = new FormData(contactForm);
+        const params = {
+          name:    formData.get('name'),
+          email:   formData.get('email'),
+          subject: formData.get('subject'),
+          message: formData.get('message'),
+          time:    new Date().toLocaleString()
+        };
+  
+        setLoading(true);
+        try {
+          await emailjs.send(SERVICE_ID, TEMPLATE_ID, params);
+          alert("✅ Message sent successfully!");
+          contactForm.reset();
+        } catch (err) {
+          console.error(err);
+          alert("❌ Failed to send message. Please try again.");
+        } finally {
+          setLoading(false);
         }
       });
-    });
-  }
-
-  function updateRegisterButtons() {
-    const signedIn = !!auth.currentUser;
-    const btns = document.querySelectorAll(REGISTER_SELECTOR);
-    btns.forEach(btn => {
-      if (signedIn) {
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
-        btn.title = "";
+    }
+  
+    function setLoading(state) {
+      if (!submitBtn) return;
+      if (state) {
+        submitBtn.disabled = true;
+        if (btnSpinner) btnSpinner.style.display = 'inline-block';
+        if (btnText) btnText.textContent = 'Sending...';
       } else {
-        btn.style.opacity = "0.6";
-        btn.style.pointerEvents = "auto";
-        btn.title = "Sign in with your @klu.ac.in email to register";
+        submitBtn.disabled = false;
+        if (btnSpinner) btnSpinner.style.display = 'none';
+        if (btnText) btnText.textContent = 'Send Message';
+      }
+    }
+  
+    // Popup (Connect)
+    const connectBtn   = document.getElementById('connectBtn');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const closePopup   = document.getElementById('closePopup');
+    if (connectBtn && popupOverlay && closePopup) {
+      connectBtn.addEventListener('click', () => { popupOverlay.style.display = 'flex'; popupOverlay.classList.add('active'); });
+      closePopup.addEventListener('click', () => { popupOverlay.style.display = 'none'; popupOverlay.classList.remove('active'); });
+      window.addEventListener('click', (e) => { if (e.target === popupOverlay) { popupOverlay.style.display = 'none'; popupOverlay.classList.remove('active'); }});
+    }
+  
+    // Scroll reveal animation
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    // Init styles for reveal
+    revealEls.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s ease-out';
+        io.observe(el);
+    });
+  
+    // ==== Auth UI refs ====
+    const openSignin     = document.getElementById('openSignin');
+    const signinOverlay  = document.getElementById('signinOverlay');
+    const signinClose    = document.getElementById('signinClose');
+  
+    // tabs
+    const tabSignIn      = document.getElementById('tabSignIn');
+    const tabSignUp      = document.getElementById('tabSignUp');
+    const signinForm     = document.getElementById('signinForm');
+    const signupForm     = document.getElementById('signupForm');
+  
+    const signinEmail    = document.getElementById('signinEmail');
+    const signinPassword = document.getElementById('signinPassword');
+    const signinBtn      = document.querySelector('#signinForm button[type="submit"]');
+  
+    const signupName     = document.getElementById('signupName');
+    const signupEmail    = document.getElementById('signupEmail');
+    const signupPassword = document.getElementById('signupPassword');
+    const signupPassword2= document.getElementById('signupPassword2');
+  
+    const googleBtn      = document.getElementById('googleBtn');
+    const googleBtn2     = document.getElementById('googleBtn2');
+    const forgotBtn      = document.getElementById('forgotBtn');
+    const signinError    = document.getElementById('signinError');
+  
+    const authRight      = document.getElementById('authRight');
+    const profileBox     = document.getElementById('profileBox');
+    const avatarBtn      = document.getElementById('avatarBtn');
+    const profileMenu    = document.getElementById('profileMenu');
+    const profileEmail   = document.getElementById('profileEmail');
+    const logoutBtn      = document.getElementById('logoutBtn');
+  
+    const viewProfileBtn   = document.getElementById('viewProfileBtn');
+    const downloadPassBtn  = document.getElementById('downloadPassBtn');
+  
+    const profileOverlay = document.getElementById('profileOverlay');
+    const profileClose   = document.getElementById('profileClose');
+    const profileCloseBtn= document.getElementById('profileCloseBtn');
+    const profileInfo    = document.getElementById('profileInfo');
+  
+    // -----------------
+    // Helpers to gate Register buttons
+    // -----------------
+     const REGISTER_SELECTOR = '.register-btn, [data-requires-auth="true"], a[href*="apimaze.html"]';
+  
+    function gateRegisterButtons() {
+      const btns = document.querySelectorAll(REGISTER_SELECTOR);
+      btns.forEach(btn => {
+        if (btn.dataset.authBound === '1') return;
+        btn.dataset.authBound = '1';
+        btn.addEventListener('click', (e) => {
+          if (!auth.currentUser) {
+            e.preventDefault();
+            if (signinOverlay) {
+              signinOverlay.classList.add('active');
+              tabSignIn?.click();
+            } else {
+              alert("Please sign in to register for the event.");
+            }
+          }
+        });
+      });
+    }
+  
+    function updateRegisterButtons() {
+      const signedIn = !!auth.currentUser;
+      const btns = document.querySelectorAll(REGISTER_SELECTOR);
+      btns.forEach(btn => {
+        if (signedIn) {
+          btn.style.opacity = "1";
+          btn.style.pointerEvents = "auto";
+          btn.title = "";
+          btn.style.filter = "none";
+        } else {
+          btn.style.opacity = "0.6"; 
+          btn.title = "Sign in with your @klu.ac.in email to register";
+        }
+      });
+    }
+  
+    logoutBtn?.addEventListener('click', async () => {
+      await signOut(auth);
+    });
+  
+    // ✅ Listen for Auth state changes and update UI
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if(openSignin) openSignin.style.display = 'none';
+        if(profileBox) profileBox.style.display = 'block';
+        const displayChar = user.displayName?.[0]?.toUpperCase() || 'U';
+        if(avatarBtn) avatarBtn.textContent = displayChar;
+        if(profileEmail) profileEmail.textContent = user.email;
+      } else {
+        if(openSignin) openSignin.style.display = 'inline-flex';
+        if(profileBox) profileBox.style.display = 'none';
+        if(profileMenu) profileMenu.style.display = 'none';
+      }
+  
+      updateRegisterButtons();
+      gateRegisterButtons(); 
+    });
+  
+    // tabs switching
+    tabSignIn?.addEventListener('click', ()=>{
+      tabSignIn.classList.add('active');
+      tabSignUp?.classList.remove('active');
+      signinForm.style.display = 'block';
+      if (signupForm) signupForm.style.display = 'none';
+      if (signinError) signinError.style.display='none';
+    });
+    tabSignUp?.addEventListener('click', ()=>{
+      tabSignUp.classList.add('active');
+      tabSignIn?.classList.remove('active');
+      if (signupForm) signupForm.style.display = 'block';
+      signinForm.style.display = 'none';
+      if (signinError) signinError.style.display='none';
+    });
+  
+    // Open/close signin modal
+    openSignin?.addEventListener('click', ()=> {
+      if (!signinOverlay) return;
+      signinOverlay.classList.add('active');
+      tabSignIn?.click();
+      if (signinError) signinError.style.display='none';
+      signinForm?.reset();
+      signupForm?.reset();
+    });
+    signinClose?.addEventListener('click', ()=> signinOverlay?.classList.remove('active'));
+    signinOverlay?.addEventListener('click', (e)=> { if(e.target === signinOverlay) signinOverlay.classList.remove('active') });
+  
+    // Forgot password
+    forgotBtn?.addEventListener('click', async ()=>{
+      const email = prompt("Enter your @klu.ac.in email for password reset:");
+      if(!email) return;
+      if(!email.endsWith('@klu.ac.in')) {
+        alert('Only @klu.ac.in emails are allowed.');
+        return;
+      }
+      try{
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset email sent!");
+      }catch(err){
+        console.error(err);
+        alert(err.message);
       }
     });
-  }
-
-  logoutBtn?.addEventListener('click', async () => {
-    await signOut(auth);
-  });
-
-  // ✅ Listen for Auth state changes and update UI
-  onAuthStateChanged(auth, (user) => {
-    const authRight = document.getElementById('authRight');
-    if (user) {
-      openSignin.style.display = 'none';
-      profileBox.style.display = 'block';
-      const displayChar = user.displayName?.[0]?.toUpperCase() || 'U';
-      avatarBtn.textContent = displayChar;
-      profileEmail.textContent = user.email;
-    } else {
-      openSignin.style.display = 'inline-block';
-      profileBox.style.display = 'none';
-      profileMenu.style.display = 'none';
-    }
-
-    updateRegisterButtons();
-    gateRegisterButtons(); // 🚨 Make sure to run after onAuthStateChanged
-  });
-  // tabs switching
-  tabSignIn?.addEventListener('click', ()=>{
-    tabSignIn.classList.add('active');
-    tabSignUp?.classList.remove('active');
-    signinForm.style.display = 'block';
-    if (signupForm) signupForm.style.display = 'none';
-    if (signinError) signinError.style.display='none';
-  });
-  tabSignUp?.addEventListener('click', ()=>{
-    tabSignUp.classList.add('active');
-    tabSignIn?.classList.remove('active');
-    if (signupForm) signupForm.style.display = 'block';
-    signinForm.style.display = 'none';
-    if (signinError) signinError.style.display='none';
-  });
-
-  // Open/close signin modal
-  openSignin?.addEventListener('click', ()=> {
-    if (!signinOverlay) return;
-    signinOverlay.classList.add('active');
-    tabSignIn?.click();
-    if (signinError) signinError.style.display='none';
-    signinForm?.reset();
-    signupForm?.reset();
-  });
-  signinClose?.addEventListener('click', ()=> signinOverlay?.classList.remove('active'));
-  signinOverlay?.addEventListener('click', (e)=> { if(e.target === signinOverlay) signinOverlay.classList.remove('active') });
-
-  // Forgot password
-  forgotBtn?.addEventListener('click', async ()=>{
-    const email = prompt("Enter your @klu.ac.in email for password reset:");
-    if(!email) return;
-    if(!email.endsWith('@klu.ac.in')) {
-      alert('Only @klu.ac.in emails are allowed.');
-      return;
-    }
-    try{
-      await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent!");
-    }catch(err){
-      console.error(err);
-      alert(err.message);
-    }
-  });
-
-  // Email/Password signin
-  signinForm?.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    if (signinError) signinError.style.display='none';
-    const email = signinEmail.value.trim();
-    const pass  = signinPassword.value;
-    if(!email.endsWith('@klu.ac.in')){
-      showSigninError('Only @klu.ac.in email is allowed');
-      return;
-    }
-    try{
-      await signInWithEmailAndPassword(auth, email, pass);
-      signinOverlay?.classList.remove('active');
-    }catch(err){
-      console.error(err);
-      showSigninError(err.message);
-    }
-  });
-
-  // Email/Password signup
-  signupForm?.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    if (signinError) signinError.style.display='none';
-    const name  = signupName.value.trim();
-    const email = signupEmail.value.trim();
-    const pass1 = signupPassword.value;
-    const pass2 = signupPassword2.value;
-
-    if(!email.endsWith('@klu.ac.in')){
-      showSigninError('Only @klu.ac.in email is allowed');
-      return;
-    }
-    if(pass1 !== pass2){
-      showSigninError('Passwords do not match');
-      return;
-    }
-    if(pass1.length < 6){
-      showSigninError('Password should be at least 6 characters');
-      return;
-    }
-    try{
-      const cred = await createUserWithEmailAndPassword(auth, email, pass1);
-      if(name){
-        await updateProfile(cred.user, { displayName: name });
-      }
-      signinOverlay?.classList.remove('active');
-    }catch(err){
-      console.error(err);
-      showSigninError(err.message);
-    }
-  });
-
-  // Google signin
-  async function signInWithGoogle(){
-    if (signinError) signinError.style.display='none';
-    const provider = new GoogleAuthProvider();
-    try{
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      if(!user.email.endsWith('@klu.ac.in')){
-        await signOut(auth);
+  
+    // Email/Password signin
+    signinForm?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if (signinError) signinError.style.display='none';
+      const email = signinEmail.value.trim();
+      const pass  = signinPassword.value;
+      if(!email.endsWith('@klu.ac.in')){
         showSigninError('Only @klu.ac.in email is allowed');
         return;
       }
-      signinOverlay?.classList.remove('active');
-    }catch(err){
-      console.error(err);
-      showSigninError(err.message);
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        signinOverlay?.classList.remove('active');
+      }catch(err){
+        console.error(err);
+        showSigninError(err.message);
+      }
+    });
+  
+    // Email/Password signup
+    signupForm?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if (signinError) signinError.style.display='none';
+      const name  = signupName.value.trim();
+      const email = signupEmail.value.trim();
+      const pass1 = signupPassword.value;
+      const pass2 = signupPassword2.value;
+  
+      if(!email.endsWith('@klu.ac.in')){
+        showSigninError('Only @klu.ac.in email is allowed');
+        return;
+      }
+      if(pass1 !== pass2){
+        showSigninError('Passwords do not match');
+        return;
+      }
+      if(pass1.length < 6){
+        showSigninError('Password should be at least 6 characters');
+        return;
+      }
+      try{
+        const cred = await createUserWithEmailAndPassword(auth, email, pass1);
+        if(name){
+          await updateProfile(cred.user, { displayName: name });
+        }
+        signinOverlay?.classList.remove('active');
+      }catch(err){
+        console.error(err);
+        showSigninError(err.message);
+      }
+    });
+  
+    // Google signin
+    async function signInWithGoogle(){
+      if (signinError) signinError.style.display='none';
+      const provider = new GoogleAuthProvider();
+      try{
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        if(!user.email.endsWith('@klu.ac.in')){
+          await signOut(auth);
+          showSigninError('Only @klu.ac.in email is allowed');
+          return;
+        }
+        signinOverlay?.classList.remove('active');
+      }catch(err){
+        console.error(err);
+        showSigninError(err.message);
+      }
     }
-  }
-  googleBtn?.addEventListener('click', signInWithGoogle);
-  googleBtn2?.addEventListener('click', signInWithGoogle);
-
-  function showSigninError(msg){
-    if (!signinError) return;
-    signinError.textContent = msg;
-    signinError.style.display = 'block';
-  }
-
-  // Avatar / Menu
-  avatarBtn?.addEventListener('click', ()=>{
-    const isOpen = profileMenu.style.display === 'flex';
-    profileMenu.style.display = isOpen ? 'none' : 'flex';
-  });
-  document.addEventListener('click', (e)=>{
-    if(profileBox && !profileBox.contains(e.target)){
+    googleBtn?.addEventListener('click', signInWithGoogle);
+    googleBtn2?.addEventListener('click', signInWithGoogle);
+  
+    function showSigninError(msg){
+      if (!signinError) return;
+      signinError.textContent = msg;
+      signinError.style.display = 'block';
+    }
+  
+    // Avatar / Menu
+    avatarBtn?.addEventListener('click', ()=>{
+      const isOpen = profileMenu.style.display === 'flex';
+      profileMenu.style.display = isOpen ? 'none' : 'flex';
+    });
+    document.addEventListener('click', (e)=>{
+      if(profileBox && !profileBox.contains(e.target)){
+        if(profileMenu) profileMenu.style.display = 'none';
+      }
+    });
+  
+    // Show profile modal
+    viewProfileBtn?.addEventListener('click', async ()=>{
       if(profileMenu) profileMenu.style.display = 'none';
-    }
-  });
-
-  // Logout
-  logoutBtn?.addEventListener('click', async ()=>{
-    await signOut(auth);
-  });
-
-  // Show profile modal
-  viewProfileBtn?.addEventListener('click', async ()=>{
-    if(profileMenu) profileMenu.style.display = 'none';
-    const user = auth.currentUser;
-    if(!user) return;
-    if (profileInfo) {
-      profileInfo.innerHTML = `
-        <div><b>Name</b>: ${user.displayName || '(not set)'}</div>
-        <div><b>Email</b>: ${user.email}</div>
-        <div><b>UID</b>: ${user.uid}</div>
-      `;
-    }
-    profileOverlay?.classList.add('active');
-  });
-  profileClose?.addEventListener('click', ()=> profileOverlay?.classList.remove('active'));
-  profileCloseBtn?.addEventListener('click', ()=> profileOverlay?.classList.remove('active'));
-  profileOverlay?.addEventListener('click', (e)=> { if(e.target === profileOverlay) profileOverlay.classList.remove('active') });
-
-  /* -----------------------
-     EVENT PASS FEATURE
-  ----------------------- */
-  const EVENT_ID   = "api-maze-2025";
-  const EVENT_NAME = "EDU HACK";
-  const EVENT_DATE = "2025-08-02";
-  const ORG_NAME   = "10X Club – KARE Student Chapter";
-  const LOGO_KARE  = "img/klu.png";
-  const LOGO_CLUB  = "img/image 26.png";
-
-  downloadPassBtn?.addEventListener('click', async ()=>{
-    if(profileMenu) profileMenu.style.display = 'none';
-    const user = auth.currentUser;
-    if (!user) return alert("Sign in first.");
-    try {
-      const reg = await findLatestVerifiedRegistration(user.email);
-      if (!reg) return alert("Your event registration is not verified yet.");
-      const base64 = await generateEntryPassPDF(reg);
-      downloadBase64Pdf(base64, `${EVENT_NAME}_Pass_${reg.token || 'pass'}.pdf`);
-    } catch(err) {
-      console.error(err);
-      alert("Failed to generate pass. Try later.");
-    }
-  });
-
-  async function findLatestVerifiedRegistration(email) {
-    const colRef = collection(db, "events", EVENT_ID, "registrations");
-    const q = query(colRef, where("email", "==", email));
-    const snap = await getDocs(q);
-    const all = [];
-    snap.forEach(d => all.push({ id: d.id, ...d.data() }));
-    const verified = all.filter(r => r.verified === true);
-    if (!verified.length) return null;
-    verified.sort((a,b)=> (b.verifiedAt?.seconds||0)-(a.verifiedAt?.seconds||0));
-    return verified[0];
-  }
-
-  async function generateEntryPassPDF(r) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit:'pt', format:'a4' });
-    const pageWidth  = doc.internal.pageSize.getWidth();
-    const marginX    = 50;
-    let y = 60;
-    const row=(label,value)=>{
-      doc.setFont('helvetica','bold'); doc.text(label, marginX, y);
-      doc.setFont('helvetica','normal'); doc.text(value||'-', pageWidth-marginX, y, {align:'right'});
-      y+=22;
-    };
-    const kareLogo = await toDataURL(LOGO_KARE);
-    const clubLogo = await toDataURL(LOGO_CLUB);
-    const qrPayload = JSON.stringify({
-      participant_no:r.participant_no, token:r.token, name:r.name,
-      regno:r.regno, event:EVENT_NAME, date:EVENT_DATE
+      const user = auth.currentUser;
+      if(!user) return;
+      if (profileInfo) {
+        profileInfo.innerHTML = `
+          <div><b>Name:</b> ${user.displayName || '(not set)'}</div>
+          <div style="margin-top:10px;"><b>Email:</b> ${user.email}</div>
+          <div style="margin-top:10px; font-size:0.75rem;"><b>UID:</b> ${user.uid}</div>
+        `;
+      }
+      profileOverlay?.classList.add('active');
     });
-    doc.addImage(kareLogo,'PNG', marginX, 30, 70,70);
-    doc.addImage(clubLogo,'PNG', pageWidth-marginX-70, 30, 70,70);
-    doc.setFont('helvetica','bold'); doc.setFontSize(20);
-    doc.text(`${EVENT_NAME} – ENTRY PASS`, pageWidth/2,55,{align:'center'});
-    doc.setFontSize(12); doc.setTextColor(120);
-    doc.text(ORG_NAME, pageWidth/2,75,{align:'center'}); doc.setTextColor(0);
-    y=130; doc.setDrawColor(220); doc.line(marginX, y, pageWidth-marginX,y); y+=30;
-    row('Participant No.', String(r.participant_no||'-'));
-    row('Name', r.name); row('Reg No.', r.regno);
-    row('Year', r.year); row('Department', r.dept);
-    row('Phone', r.phone); row('Email', r.email);
-    row('Transaction ID', r.transaction_id||'-');
-    row('Amount', `₹${r.amount||100}`);
-    row('Event Date', EVENT_DATE);
-    row('Token', r.token);
-    y+=10; doc.setDrawColor(220); doc.line(marginX,y,pageWidth-marginX,y); y+=20;
-    const qrCanvas = await makeQrCanvas(qrPayload,160);
-    const qrData   = qrCanvas ? qrCanvas.toDataURL('image/png') : null;
-    if (qrData) {
-      const qrSize=150; const qrX=(pageWidth-qrSize)/2;
-      doc.addImage(qrData,'PNG',qrX,y,qrSize,qrSize); y+=qrSize+20;
+    profileClose?.addEventListener('click', ()=> profileOverlay?.classList.remove('active'));
+    profileCloseBtn?.addEventListener('click', ()=> profileOverlay?.classList.remove('active'));
+    profileOverlay?.addEventListener('click', (e)=> { if(e.target === profileOverlay) profileOverlay.classList.remove('active') });
+  
+    /* -----------------------
+       EVENT PASS FEATURE
+    ----------------------- */
+    const EVENT_ID   = "api-maze-2025";
+    const EVENT_NAME = "EDU HACK";
+    const EVENT_DATE = "2025-08-02";
+    const ORG_NAME   = "10X Club – KARE Student Chapter";
+    const LOGO_KARE  = "img/klu.png";
+    const LOGO_CLUB  = "img/image 26.png";
+  
+    downloadPassBtn?.addEventListener('click', async ()=>{
+      if(profileMenu) profileMenu.style.display = 'none';
+      const user = auth.currentUser;
+      if (!user) return alert("Sign in first.");
+      try {
+        const reg = await findLatestVerifiedRegistration(user.email);
+        if (!reg) return alert("Your event registration is not verified yet.");
+        const base64 = await generateEntryPassPDF(reg);
+        downloadBase64Pdf(base64, `${EVENT_NAME}_Pass_${reg.token || 'pass'}.pdf`);
+      } catch(err) {
+        console.error(err);
+        alert("Failed to generate pass. Try later.");
+      }
+    });
+  
+    async function findLatestVerifiedRegistration(email) {
+      const colRef = collection(db, "events", EVENT_ID, "registrations");
+      const q = query(colRef, where("email", "==", email));
+      const snap = await getDocs(q);
+      const all = [];
+      snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+      const verified = all.filter(r => r.verified === true);
+      if (!verified.length) return null;
+      verified.sort((a,b)=> (b.verifiedAt?.seconds||0)-(a.verifiedAt?.seconds||0));
+      return verified[0];
     }
-    doc.setFontSize(10); doc.setTextColor(120);
-    doc.text('Please bring this token to event check-in.', pageWidth/2, y,{align:'center'});
-    const arrayBuf=doc.output('arraybuffer');
-    return arrayBufferToBase64(arrayBuf);
-  }
-
-  function downloadBase64Pdf(base64, filename) {
-    const link=document.createElement('a');
-    link.href=`data:application/pdf;base64,${base64}`;
-    link.download=filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  async function toDataURL(url) {
-    try{
-      const res=await fetch(url);
-      const blob=await res.blob();
-      return await new Promise((resolve)=>{
-        const reader=new FileReader();
-        reader.onload=()=>resolve(reader.result);
-        reader.readAsDataURL(blob);
+  
+    async function generateEntryPassPDF(r) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
+      const pageWidth  = doc.internal.pageSize.getWidth();
+      const marginX    = 50;
+      let y = 60;
+      const row=(label,value)=>{
+        doc.setFont('helvetica','bold'); doc.text(label, marginX, y);
+        doc.setFont('helvetica','normal'); doc.text(value||'-', pageWidth-marginX, y, {align:'right'});
+        y+=22;
+      };
+      const kareLogo = await toDataURL(LOGO_KARE);
+      const clubLogo = await toDataURL(LOGO_CLUB);
+      const qrPayload = JSON.stringify({
+        participant_no:r.participant_no, token:r.token, name:r.name,
+        regno:r.regno, event:EVENT_NAME, date:EVENT_DATE
       });
-    }catch(err){return null;}
-  }
-  function arrayBufferToBase64(buffer) {
-    let binary=''; const bytes=new Uint8Array(buffer);
-    for (let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
-    return window.btoa(binary);
-  }
-  function makeQrCanvas(text,size=128) {
-    return new Promise((resolve)=>{
-      const temp=document.createElement('div');
-      const qr=new QRCode(temp,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});
-      setTimeout(()=>{
-        const img=temp.querySelector('img')||temp.querySelector('canvas');
-        if(img && img.tagName==='IMG'){ const c=document.createElement('canvas');
-          c.width=size; c.height=size; const ctx=c.getContext('2d');
-          const i=new Image(); i.crossOrigin='Anonymous';
-          i.onload=()=>{ctx.drawImage(i,0,0,size,size); resolve(c);};
-          i.src=img.src; } else if(img && img.tagName==='CANVAS') resolve(img);
-        else resolve(null);
-      },300);
-    });
-  }
-
-  // Auth state listener
-  onAuthStateChanged(auth, async (user)=>{
-    if(user && user.email && !user.email.endsWith("@klu.ac.in")){
-      await signOut(auth);
-      return;
+      if(kareLogo) doc.addImage(kareLogo,'PNG', marginX, 30, 70,70);
+      if(clubLogo) doc.addImage(clubLogo,'PNG', pageWidth-marginX-70, 30, 70,70);
+      doc.setFont('helvetica','bold'); doc.setFontSize(20);
+      doc.text(`${EVENT_NAME} – ENTRY PASS`, pageWidth/2,55,{align:'center'});
+      doc.setFontSize(12); doc.setTextColor(120);
+      doc.text(ORG_NAME, pageWidth/2,75,{align:'center'}); doc.setTextColor(0);
+      y=130; doc.setDrawColor(220); doc.line(marginX, y, pageWidth-marginX,y); y+=30;
+      row('Participant No.', String(r.participant_no||'-'));
+      row('Name', r.name); row('Reg No.', r.regno);
+      row('Year', r.year); row('Department', r.dept);
+      row('Phone', r.phone); row('Email', r.email);
+      row('Transaction ID', r.transaction_id||'-');
+      row('Amount', `₹${r.amount||100}`);
+      row('Event Date', EVENT_DATE);
+      row('Token', r.token);
+      y+=10; doc.setDrawColor(220); doc.line(marginX,y,pageWidth-marginX,y); y+=20;
+      const qrCanvas = await makeQrCanvas(qrPayload,160);
+      const qrData   = qrCanvas ? qrCanvas.toDataURL('image/png') : null;
+      if (qrData) {
+        const qrSize=150; const qrX=(pageWidth-qrSize)/2;
+        doc.addImage(qrData,'PNG',qrX,y,qrSize,qrSize); y+=qrSize+20;
+      }
+      doc.setFontSize(10); doc.setTextColor(120);
+      doc.text('Please bring this token to event check-in.', pageWidth/2, y,{align:'center'});
+      const arrayBuf=doc.output('arraybuffer');
+      return arrayBufferToBase64(arrayBuf);
     }
-    if(user){
-      document.getElementById('openSignin')?.style && (document.getElementById('openSignin').style.display = 'none');
-      if(profileBox) profileBox.style.display = 'block';
-      const initial = (user.displayName?.[0] || user.email?.[0] || 'U').toUpperCase();
-      if (avatarBtn) avatarBtn.textContent = initial;
-      if (profileEmail) profileEmail.textContent = user.email;
-    }else{
-      document.getElementById('openSignin')?.style && (document.getElementById('openSignin').style.display = 'inline-flex');
-      if(profileBox) profileBox.style.display = 'none';
+  
+    function downloadBase64Pdf(base64, filename) {
+      const link=document.createElement('a');
+      link.href=`data:application/pdf;base64,${base64}`;
+      link.download=filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-    gateRegisterButtons();
-    updateRegisterButtons();
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    gateRegisterButtons();
-    updateRegisterButtons();
-  });
-</script>
+  
+    async function toDataURL(url) {
+      try{
+        const res=await fetch(url);
+        const blob=await res.blob();
+        return await new Promise((resolve)=>{
+          const reader=new FileReader();
+          reader.onload=()=>resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      }catch(err){return null;}
+    }
+    function arrayBufferToBase64(buffer) {
+      let binary=''; const bytes=new Uint8Array(buffer);
+      for (let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
+      return window.btoa(binary);
+    }
+    function makeQrCanvas(text,size=128) {
+      return new Promise((resolve)=>{
+        const temp=document.createElement('div');
+        const qr=new QRCode(temp,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});
+        setTimeout(()=>{
+          const img=temp.querySelector('img')||temp.querySelector('canvas');
+          if(img && img.tagName==='IMG'){ const c=document.createElement('canvas');
+            c.width=size; c.height=size; const ctx=c.getContext('2d');
+            const i=new Image(); i.crossOrigin='Anonymous';
+            i.onload=()=>{ctx.drawImage(i,0,0,size,size); resolve(c);};
+            i.src=img.src; } else if(img && img.tagName==='CANVAS') resolve(img);
+          else resolve(null);
+        },300);
+      });
+    }
+  </script>
 </body>
 </html>
