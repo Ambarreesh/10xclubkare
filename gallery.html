@@ -2,185 +2,302 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>10X Family • Gallery</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Gallery | 10X Family</title>
+  <link rel="icon" href="img/image 26.png" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #0a0a0a; /* Ninja dark background */
-      background-image: radial-gradient(circle at top left, rgba(0, 200, 255, 0.08), transparent 70%),
-                        radial-gradient(circle at bottom right, rgba(255, 0, 150, 0.08), transparent 70%);
-      background-attachment: fixed;
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    /* =========================================
+       CORE VARIABLES & RESET (Matches Main Page)
+       ========================================= */
+    :root {
+      --bg-deep: #000000;
+      --glass-surface: rgba(30, 30, 30, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --primary-accent: #0A84FF;
+      --secondary-accent: #BF5AF2;
+      --text-main: #ffffff;
+      --text-muted: #86868b;
+      --radius-lg: 24px;
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      /* Background Mesh */
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.1) 0%, transparent 40%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* =========================================
+       NAVBAR (Floating Pill)
+       ========================================= */
+    .navbar {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      padding: 12px 24px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 15px; font-weight: 600; font-size: 0.95rem; }
+    .nav-left img { height: 30px; border-radius: 50%; }
+    
+    .back-link {
+      color: var(--text-muted);
+      transition: 0.3s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .back-link:hover { color: white; }
+
+    /* =========================================
+       HEADER
+       ========================================= */
     header {
-      padding: 50px 20px 20px;
+      padding: 120px 20px 40px;
       text-align: center;
     }
 
     header h1 {
-      font-size: 3rem;
+      font-size: 3.5rem;
       font-weight: 800;
-      color: #fff;
-      text-shadow: 0 0 10px rgba(0, 200, 255, 0.8),
-                   0 0 20px rgba(0, 200, 255, 0.5);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 0%, #888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
     }
 
     header p {
       font-size: 1.1rem;
-      opacity: 0.8;
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto;
     }
 
+    /* =========================================
+       GALLERY GRID
+       ========================================= */
     .gallery-container {
       width: 100%;
-      max-width: 750px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
     }
 
     .event-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 25px;
-      padding: 20px;
-      backdrop-filter: blur(16px) saturate(150%);
-      -webkit-backdrop-filter: blur(16px) saturate(150%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      text-align: center;
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
     .event-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 40px rgba(0, 200, 255, 0.25);
+      transform: translateY(-8px);
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
 
-    .event-card img {
+    /* Image Styling */
+    .card-images {
+      position: relative;
+      height: 250px;
+      overflow: hidden;
+    }
+
+    .card-images img {
       width: 100%;
-      height: auto;
-      border-radius: 18px;
-      margin-bottom: 15px;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
     }
 
-    .event-card h2 {
-      font-size: 1.6rem;
+    /* Hover Zoom Effect */
+    .event-card:hover .card-images img {
+      transform: scale(1.05);
+    }
+
+    /* Multi-image layout handling (if 2 images present) */
+    .card-images.multi {
+      display: flex;
+    }
+    .card-images.multi img {
+      width: 50%;
+    }
+
+    .card-content {
+      padding: 24px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-content h2 {
+      font-size: 1.5rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .event-card p {
-      font-size: 1rem;
-      opacity: 0.75;
-      margin-bottom: 15px;
+    .card-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .btn {
-      display: inline-block;
-      padding: 10px 22px;
-      background: rgba(0, 200, 255, 0.15);
-      border: 1px solid rgba(0, 200, 255, 0.4);
-      color: #00eaff;
+    /* Modern Button */
+    .btn-glass {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      padding: 12px 0;
+      text-align: center;
+      border-radius: 12px;
       font-weight: 600;
-      text-decoration: none;
-      border-radius: 14px;
+      font-size: 0.9rem;
       transition: 0.3s;
-      font-size: 0.95rem;
+      border: 1px solid var(--glass-border);
+      display: block;
     }
 
-    .btn:hover {
-      background: rgba(0, 200, 255, 0.3);
-      border-color: rgba(0, 200, 255, 0.6);
-      color: #fff;
-      text-shadow: 0 0 8px #00eaff;
+    .btn-glass:hover {
+      background: white;
+      color: black;
     }
 
-    /* 📱 Mobile Responsiveness */
+    /* =========================================
+       RESPONSIVE
+       ========================================= */
     @media (max-width: 768px) {
-      header h1 {
-        font-size: 2.2rem;
-      }
-      header p {
-        font-size: 1rem;
-      }
-      .event-card h2 {
-        font-size: 1.3rem;
-      }
-      .event-card p {
-        font-size: 0.9rem;
-      }
-      .btn {
-        width: 100%;
-        padding: 12px;
-        font-size: 1rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      header {
-        padding: 40px 15px 15px;
-      }
-      header h1 {
-        font-size: 1.8rem;
-      }
-      .gallery-container {
-        padding: 10px;
-        gap: 25px;
-      }
-      .event-card {
-        padding: 15px;
-        border-radius: 18px;
-      }
-      .event-card h2 {
-        font-size: 1.1rem;
-      }
-      .btn {
-        font-size: 0.9rem;
-        padding: 10px;
-      }
+      header h1 { font-size: 2.5rem; }
+      .gallery-container { grid-template-columns: 1fr; padding: 0 20px 60px; }
+      .event-card { min-height: auto; }
     }
   </style>
 </head>
 <body>
 
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="img/image 26.png" alt="Logo">
+      <span>10X Gallery</span>
+    </div>
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </nav>
+
   <header>
-    <h1>10X Family</h1>
-    <p>Our journey through events & memories ⚡</p>
+    <h1>Memories</h1>
+    <p>Capturing the moments that define our journey. ⚡</p>
   </header>
 
   <div class="gallery-container">
+
     <div class="event-card">
-      <img src="img/gp1.jpeg" alt="Hackathon 2025 Group Photo">
-      <h2>TECH TIDE 2025</h2>
-      <p>31 OCT, 2025 • KARE</p>
-      <a href="https://drive.google.com/drive/folders/1fLlQjNPrslTbBnaEJ__owQKudzqBQIQK?usp=share_link" target="_blank" class="btn">View Full Album</a>
+      <div class="card-images">
+        <img src="img/edu.HEIC" alt="Tech Tide 2025">
+      </div>
+      <div class="card-content">
+        <div>
+          <h2>EDUHACK 2026</h2>
+          <p>30 & 31 JAN 2026 • KARE</p>
+        </div>
+        <a href="https://drive.google.com/drive/folders/1NGPZcgimwjeRqS_SWVQFyHUQZbqM1m7k?usp=share_link" target="_blank" class="btn-glass">
+          View Album <i class="fas fa-external-link-alt" style="margin-left:5px; font-size:0.8em;"></i>
+        </a>
+      </div>
     </div>
-    <!-- Event 1 -->
+    
     <div class="event-card">
-      <img src="img/am1.jpg" alt="Hackathon 2025 Group Photo">
-      <img src="img/am2.jpg" alt="Hackathon 2025 Group Photo">
-      <h2>API MAZE 2025</h2>
-      <p>AUG 2, 2025 • KARE</p>
-      <a href="https://drive.google.com/drive/folders/1fLlQjNPrslTbBnaEJ__owQKudzqBQIQK?usp=share_link" target="_blank" class="btn">View Full Album</a>
+      <div class="card-images">
+        <img src="img/gp1.HEIF" alt="Tech Tide 2025">
+      </div>
+      <div class="card-content">
+        <div>
+          <h2>TECH TIDE 2025</h2>
+          <p>31 OCT 2025 • KARE</p>
+        </div>
+        <a href="https://drive.google.com/drive/folders/1fLlQjNPrslTbBnaEJ__owQKudzqBQIQK?usp=share_link" target="_blank" class="btn-glass">
+          View Album <i class="fas fa-external-link-alt" style="margin-left:5px; font-size:0.8em;"></i>
+        </a>
+      </div>
     </div>
 
-    <!-- Event 2 -->
     <div class="event-card">
-      <img src="img/jj.jpg" alt="Workshop Group Photo">
-      <h2>JOURNEY TO JOB SUCCESS</h2>
-      <p>AUG 9, 2025 • KARE</p>
-      <a href="https://drive.google.com/drive/folders/1-0b1vmssRTA5WNcrHNsvgjWeVDWyW-5S?usp=sharing" target="_blank" class="btn">View Full Album</a>
+      <div class="card-images multi">
+        <img src="img/am1.HEIF" alt="API Maze 1">
+        <img src="img/am2.HEIF" alt="API Maze 2">
+      </div>
+      <div class="card-content">
+        <div>
+          <h2>API MAZE 2025</h2>
+          <p>AUG 2, 2025 • KARE</p>
+        </div>
+        <a href="https://drive.google.com/drive/folders/1fLlQjNPrslTbBnaEJ__owQKudzqBQIQK?usp=share_link" target="_blank" class="btn-glass">
+          View Album <i class="fas fa-external-link-alt" style="margin-left:5px; font-size:0.8em;"></i>
+        </a>
+      </div>
     </div>
+
+    <div class="event-card">
+      <div class="card-images">
+        <img src="img/jj.HEIF" alt="Journey to Job Success">
+      </div>
+      <div class="card-content">
+        <div>
+          <h2>JOB SUCCESS</h2>
+          <p>AUG 9, 2025 • KARE</p>
+        </div>
+        <a href="https://drive.google.com/drive/folders/1-0b1vmssRTA5WNcrHNsvgjWeVDWyW-5S?usp=sharing" target="_blank" class="btn-glass">
+          View Album <i class="fas fa-external-link-alt" style="margin-left:5px; font-size:0.8em;"></i>
+        </a>
+      </div>
+    </div>
+
   </div>
+
+  <footer style="text-align:center; padding-bottom:40px; color:#555; font-size:0.85rem;">
+    &copy; 2025 10X Club KARE. All Rights Reserved.
+  </footer>
 
 </body>
 </html>
