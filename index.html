@@ -48,6 +48,7 @@
         radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.1) 0%, transparent 40%);
       background-attachment: fixed;
+      padding-bottom: 80px; /* Space for mobile nav */
     }
 
     /* Scrollbar Styling */
@@ -189,6 +190,43 @@
     .profile-menu button:hover { background: rgba(255,255,255,0.1); }
 
     /* =========================================
+       MOBILE NAVIGATION (NEW)
+       ========================================= */
+    .mobile-nav {
+      display: none; /* Hidden on Desktop */
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      padding: 12px 30px;
+      border-radius: 100px;
+      z-index: 1100;
+      gap: 30px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mobile-nav a {
+      color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      gap: 4px;
+      transition: 0.3s;
+    }
+
+    .mobile-nav a i {
+      font-size: 1.2rem;
+    }
+
+    .mobile-nav a:hover, .mobile-nav a.active {
+      color: var(--primary-accent);
+      transform: translateY(-2px);
+    }
+
+    /* =========================================
        HERO SECTION
        ========================================= */
     .hero {
@@ -327,7 +365,6 @@
       width: 250px; 
       height: 250px;
       margin: 0 auto 20px auto;
-      /* SQUARE with rounded corners */
       border-radius: 24px; 
       overflow: hidden;
       border: 3px solid rgba(255,255,255,0.1);
@@ -458,16 +495,30 @@
     .popup-icons { display: flex; gap: 20px; justify-content: center; margin: 20px 0; }
 
     /* =========================================
-       RESPONSIVE
+       RESPONSIVE & MOBILE
        ========================================= */
     @media (max-width: 768px) {
       .navbar { width: 95%; top: 10px; padding: 10px 15px; }
       .nav-links, .hide-mobile { display: none; }
+      
+      /* Mobile Navigation Bar */
+      .mobile-nav { display: flex; }
+      
       .hero h1 { font-size: 2.5rem; }
       .events-container { padding-left: 20px; padding-right: 20px; }
       .event-card { min-width: 85vw; height: 400px; }
-      /* Adjust square size for mobile if needed, but 180px usually fits fine */
       .img-wrapper { width: 160px; height: 160px; } 
+
+      /* Force Center Alignment for Team Grid on Mobile */
+      .team-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .profile-card {
+        width: 100%;
+        max-width: 320px; /* Nice width for mobile cards */
+      }
     }
   </style>
 </head>
@@ -501,6 +552,17 @@
       </div>
     </div>
   </nav>
+
+  <div class="mobile-nav glass-panel">
+    <a href="#home">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </a>
+    <a href="gallery.html">
+      <i class="fas fa-images"></i>
+      <span>Gallery</span>
+    </a>
+  </div>
 
   <header class="hero" id="home">
     <div class="hero-content">
