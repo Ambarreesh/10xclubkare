@@ -30,6 +30,8 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
     
+    html { scroll-behavior: smooth; }
+
     body {
       background-color: var(--bg-deep);
       color: var(--text-main);
@@ -114,8 +116,10 @@
     }
     .nav-left { display: flex; align-items: center; gap: 15px; font-weight: 600; }
     .nav-left img { height: 35px; border-radius: 50%; }
-    .nav-links { display: flex; gap: 20px; font-size: 0.9rem; }
-    .nav-links a:hover { color: var(--primary-accent); }
+    
+    .nav-links { display: flex; gap: 30px; font-size: 0.95rem; list-style: none; }
+    .nav-links a { opacity: 0.7; transition: 0.3s; }
+    .nav-links a:hover { opacity: 1; color: var(--primary-accent); }
 
     /* Mobile Bottom Nav */
     .mobile-nav {
@@ -276,21 +280,15 @@
   <nav class="navbar glass-panel">
     <div class="nav-left">
       <img src="img/image 26.png" alt="Logo">
-      <span>Hiring</span>
+      <span>10X Hiring</span>
     </div>
-    <div class="nav-left">
-     <a href="#home"> <span>Home</span></a>
-    </div>
-    <div class="nav-left">
-     <a href="#open positions"> <span>Open Positions</span></a>
-    </div>
-    <div class="nav-left">
-     <a href="#Application form"> <span>Register</span></a>
-    </div>
-    
-    
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#positions">Open Positions</a></li>
+      <li><a href="#apply">Register</a></li>
+    </ul>
     <div class="nav-right">
-        <a href="index.html" class="btn-ios" style="font-size:0.85rem; padding:8px 16px;">Back</a>
+      <a href="index.html" class="btn-ios" style="font-size:0.85rem; padding:8px 16px;">Back</a>
     </div>
   </nav>
 
@@ -299,11 +297,14 @@
       <i class="fas fa-home"></i>
       <span>Home</span>
     </a>
-    <a href="#" class="active">
+    <a href="#positions">
+      <i class="fas fa-list"></i>
+      <span>Roles</span>
+    </a>
+    <a href="#apply" class="active">
       <i class="fas fa-user-plus"></i>
       <span>Apply</span>
     </a>
-    
   </div>
 
   <div class="container">
